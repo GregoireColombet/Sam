@@ -1,0 +1,18 @@
+---
+import type { PlatformLink } from "@/lib/types";
+
+type Props = {
+  links: PlatformLink[];
+};
+
+const { links } = Astro.props;
+---
+
+<div class="external-grid">
+  {links.map((link) => (
+    <a class="platform-link" href={link.url} target="_blank" rel="noopener noreferrer">
+      <img src={link.logo.url} alt={link.logo.alt || link.name} loading="lazy" />
+      <strong>{link.name}</strong>
+    </a>
+  ))}
+</div>

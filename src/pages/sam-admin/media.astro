@@ -1,0 +1,25 @@
+---
+import AdminLayout from "@/layouts/AdminLayout.astro";
+
+export const prerender = false;
+---
+
+<AdminLayout title="Media">
+  <h1>Media Library</h1>
+  <p class="admin-muted">Central R2 media library. Upload/select controls will reuse this source.</p>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>File</th>
+        <th>Type</th>
+        <th>Usage</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="4" class="admin-muted">No media loaded yet.</td>
+      </tr>
+    </tbody>
+  </table>
+</AdminLayout>

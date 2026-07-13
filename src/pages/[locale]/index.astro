@@ -1,0 +1,37 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SiteNav from "@/components/SiteNav.astro";
+import Hero from "@/components/Hero.astro";
+import NewsBlock from "@/components/NewsBlock.astro";
+import TourSection from "@/components/TourSection.astro";
+import AlbumMosaic from "@/components/AlbumMosaic.astro";
+import VideoCarousel from "@/components/VideoCarousel.astro";
+import Footer from "@/components/Footer.astro";
+import { getLandingContent, getMerchUrl } from "@/lib/db";
+import { isLocale, labels, type Locale } from "@/lib/i18n";
+
+export const prerender = false;
+
+const requestedLocale = Astro.params.locale;
+if (!isLocale(requestedLocale)) {
+  return Astro.redirect("/zh-TW");
+}
+
+const locale: Locale = requestedLocale;
+const env = Astro.locals.runtime?.env;
+const content = await getLandingContent(env);
+const merchUrl = await getMerchUrl(env, locale);
+const t = labels[locale];
+---
+
+<BaseLayout locale={locale} title={`Sam Lee | ${t.home}`}>
+  <SiteNav locale={locale} merchUrl={merchUrl} />
+  <main>
+    <Hero />
+    {content.news && <NewsBlock locale={locale} news={content.news} />}
+    <TourSection locale={locale} tours={content.tours} />
+    <AlbumMosaic locale={locale} albums={content.albums} />
+    <VideoCarousel locale={locale} videos={content.videos} />
+  </main>
+  <Footer socialLinks={content.socialLinks} />
+</BaseLayout>

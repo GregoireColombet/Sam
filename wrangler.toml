@@ -1,0 +1,17 @@
+name = "sam-lee-site"
+compatibility_date = "2026-07-01"
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sam-production"
+database_id = "replace-with-cloudflare-d1-id"
+
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "sam-media-production"
+
+[vars]
+PUBLIC_MEDIA_BASE_URL = "/media"
+INITIAL_ADMIN_EMAIL = ""
+ADMIN_PATH = "/sam-admin"

@@ -1,0 +1,72 @@
+---
+import { labels, localePath, type Locale } from "@/lib/i18n";
+import type { AlbumCover } from "@/lib/types";
+
+type Props = {
+  locale: Locale;
+  albums: AlbumCover[];
+};
+
+const { locale, albums } = Astro.props;
+const t = labels[locale];
+---
+
+<section class="section albums">
+  <div class="container">
+    <h2 class="section-title">{t.music}</h2>
+    {albums.length === 0 ? (
+      <div class="empty-state">{t.albumComingSoon}</div>
+    ) : (
+      <a class="mosaic" href={localePath(locale, "/music")} aria-label={t.music}>
+        {albums.map((album) => (
+          <img src={album.image.url} alt={album.image.alt || album.title} loading="lazy" />
+        ))}
+      </a>
+    )}
+  </div>
+</section>
+
+<style>
+  .albums {
+    background: #080808;
+  }
+
+  .mosaic {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 10px;
+  }
+
+  .mosaic img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    grid-column: span 3;
+    filter: saturate(0.92);
+    transition:
+      transform 220ms ease,
+      filter 220ms ease;
+  }
+
+  .mosaic img:nth-child(5n + 1),
+  .mosaic img:nth-child(5n + 4) {
+    grid-column: span 4;
+  }
+
+  .mosaic img:hover {
+    transform: scale(1.035);
+    filter: saturate(1.2) contrast(1.05);
+  }
+
+  @media (max-width: 760px) {
+    .mosaic {
+      grid-template-columns: repeat(6, 1fr);
+    }
+
+    .mosaic img,
+    .mosaic img:nth-child(5n + 1),
+    .mosaic img:nth-child(5n + 4) {
+      grid-column: span 3;
+    }
+  }
+</style>

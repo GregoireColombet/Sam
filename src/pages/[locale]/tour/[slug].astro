@@ -1,0 +1,88 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SiteNav from "@/components/SiteNav.astro";
+import Footer from "@/components/Footer.astro";
+import PlatformLinks from "@/components/PlatformLinks.astro";
+import { getLandingContent, getMerchUrl, getTourBySlug } from "@/lib/db";
+import { isLocale, labels, localePath, type Locale } from "@/lib/i18n";
+
+export const prerender = false;
+
+const requestedLocale = Astro.params.locale;
+if (!isLocale(requestedLocale)) {
+  return Astro.redirect("/zh-TW");
+}
+
+const locale: Locale = requestedLocale;
+const slug = Astro.params.slug || "";
+const env = Astro.locals.runtime?.env;
+const [tourData, landing, merchUrl] = await Promise.all([
+  getTourBySlug(env, slug),
+  getLandingContent(env),
+  getMerchUrl(env, locale)
+]);
+const t = labels[locale];
+
+function localized(value: { en: string; zhTW: string; zhCN: string }) {
+  return locale === "en" ? value.en : locale === "zh-CN" ? value.zhCN : value.zhTW;
+}
+---
+
+<BaseLayout locale={locale} title={`Sam Lee | ${t.tour}`}>
+  <SiteNav locale={locale} merchUrl={merchUrl} />
+  <main class="page-main">
+    <section class="section">
+      <div class="container">
+        {tourData ? (
+          <>
+            <a class="back-link" href={`${localePath(locale)}#tour`}>{t.backHome}</a>
+            <h1 class="section-title">{localized(tourData.tour.location)}</h1>
+            <p class="tour-meta">{tourData.tour.localDate} · {tourData.tour.localTime} · {tourData.tour.timezone}</p>
+            <p class="tour-description">{localized(tourData.tour.description)}</p>
+            <h2>{t.ticketLinks}</h2>
+            {tourData.links.length > 0 ? <PlatformLinks links={tourData.links} /> : <div class="empty-state">{t.comingSoon}</div>}
+          </>
+        ) : (
+          <>
+            <h1 class="section-title">{t.tour}</h1>
+            <div class="empty-state">{t.tourComingSoon}</div>
+          </>
+        )}
+      </div>
+    </section>
+  </main>
+  <Footer socialLinks={landing.socialLinks} />
+</BaseLayout>
+
+<style>
+  .page-main {
+    padding-top: 96px;
+    min-height: 74vh;
+    background:
+      linear-gradient(180deg, rgba(207, 169, 104, 0.1), transparent 280px),
+      var(--bg);
+  }
+
+  .back-link {
+    display: inline-flex;
+    margin-bottom: 24px;
+    color: var(--text-muted);
+    font-weight: 800;
+  }
+
+  .tour-meta {
+    color: var(--gold);
+    font-size: 1.1rem;
+    font-weight: 800;
+  }
+
+  .tour-description {
+    max-width: 720px;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+
+  h2 {
+    margin: 42px 0 18px;
+  }
+</style>

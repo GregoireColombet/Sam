@@ -1,0 +1,20 @@
+---
+import AdminLayout from "@/layouts/AdminLayout.astro";
+
+export const prerender = false;
+---
+
+<AdminLayout title="Content">
+  <h1>Content</h1>
+  <p class="admin-muted">First implementation sections. Forms will connect to the admin API endpoints as each editor is built out.</p>
+
+  <section class="admin-grid">
+    <div class="admin-card"><h2>News Block</h2><p>One active news block, optional background, optional Taiwan-time countdown.</p></div>
+    <div class="admin-card"><h2>Tour Dates</h2><p>Local timezone per event, automatic English-based slug, ticket links per tour date.</p></div>
+    <div class="admin-card"><h2>Album Mosaic</h2><p>Editable album covers with shared alt/title and display order.</p></div>
+    <div class="admin-card"><h2>Videos</h2><p>Multiple providers with Simplified Chinese override support.</p></div>
+    <div class="admin-card"><h2>Music Platforms</h2><p>Shared platform links with custom logos.</p></div>
+    <div class="admin-card"><h2>Merch</h2><p>Language-specific external shop URLs with coming-soon fallback.</p></div>
+    <div class="admin-card"><h2>Social Links</h2><p>Shared social URLs with uploaded custom images.</p></div>
+  </section>
+</AdminLayout>

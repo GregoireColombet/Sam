@@ -1,0 +1,47 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SiteNav from "@/components/SiteNav.astro";
+import Footer from "@/components/Footer.astro";
+import PlatformLinks from "@/components/PlatformLinks.astro";
+import { getLandingContent, getMerchUrl, getMusicLinks } from "@/lib/db";
+import { isLocale, labels, type Locale } from "@/lib/i18n";
+
+export const prerender = false;
+
+const requestedLocale = Astro.params.locale;
+if (!isLocale(requestedLocale)) {
+  return Astro.redirect("/zh-TW/music");
+}
+
+const locale: Locale = requestedLocale;
+const env = Astro.locals.runtime?.env;
+const [links, landing, merchUrl] = await Promise.all([
+  getMusicLinks(env),
+  getLandingContent(env),
+  getMerchUrl(env, locale)
+]);
+const t = labels[locale];
+---
+
+<BaseLayout locale={locale} title={`Sam Lee | ${t.music}`}>
+  <SiteNav locale={locale} merchUrl={merchUrl} />
+  <main class="page-main">
+    <section class="section">
+      <div class="container">
+        <h1 class="section-title">{t.music}</h1>
+        {links.length > 0 ? <PlatformLinks links={links} /> : <div class="empty-state">{t.musicComingSoon}</div>}
+      </div>
+    </section>
+  </main>
+  <Footer socialLinks={landing.socialLinks} />
+</BaseLayout>
+
+<style>
+  .page-main {
+    padding-top: 96px;
+    min-height: 74vh;
+    background:
+      linear-gradient(180deg, rgba(111, 179, 156, 0.08), transparent 280px),
+      var(--bg);
+  }
+</style>

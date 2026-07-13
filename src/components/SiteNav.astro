@@ -1,0 +1,167 @@
+---
+import { labels, localePath, locales, type Locale } from "@/lib/i18n";
+
+type Props = {
+  locale: Locale;
+  merchUrl?: string | null;
+};
+
+const { locale, merchUrl = null } = Astro.props;
+const t = labels[locale];
+const currentPath = Astro.url.pathname.replace(/^\/(en|zh-TW|zh-CN)/, "") || "/";
+const merchHref = merchUrl || localePath(locale, "/merch");
+const merchExternal = Boolean(merchUrl);
+---
+
+<header class="site-nav" data-site-nav>
+  <a class="brand" href={localePath(locale)} aria-label="Sam Lee home">Sam Lee</a>
+  <nav class="desktop-nav" aria-label="Primary navigation">
+    <a href={localePath(locale)}>{t.home}</a>
+    <a href={localePath(locale, "/music")}>{t.music}</a>
+    <a href={`${localePath(locale)}#tour`} data-scroll-tour>{t.tour}</a>
+    <a href={merchHref} target={merchExternal ? "_blank" : undefined} rel={merchExternal ? "noopener noreferrer" : undefined}>
+      {t.merch}
+    </a>
+  </nav>
+  <div class="nav-actions">
+    <div class="language-switcher" aria-label="Language selector">
+      {locales.map((item) => (
+        <a class:list={[{ active: item === locale }]} href={`/${item}${currentPath === "/" ? "" : currentPath}`}>
+          {item === "en" ? "EN" : item === "zh-TW" ? "繁" : "简"}
+        </a>
+      ))}
+    </div>
+    <button class="menu-button" type="button" aria-label="Open menu" aria-expanded="false" data-menu-button>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+  <nav class="mobile-menu" data-mobile-menu aria-label="Mobile navigation">
+    <a href={localePath(locale)}>{t.home}</a>
+    <a href={localePath(locale, "/music")}>{t.music}</a>
+    <a href={`${localePath(locale)}#tour`} data-scroll-tour>{t.tour}</a>
+    <a href={merchHref} target={merchExternal ? "_blank" : undefined} rel={merchExternal ? "noopener noreferrer" : undefined}>
+      {t.merch}
+    </a>
+  </nav>
+</header>
+
+<style>
+  .site-nav {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 24px;
+    min-height: 72px;
+    padding: 14px clamp(16px, 4vw, 48px);
+    color: #fff;
+    transition:
+      background 180ms ease,
+      border-color 180ms ease;
+    border-bottom: 1px solid transparent;
+    text-shadow: 0 1px 16px rgba(0, 0, 0, 0.65);
+  }
+
+  .site-nav.is-scrolled {
+    background: rgba(8, 8, 8, 0.88);
+    border-color: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(16px);
+  }
+
+  .brand {
+    font-size: 1.15rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .desktop-nav {
+    display: flex;
+    justify-content: center;
+    gap: clamp(18px, 3vw, 34px);
+    font-weight: 700;
+  }
+
+  .desktop-nav a,
+  .mobile-menu a {
+    color: #fff;
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .language-switcher {
+    display: flex;
+    gap: 6px;
+  }
+
+  .language-switcher a {
+    display: grid;
+    place-items: center;
+    min-width: 34px;
+    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+
+  .language-switcher a.active {
+    background: #fff;
+    color: #080808;
+    text-shadow: none;
+  }
+
+  .menu-button {
+    display: none;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    background: rgba(0, 0, 0, 0.16);
+    color: #fff;
+  }
+
+  .menu-button span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    margin: 5px auto;
+    background: currentColor;
+  }
+
+  .mobile-menu {
+    display: none;
+  }
+
+  @media (max-width: 760px) {
+    .site-nav {
+      grid-template-columns: 1fr auto;
+    }
+
+    .desktop-nav {
+      display: none;
+    }
+
+    .menu-button {
+      display: block;
+    }
+
+    .mobile-menu {
+      grid-column: 1 / -1;
+      display: none;
+      padding: 16px 0 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      gap: 16px;
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .mobile-menu.is-open {
+      display: grid;
+    }
+  }
+</style>

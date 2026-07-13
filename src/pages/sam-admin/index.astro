@@ -1,0 +1,31 @@
+---
+import AdminLayout from "@/layouts/AdminLayout.astro";
+
+export const prerender = false;
+---
+
+<AdminLayout title="Dashboard">
+  <h1>Dashboard</h1>
+  <p class="admin-muted">
+    This area is designed to sit behind Cloudflare Access at <strong>/sam-admin/*</strong>.
+  </p>
+
+  <section class="admin-grid">
+    <a class="admin-card" href="/sam-admin/content">
+      <h2>Content</h2>
+      <p>Manage news, tour dates, album covers, videos, platform links, and merch URL settings.</p>
+    </a>
+    <a class="admin-card" href="/sam-admin/media">
+      <h2>Media Library</h2>
+      <p>Upload PNG, JPG, JPEG, and WebP images to R2 and reuse them across the site.</p>
+    </a>
+    <a class="admin-card" href="/sam-admin/users">
+      <h2>Admin Users</h2>
+      <p>Owners manage allowed Google email addresses and owner/editor roles.</p>
+    </a>
+    <a class="admin-card" href="/sam-admin/activity">
+      <h2>Activity Log</h2>
+      <p>Review content, user, and media changes made by admins.</p>
+    </a>
+  </section>
+</AdminLayout>

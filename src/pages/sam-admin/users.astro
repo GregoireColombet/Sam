@@ -1,0 +1,24 @@
+---
+import AdminLayout from "@/layouts/AdminLayout.astro";
+
+export const prerender = false;
+---
+
+<AdminLayout title="Users">
+  <h1>Admin Users</h1>
+  <p class="admin-muted">Allowed Google email addresses are stored in D1. The first owner comes from INITIAL_ADMIN_EMAIL.</p>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="3" class="admin-muted">Connect the API to load admin users.</td>
+      </tr>
+    </tbody>
+  </table>
+</AdminLayout>

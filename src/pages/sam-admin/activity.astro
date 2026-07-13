@@ -1,0 +1,25 @@
+---
+import AdminLayout from "@/layouts/AdminLayout.astro";
+
+export const prerender = false;
+---
+
+<AdminLayout title="Activity">
+  <h1>Activity Log</h1>
+  <p class="admin-muted">Owner-only audit trail for admin actions.</p>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Admin</th>
+        <th>Action</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="4" class="admin-muted">No activity loaded yet.</td>
+      </tr>
+    </tbody>
+  </table>
+</AdminLayout>

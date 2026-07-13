@@ -1,0 +1,79 @@
+---
+import { labels, type Locale } from "@/lib/i18n";
+import type { VideoLink } from "@/lib/types";
+
+type Props = {
+  locale: Locale;
+  videos: VideoLink[];
+};
+
+const { locale, videos } = Astro.props;
+const t = labels[locale];
+
+function videoUrl(video: VideoLink) {
+  if (locale === "en") return video.urlEn;
+  if (locale === "zh-CN") return video.urlZhCn;
+  return video.urlZhTw;
+}
+---
+
+<section class="section videos">
+  <div class="container">
+    <h2 class="section-title">Video</h2>
+    {videos.length === 0 ? (
+      <div class="empty-state">{t.videoComingSoon}</div>
+    ) : (
+      <div class="video-strip">
+        {videos.map((video) => (
+          <a class="video-card" href={videoUrl(video)} target="_blank" rel="noopener noreferrer">
+            {video.thumbnail ? <img src={video.thumbnail.url} alt={video.thumbnail.alt || video.title} loading="lazy" /> : <span>{video.title}</span>}
+            <strong>{video.title}</strong>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .videos {
+    background: #101010;
+  }
+
+  .video-strip {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(260px, 38%);
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .video-card {
+    scroll-snap-align: start;
+    display: grid;
+    gap: 12px;
+  }
+
+  .video-card img,
+  .video-card span {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    background: #191919;
+  }
+
+  .video-card strong {
+    font-size: 1.05rem;
+  }
+
+  @media (max-width: 760px) {
+    .video-strip {
+      grid-auto-columns: minmax(240px, 84%);
+    }
+  }
+</style>

@@ -1,0 +1,58 @@
+---
+---
+
+<section class="hero" aria-label="Sam Lee">
+  <video class="hero-video" autoplay muted loop playsinline poster="/hero-poster.jpg">
+    <source src="/hero-video.mp4" type="video/mp4" />
+  </video>
+  <div class="hero-shade"></div>
+  <div class="hero-content">
+    <h1>Sam Lee</h1>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: #080808;
+  }
+
+  .hero-video,
+  .hero-shade {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-video {
+    object-fit: cover;
+  }
+
+  .hero-shade {
+    background:
+      linear-gradient(180deg, rgba(0, 0, 0, 0.52), rgba(0, 0, 0, 0.16) 44%, #080808 100%),
+      radial-gradient(circle at 50% 44%, rgba(207, 169, 104, 0.14), transparent 42%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 96px 24px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(4rem, 15vw, 12rem);
+    line-height: 0.86;
+    font-weight: 950;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    text-shadow: 0 8px 40px rgba(0, 0, 0, 0.55);
+  }
+</style>

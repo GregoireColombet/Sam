@@ -1,0 +1,24 @@
+{
+  "name": "sam-lee-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro check && ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "preview": "wrangler pages dev ./dist",
+    "astro": "ASTRO_TELEMETRY_DISABLED=1 astro",
+    "db:migrate:local": "wrangler d1 migrations apply sam-production --local",
+    "db:migrate:remote": "wrangler d1 migrations apply sam-production --remote"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^12.6.0",
+    "astro": "^5.12.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@cloudflare/workers-types": "^5.20260708.1",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.24.0"
+  }
+}

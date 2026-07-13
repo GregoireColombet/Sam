@@ -1,0 +1,118 @@
+---
+import type { Locale } from "@/lib/i18n";
+import { labels } from "@/lib/i18n";
+import type { NewsBlock } from "@/lib/types";
+
+type Props = {
+  locale: Locale;
+  news: NewsBlock;
+};
+
+const { locale, news } = Astro.props;
+const title = locale === "en" ? news.title.en : locale === "zh-CN" ? news.title.zhCN : news.title.zhTW;
+const body = locale === "en" ? news.body.en : locale === "zh-CN" ? news.body.zhCN : news.body.zhTW;
+const t = labels[locale];
+---
+
+<section class="news section" style={news.background ? `--news-bg: url('${news.background.url}')` : undefined}>
+  <div class="container news-card">
+    <div>
+      <p class="eyebrow">News</p>
+      <h2>{title}</h2>
+      <p>{body}</p>
+    </div>
+    {news.countdownAtUtc && (
+      <div class="countdown" data-countdown={news.countdownAtUtc}>
+        <span><strong data-days>0</strong>{t.days}</span>
+        <span><strong data-hours>0</strong>{t.hours}</span>
+        <span><strong data-minutes>0</strong>{t.minutes}</span>
+      </div>
+    )}
+  </div>
+</section>
+
+<script>
+  const countdown = document.querySelector("[data-countdown]");
+  if (countdown) {
+    const target = new Date(countdown.getAttribute("data-countdown") || "").getTime();
+    const update = () => {
+      const diff = Math.max(0, target - Date.now());
+      const totalMinutes = Math.floor(diff / 60000);
+      const days = Math.floor(totalMinutes / 1440);
+      const hours = Math.floor((totalMinutes % 1440) / 60);
+      const minutes = totalMinutes % 60;
+      countdown.querySelector("[data-days]")!.textContent = String(days);
+      countdown.querySelector("[data-hours]")!.textContent = String(hours);
+      countdown.querySelector("[data-minutes]")!.textContent = String(minutes);
+    };
+    update();
+    window.setInterval(update, 30000);
+  }
+</script>
+
+<style>
+  .news {
+    background:
+      linear-gradient(90deg, rgba(8, 8, 8, 0.88), rgba(8, 8, 8, 0.44)),
+      var(--news-bg, linear-gradient(135deg, #181818, #0b0b0b));
+    background-size: cover;
+    background-position: center;
+  }
+
+  .news-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 28px;
+    align-items: end;
+    min-height: 360px;
+  }
+
+  .eyebrow {
+    margin: 0 0 12px;
+    color: var(--gold);
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    max-width: 780px;
+    margin: 0;
+    font-size: clamp(2.2rem, 6vw, 6rem);
+    line-height: 0.92;
+    letter-spacing: 0;
+  }
+
+  p {
+    max-width: 680px;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+
+  .countdown {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(84px, 1fr));
+    gap: 10px;
+  }
+
+  .countdown span {
+    min-width: 86px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    background: rgba(0, 0, 0, 0.38);
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  .countdown strong {
+    display: block;
+    color: var(--text);
+    font-size: 2rem;
+  }
+
+  @media (max-width: 760px) {
+    .news-card {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

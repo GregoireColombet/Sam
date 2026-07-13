@@ -1,0 +1,122 @@
+---
+import { labels, localePath, type Locale } from "@/lib/i18n";
+import type { TourDate } from "@/lib/types";
+
+type Props = {
+  locale: Locale;
+  tours: TourDate[];
+};
+
+const { locale, tours } = Astro.props;
+const t = labels[locale];
+const now = Date.now();
+
+function localized(value: TourDate["location"]) {
+  return locale === "en" ? value.en : locale === "zh-CN" ? value.zhCN : value.zhTW;
+}
+---
+
+<section class="section tour-section" id="tour">
+  <div class="container">
+    <h2 class="section-title">{t.tour}</h2>
+    {tours.length === 0 ? (
+      <div class="empty-state">{t.tourComingSoon}</div>
+    ) : (
+      <div class="tour-list">
+        {tours.map((tour) => {
+          const isPast = new Date(tour.dateUtc).getTime() < now;
+          return (
+            <article class:list={["tour-item", { "is-past": isPast }]}>
+              <time datetime={tour.dateUtc}>
+                <span>{tour.localDate}</span>
+                <strong>{tour.localTime}</strong>
+              </time>
+              <div>
+                <h3>{localized(tour.location)}</h3>
+                <p>{locale === "en" ? tour.description.en : locale === "zh-CN" ? tour.description.zhCN : tour.description.zhTW}</p>
+              </div>
+              <div class="tour-action">
+                {isPast ? (
+                  <span class="status">{t.passed}</span>
+                ) : tour.ticketLinkCount > 0 ? (
+                  <a class="button" href={localePath(locale, `/tour/${tour.slug}`)}>{t.purchase}</a>
+                ) : (
+                  <span class="status">{t.comingSoon}</span>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .tour-section {
+    background: #0e0e0e;
+  }
+
+  .tour-list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .tour-item {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr) auto;
+    gap: 24px;
+    align-items: center;
+    padding: 22px;
+    border: 1px solid var(--line);
+    background: #141414;
+  }
+
+  .tour-item.is-past {
+    filter: grayscale(1);
+    opacity: 0.58;
+    background: #181818;
+  }
+
+  time {
+    display: grid;
+    gap: 6px;
+    color: var(--text-muted);
+  }
+
+  time strong {
+    color: var(--text);
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: clamp(1.35rem, 3vw, 2.2rem);
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--line);
+    color: var(--text-muted);
+    font-weight: 800;
+  }
+
+  @media (max-width: 760px) {
+    .tour-item {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .tour-action {
+      justify-self: start;
+    }
+  }
+</style>

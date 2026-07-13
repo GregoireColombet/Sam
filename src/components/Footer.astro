@@ -1,0 +1,71 @@
+---
+import type { PlatformLink } from "@/lib/types";
+
+type Props = {
+  socialLinks: PlatformLink[];
+};
+
+const { socialLinks } = Astro.props;
+---
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">Sam Lee</div>
+    {socialLinks.length > 0 && (
+      <div class="socials" aria-label="Social links">
+        {socialLinks.map((link) => (
+          <a href={link.url} target="_blank" rel="noopener noreferrer" aria-label={link.name}>
+            <img src={link.logo.url} alt={link.logo.alt || link.name} loading="lazy" />
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding: 36px 0;
+    border-top: 1px solid var(--line);
+    background: #050505;
+  }
+
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .footer-brand {
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 14px;
+  }
+
+  .socials a {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+  }
+
+  .socials img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+  }
+
+  @media (max-width: 640px) {
+    .footer-inner {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>
