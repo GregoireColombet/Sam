@@ -7,6 +7,9 @@ import type {
 
 function mediaUrl(env: RuntimeEnv | undefined, key: string | null) {
   if (!key) return "";
+  if (key.startsWith("assets/") || key.startsWith("/assets/") || key.startsWith("http://") || key.startsWith("https://")) {
+    return key.startsWith("/") ? key : `/${key}`;
+  }
   const base = env?.PUBLIC_MEDIA_BASE_URL || "/media";
   return `${base.replace(/\/$/, "")}/${key.replace(/^\//, "")}`;
 }

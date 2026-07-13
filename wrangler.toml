@@ -1,6 +1,9 @@
-name = "sam-lee-site"
+name = "sam"
 compatibility_date = "2026-07-01"
-pages_build_output_dir = "./dist"
+main = "./dist/_worker.js"
+
+[assets]
+directory = "./dist"
 
 [[d1_databases]]
 binding = "DB"
