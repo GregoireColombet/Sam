@@ -4,7 +4,7 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ params, locals }) => {
   const key = params.key;
-  const bucket = locals.runtime?.env.MEDIA_BUCKET;
+  const bucket = locals.runtime?.env.MEDI_BUCKET || locals.runtime?.env.MEDIA_BUCKET;
 
   if (!key || !bucket) {
     return new Response("Media not found", { status: 404 });

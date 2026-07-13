@@ -12,7 +12,7 @@ database_name = "sam-production"
 database_id = "570120ea-e17f-453a-b71e-76425e3362a8"
 
 [[r2_buckets]]
-binding = "MEDIA_BUCKET"
+binding = "MEDI_BUCKET"
 bucket_name = "sam-media-production"
 
 [vars]

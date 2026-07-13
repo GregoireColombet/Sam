@@ -26,7 +26,7 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
   }
 
   const db = env?.DB;
-  const bucket = env?.MEDIA_BUCKET;
+  const bucket = env?.MEDI_BUCKET || env?.MEDIA_BUCKET;
   if (!db) {
     return json({ error: "Database not configured" }, { status: 503 });
   }
