@@ -1,24 +1,345 @@
 ---
 import AdminLayout from "@/layouts/AdminLayout.astro";
+import { getAdminContext } from "@/lib/admin";
 
 export const prerender = false;
+
+const env = Astro.locals.runtime?.env;
+const db = env?.DB;
+
+// Restrict to owner only
+const admin = await getAdminContext(env, Astro.request);
+if (!admin || admin.role !== "owner") {
+  return Astro.redirect("/sam-admin");
+}
+
+let users: any[] = [];
+let error = "";
+
+if (db) {
+  try {
+    const result = await db.prepare(
+      `select id, email, role, is_active, created_at from admin_users order by email asc`
+    ).all();
+    users = result.results || [];
+  } catch (e: any) {
+    error = e.message;
+  }
+} else {
+  error = "Database is not available.";
+}
 ---
 
-<AdminLayout title="Users">
-  <h1>Admin Users</h1>
-  <p class="admin-muted">Allowed Google email addresses are stored in D1. The first owner comes from INITIAL_ADMIN_EMAIL.</p>
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Email</th>
-        <th>Role</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td colspan="3" class="admin-muted">Connect the API to load admin users.</td>
-      </tr>
-    </tbody>
-  </table>
+<AdminLayout title="Admin Users">
+  <div class="users-header">
+    <div>
+      <h1>Admin Users</h1>
+      <p class="admin-muted">Manage administrators allowed to edit the website content.</p>
+    </div>
+  </div>
+
+  {error && <div class="admin-alert admin-alert-error">{error}</div>}
+
+  <div class="users-grid">
+    <!-- User List -->
+    <div class="admin-card user-list-card">
+      <h2>Active Administrators</h2>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="users-tbody">
+          {users.map((u) => (
+            <tr data-user-id={u.id}>
+              <td>
+                <strong class="user-email-text">{u.email}</strong>
+                <span class="user-date">Added {new Date(u.created_at).toLocaleDateString()}</span>
+              </td>
+              <td>
+                <select class="role-select" data-id={u.id} data-email={u.email} disabled={u.email.toLowerCase() === admin.email.toLowerCase()}>
+                  <option value="owner" selected={u.role === "owner"}>Owner</option>
+                  <option value="editor" selected={u.role === "editor"}>Editor</option>
+                </select>
+              </td>
+              <td>
+                <button 
+                  class:list={["status-toggle-btn", u.is_active === 1 ? "status-active" : "status-inactive"]} 
+                  data-id={u.id} 
+                  data-email={u.email}
+                  data-active={u.is_active}
+                  disabled={u.email.toLowerCase() === admin.email.toLowerCase()}
+                >
+                  {u.is_active === 1 ? "Active" : "Inactive"}
+                </button>
+              </td>
+              <td>
+                {u.email.toLowerCase() === admin.email.toLowerCase() ? (
+                  <span class="admin-muted">(You)</span>
+                ) : (
+                  <button class="save-user-btn" data-id={u.id} data-email={u.email}>Save</button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Create User Form -->
+    <div class="admin-card user-form-card">
+      <h2>Add New Administrator</h2>
+      <form id="add-user-form" class="admin-form">
+        <div class="form-group">
+          <label for="new-email">Google / Admin Email</label>
+          <input type="email" id="new-email" name="email" required placeholder="name@example.com" />
+        </div>
+        <div class="form-group">
+          <label for="new-role">Role</label>
+          <select id="new-role" name="role" required>
+            <option value="editor">Editor</option>
+            <option value="owner">Owner</option>
+          </select>
+        </div>
+        <div class="form-group row-group">
+          <input type="checkbox" id="new-active" name="is_active" checked />
+          <label for="new-active">Is Active (Access Granted)</label>
+        </div>
+        <button type="submit" class="btn-submit">Add Administrator</button>
+      </form>
+    </div>
+  </div>
 </AdminLayout>
+
+<script>
+  const addUserForm = document.getElementById("add-user-form") as HTMLFormElement;
+
+  // Add User Form Submission
+  addUserForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(addUserForm);
+    const email = String(formData.get("email")).trim();
+    const role = String(formData.get("role"));
+    const is_active = formData.get("is_active") === "on";
+
+    if (!email) return;
+
+    try {
+      const response = await fetch("/sam-admin/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, role, is_active })
+      });
+
+      if (!response.ok) {
+        const err = await response.json() as any;
+        throw new Error(err.error || "Failed to add user");
+      }
+
+      alert("User added successfully! Reloading user list.");
+      window.location.reload();
+    } catch (e: any) {
+      alert("Error: " + e.message);
+    }
+  });
+
+  // Save changes to existing user
+  async function saveUser(id: number, email: string, role: string, is_active: boolean) {
+    try {
+      const response = await fetch("/sam-admin/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, email, role, is_active })
+      });
+
+      if (!response.ok) {
+        const err = await response.json() as any;
+        throw new Error(err.error || "Failed to save user");
+      }
+
+      alert(`Changes saved successfully for ${email}`);
+    } catch (e: any) {
+      alert("Error: " + e.message);
+    }
+  }
+
+  // Bind actions
+  document.querySelectorAll(".save-user-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = Number(btn.getAttribute("data-id"));
+      const email = String(btn.getAttribute("data-email"));
+      const tr = btn.closest("tr");
+      const roleSelect = tr?.querySelector(".role-select") as any;
+      const statusBtn = tr?.querySelector(".status-toggle-btn") as any;
+      
+      if (roleSelect && statusBtn) {
+        const role = roleSelect.value;
+        const is_active = statusBtn.getAttribute("data-active") === "1";
+        saveUser(id, email, role, is_active);
+      }
+    });
+  });
+
+  // Toggle active status in UI
+  document.querySelectorAll(".status-toggle-btn").forEach((btn: any) => {
+    btn.addEventListener("click", () => {
+      const active = btn.getAttribute("data-active") === "1";
+      const nextActive = !active;
+      
+      btn.setAttribute("data-active", nextActive ? "1" : "0");
+      btn.textContent = nextActive ? "Active" : "Inactive";
+      btn.className = `status-toggle-btn ${nextActive ? "status-active" : "status-inactive"}`;
+    });
+  });
+</script>
+
+<style>
+  .users-header {
+    margin-bottom: 24px;
+  }
+
+  .users-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  .user-list-card,
+  .user-form-card {
+    padding: 24px;
+    border: 1px solid var(--admin-line);
+    background: var(--admin-panel);
+  }
+
+  .user-list-card h2,
+  .user-form-card h2 {
+    margin: 0 0 20px;
+    font-size: 1.2rem;
+  }
+
+  .admin-table {
+    margin-top: 0;
+  }
+
+  .user-email-text {
+    display: block;
+    font-size: 0.95rem;
+  }
+
+  .user-date {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--admin-muted);
+    margin-top: 2px;
+  }
+
+  .role-select {
+    padding: 6px;
+    border: 1px solid var(--admin-line);
+    background: #fff;
+    font-size: 0.85rem;
+  }
+
+  .status-toggle-btn {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+
+  .status-toggle-btn:disabled,
+  .role-select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .status-active {
+    background: rgba(83, 175, 122, 0.1);
+    color: #53af7a;
+    border-color: #53af7a;
+  }
+
+  .status-inactive {
+    background: rgba(229, 83, 83, 0.1);
+    color: #e55353;
+    border-color: #e55353;
+  }
+
+  .save-user-btn {
+    background: var(--admin-text);
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .save-user-btn:hover {
+    opacity: 0.9;
+  }
+
+  .admin-form {
+    display: grid;
+    gap: 16px;
+  }
+
+  .form-group {
+    display: grid;
+    gap: 6px;
+  }
+
+  .form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .form-group input[type="email"],
+  .form-group select {
+    width: 100%;
+    min-height: 38px;
+    padding: 0 10px;
+    border: 1px solid var(--admin-line);
+    background: #fff;
+    font-size: 0.9rem;
+  }
+
+  .row-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .row-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+  }
+
+  .btn-submit {
+    min-height: 40px;
+    background: #7d5b2f;
+    color: #fff;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 180ms ease;
+  }
+
+  .btn-submit:hover {
+    background: #966f3e;
+  }
+
+  @media (max-width: 960px) {
+    .users-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

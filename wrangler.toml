@@ -5,7 +5,7 @@ pages_build_output_dir = "./dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "sam-production"
-database_id = "replace-with-cloudflare-d1-id"
+database_id = "570120ea-e17f-453a-b71e-76425e3362a8"
 
 [[r2_buckets]]
 binding = "MEDIA_BUCKET"
@@ -13,5 +13,5 @@ bucket_name = "sam-media-production"
 
 [vars]
 PUBLIC_MEDIA_BASE_URL = "/media"
-INITIAL_ADMIN_EMAIL = ""
+INITIAL_ADMIN_EMAIL = "greg.clb@gmail.com"
 ADMIN_PATH = "/sam-admin"

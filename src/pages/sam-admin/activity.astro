@@ -1,25 +1,162 @@
 ---
 import AdminLayout from "@/layouts/AdminLayout.astro";
+import { getAdminContext } from "@/lib/admin";
 
 export const prerender = false;
+
+const env = Astro.locals.runtime?.env;
+const db = env?.DB;
+
+// Restrict to owner only
+const admin = await getAdminContext(env, Astro.request);
+if (!admin || admin.role !== "owner") {
+  return Astro.redirect("/sam-admin");
+}
+
+let logs: any[] = [];
+let error = "";
+
+if (db) {
+  try {
+    const result = await db.prepare(
+      `select * from activity_logs order by created_at desc limit 250`
+    ).all();
+    logs = result.results || [];
+  } catch (e: any) {
+    error = e.message;
+  }
+} else {
+  error = "Database is not available.";
+}
+
+function formatDate(utcStr: string) {
+  const d = new Date(utcStr.replace(" ", "T") + "Z"); // SQLite default timestamp is UTC, replace space for compat
+  return d.toLocaleString();
+}
 ---
 
-<AdminLayout title="Activity">
-  <h1>Activity Log</h1>
-  <p class="admin-muted">Owner-only audit trail for admin actions.</p>
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Time</th>
-        <th>Admin</th>
-        <th>Action</th>
-        <th>Details</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td colspan="4" class="admin-muted">No activity loaded yet.</td>
-      </tr>
-    </tbody>
-  </table>
+<AdminLayout title="Activity Audit Logs">
+  <div class="activity-header">
+    <h1>Activity Log</h1>
+    <p class="admin-muted">Auditable history of administrative actions, user changes, and content updates.</p>
+  </div>
+
+  {error && <div class="admin-alert admin-alert-error">{error}</div>}
+
+  <div class="admin-card log-card">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width: 180px;">Time</th>
+          <th style="width: 220px;">Admin</th>
+          <th style="width: 160px;">Action</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        {logs.length === 0 ? (
+          <tr>
+            <td colspan="4" class="admin-muted" style="text-align: center; padding: 32px;">No activity logs found.</td>
+          </tr>
+        ) : (
+          logs.map((log) => (
+            <tr>
+              <td class="log-time" title={log.created_at}>{formatDate(log.created_at)}</td>
+              <td class="log-email">{log.admin_email}</td>
+              <td>
+                <span class:list={["action-badge", `action-${log.action}`]}>
+                  {log.action.replace("_", " ")}
+                </span>
+              </td>
+              <td class="log-details">{log.details || `ID: ${log.entity_id || "N/A"} (${log.entity_type || "N/A"})`}</td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
 </AdminLayout>
+
+<style>
+  .activity-header {
+    margin-bottom: 24px;
+  }
+
+  .log-card {
+    padding: 24px;
+    border: 1px solid var(--admin-line);
+    background: var(--admin-panel);
+    overflow-x: auto;
+  }
+
+  .admin-table {
+    margin-top: 0;
+  }
+
+  .log-time {
+    font-size: 0.8rem;
+    color: var(--admin-muted);
+    font-family: monospace;
+  }
+
+  .log-email {
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .action-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    border-radius: 4px;
+  }
+
+  /* Specific Badge Colors */
+  .action-login {
+    background: rgba(83, 175, 122, 0.1);
+    color: #53af7a;
+  }
+
+  .action-bootstrap_owner,
+  .action-setup_password {
+    background: rgba(207, 169, 104, 0.1);
+    color: #cfa968;
+  }
+
+  .action-create_tour,
+  .action-update_tour,
+  .action-update_tour_links {
+    background: rgba(111, 179, 156, 0.1);
+    color: #6fb39c;
+  }
+
+  .action-update_news {
+    background: rgba(184, 92, 95, 0.1);
+    color: #b85c5f;
+  }
+
+  .action-upload_media {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+  }
+
+  .action-delete_media,
+  .action-delete_tour {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+  }
+
+  .action-update_albums,
+  .action-update_videos,
+  .action-update_socials {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+  }
+
+  .log-details {
+    font-size: 0.85rem;
+    color: var(--admin-muted);
+  }
+</style>

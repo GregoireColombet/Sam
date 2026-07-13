@@ -1,0 +1,396 @@
+---
+import { getAdminContext, hashPassword, verifyPassword, logActivity } from "@/lib/admin";
+
+export const prerender = false;
+
+const env = Astro.locals.runtime?.env;
+const db = env?.DB;
+
+// If already logged in, redirect to admin index
+const admin = await getAdminContext(env, Astro.request);
+if (admin) {
+  return Astro.redirect("/sam-admin");
+}
+
+let error = "";
+let success = "";
+let isSetupMode = false;
+
+// Check if INITIAL_ADMIN_EMAIL is defined and has no password hash set
+const initialEmail = (env?.INITIAL_ADMIN_EMAIL || "").toLowerCase();
+let initialUserExists = false;
+let initialUserHasPassword = false;
+
+if (db && initialEmail) {
+  try {
+    const existing = await db.prepare(
+      `select id, password_hash from admin_users where lower(email) = lower(?) limit 1`
+    ).bind(initialEmail).first<{ id: number; password_hash: string | null }>();
+
+    if (existing) {
+      initialUserExists = true;
+      initialUserHasPassword = !!existing.password_hash;
+    }
+    
+    if (!initialUserExists || !initialUserHasPassword) {
+      isSetupMode = true;
+    }
+  } catch (e) {
+    console.error("Setup mode check failed, database might be unmigrated:", e);
+  }
+}
+
+// Handle Form Post
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData();
+    const action = data.get("action");
+    const email = String(data.get("email") || "").toLowerCase().trim();
+    const password = String(data.get("password") || "");
+
+    if (action === "setup") {
+      const confirmPassword = String(data.get("confirm_password") || "");
+      if (!email || !password) {
+        error = "Email and password are required.";
+      } else if (email !== initialEmail) {
+        error = `Only the initial admin email (${initialEmail}) can be bootstrapped.`;
+      } else if (password.length < 8) {
+        error = "Password must be at least 8 characters.";
+      } else if (password !== confirmPassword) {
+        error = "Passwords do not match.";
+      } else if (db) {
+        const hashedPassword = await hashPassword(password);
+        if (initialUserExists) {
+          await db.prepare(
+            `update admin_users set password_hash = ? where lower(email) = lower(?)`
+          ).bind(hashedPassword, initialEmail).run();
+        } else {
+          await db.prepare(
+            `insert into admin_users (email, role, is_active, password_hash) values (?, 'owner', 1, ?)`
+          ).bind(initialEmail, hashedPassword).run();
+        }
+        await logActivity(env, initialEmail, "setup_password", "admin_user", null, `Initial owner password setup complete`);
+        success = "Setup successful! You can now log in below.";
+        isSetupMode = false;
+      }
+    } else if (action === "login") {
+      if (!email || !password) {
+        error = "Email and password are required.";
+      } else if (db) {
+        const user = await db.prepare(
+          `select id, email, role, is_active, password_hash from admin_users where lower(email) = lower(?) limit 1`
+        ).bind(email).first<{ id: number; email: string; role: string; is_active: number; password_hash: string | null }>();
+
+        if (!user || !user.password_hash || user.is_active !== 1) {
+          error = "Invalid email or password.";
+        } else {
+          const valid = await verifyPassword(password, user.password_hash);
+          if (!valid) {
+            error = "Invalid email or password.";
+          } else {
+            // Generate session token
+            const sessionToken = crypto.randomUUID();
+            const expires = new Date();
+            expires.setDate(expires.getDate() + 7); // 7 days expiration
+            const expiresStr = expires.toISOString();
+
+            await db.prepare(
+              `insert into admin_sessions (id, admin_user_id, expires_at) values (?, ?, ?)`
+            ).bind(sessionToken, user.id, expiresStr).run();
+
+            await logActivity(env, user.email, "login", "admin_user", user.id);
+
+            // Set secure cookie
+            Astro.cookies.set("sam_session", sessionToken, {
+              path: "/sam-admin",
+              httpOnly: true,
+              secure: true,
+              sameSite: "lax",
+              expires: expires
+            });
+
+            return Astro.redirect("/sam-admin");
+          }
+        }
+      } else {
+        error = "Database not available.";
+      }
+    }
+  } catch (e: any) {
+    error = e.message || "An unexpected error occurred.";
+  }
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{isSetupMode ? "Setup Admin" : "Login"} | Sam Admin</title>
+  </head>
+  <body>
+    <div class="login-wrapper">
+      <div class="login-container">
+        <header class="login-header">
+          <div class="brand">Sam Admin</div>
+          <p class="subtitle">
+            {isSetupMode ? "Bootstrap owner admin account password" : "Sign in to manage artist content"}
+          </p>
+        </header>
+
+        {error && <div class="alert alert-error">{error}</div>}
+        {success && <div class="alert alert-success">{success}</div>}
+
+        {isSetupMode ? (
+          <form method="POST" class="login-form">
+            <input type="hidden" name="action" value="setup" />
+            <div class="form-group">
+              <label for="email">Initial Admin Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                value={initialEmail}
+                readonly
+                class="readonly-input"
+              />
+              <span class="field-hint">Comes from INITIAL_ADMIN_EMAIL config environment variable.</span>
+            </div>
+            <div class="form-group">
+              <label for="password">Create Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                minlength="8"
+                placeholder="Minimum 8 characters"
+              />
+            </div>
+            <div class="form-group">
+              <label for="confirm_password">Confirm Password</label>
+              <input
+                type="password"
+                id="confirm_password"
+                name="confirm_password"
+                required
+                placeholder="Confirm password"
+              />
+            </div>
+            <button type="submit" class="btn-primary">Setup Password & Log In</button>
+          </form>
+        ) : (
+          <form method="POST" class="login-form">
+            <input type="hidden" name="action" value="login" />
+            <div class="form-group">
+              <label for="email">Admin Email Address</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                placeholder="admin@example.com"
+              />
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                placeholder="••••••••"
+              />
+            </div>
+            <button type="submit" class="btn-primary">Log In</button>
+          </form>
+        )}
+
+        <footer class="login-footer">
+          <p class="admin-hint">
+            Protected by Cloudflare. If you are behind Cloudflare Access, you will be automatically authenticated via Google.
+          </p>
+          <a href="/" class="back-link">Back to Website</a>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
+
+<style>
+  :root {
+    color-scheme: dark;
+    --login-bg: #0b0b0b;
+    --login-panel: #141414;
+    --login-text: #f7f3ec;
+    --login-muted: #8c8882;
+    --login-line: #2c2925;
+    --login-accent: #cfa968;
+    --login-error: #e55353;
+    --login-success: #53af7a;
+    font-family:
+      Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: var(--login-bg);
+    color: var(--login-text);
+    background-image: 
+      radial-gradient(circle at 50% 10%, rgba(207, 169, 104, 0.12), transparent 45%),
+      radial-gradient(circle at 10% 90%, rgba(255, 255, 255, 0.02), transparent 30%);
+  }
+
+  .login-wrapper {
+    width: 100%;
+    max-width: 440px;
+    padding: 24px;
+  }
+
+  .login-container {
+    background: var(--login-panel);
+    border: 1px solid var(--login-line);
+    padding: 40px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.44);
+  }
+
+  .login-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .brand {
+    font-size: 1.6rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--login-muted);
+  }
+
+  .login-form {
+    display: grid;
+    gap: 20px;
+  }
+
+  .form-group {
+    display: grid;
+    gap: 6px;
+  }
+
+  .form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--login-text);
+  }
+
+  .form-group input {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 14px;
+    background: #080808;
+    border: 1px solid var(--login-line);
+    color: #fff;
+    font-size: 0.95rem;
+    transition: border-color 180ms ease;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--login-accent);
+  }
+
+  .form-group input.readonly-input {
+    background: #1b1b1b;
+    color: var(--login-muted);
+    cursor: not-allowed;
+    border-color: var(--login-line);
+  }
+
+  .field-hint {
+    font-size: 0.75rem;
+    color: var(--login-muted);
+    margin-top: 2px;
+  }
+
+  .btn-primary {
+    min-height: 44px;
+    background: var(--login-accent);
+    color: #0c0c0c;
+    border: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 180ms ease, background 180ms ease;
+  }
+
+  .btn-primary:hover {
+    background: #e2be82;
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .alert {
+    padding: 12px 14px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-bottom: 20px;
+    border-left: 3px solid transparent;
+  }
+
+  .alert-error {
+    background: rgba(229, 83, 83, 0.1);
+    border-color: var(--login-error);
+    color: #ff9b9b;
+  }
+
+  .alert-success {
+    background: rgba(83, 175, 122, 0.1);
+    border-color: var(--login-success);
+    color: #a4f2c3;
+  }
+
+  .login-footer {
+    margin-top: 32px;
+    text-align: center;
+    border-top: 1px solid var(--login-line);
+    padding-top: 24px;
+  }
+
+  .admin-hint {
+    font-size: 0.75rem;
+    color: var(--login-muted);
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--login-accent);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+</style>

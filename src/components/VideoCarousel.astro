@@ -25,15 +25,119 @@ function videoUrl(video: VideoLink) {
     ) : (
       <div class="video-strip">
         {videos.map((video) => (
-          <a class="video-card" href={videoUrl(video)} target="_blank" rel="noopener noreferrer">
-            {video.thumbnail ? <img src={video.thumbnail.url} alt={video.thumbnail.alt || video.title} loading="lazy" /> : <span>{video.title}</span>}
+          <button class="video-card" data-video-url={videoUrl(video)} data-video-title={video.title} type="button">
+            <span class="video-img-wrapper">
+              {video.thumbnail ? (
+                <img src={video.thumbnail.url} alt={video.thumbnail.alt || video.title} loading="lazy" />
+              ) : (
+                <span class="no-thumb">{video.title}</span>
+              )}
+              <span class="play-icon" aria-hidden="true">▶</span>
+            </span>
             <strong>{video.title}</strong>
-          </a>
+          </button>
         ))}
       </div>
     )}
   </div>
 </section>
+
+<!-- Lightbox Modal -->
+<div class="video-lightbox" id="video-lightbox" aria-hidden="true" role="dialog">
+  <div class="lightbox-overlay" id="lightbox-overlay"></div>
+  <div class="lightbox-content">
+    <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Close video player">&times;</button>
+    <div class="iframe-container" id="iframe-container"></div>
+  </div>
+</div>
+
+<script>
+  const lightbox = document.getElementById("video-lightbox");
+  const overlay = document.getElementById("lightbox-overlay");
+  const closeBtn = document.getElementById("lightbox-close");
+  const container = document.getElementById("iframe-container");
+  const videoCards = document.querySelectorAll(".video-card");
+
+  function getEmbedUrl(url: string): string | null {
+    if (!url) return null;
+    
+    // YouTube
+    if (url.includes("youtube.com/watch") || url.includes("youtu.be") || url.includes("youtube.com/embed")) {
+      let videoId = "";
+      if (url.includes("youtube.com/watch")) {
+        const match = url.match(/[?&]v=([^&#]+)/);
+        videoId = match ? match[1] : "";
+      } else if (url.includes("youtu.be")) {
+        const parts = url.split("/");
+        videoId = parts[parts.length - 1];
+      } else if (url.includes("youtube.com/embed")) {
+        const parts = url.split("/");
+        videoId = parts[parts.length - 1].split("?")[0];
+      }
+      return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0` : null;
+    }
+    
+    // Vimeo
+    if (url.includes("vimeo.com")) {
+      const match = url.match(/vimeo\.com\/(\d+)/);
+      const videoId = match ? match[1] : "";
+      return videoId ? `https://player.vimeo.com/video/${videoId}?autoplay=1` : null;
+    }
+
+    // Bilibili
+    if (url.includes("bilibili.com")) {
+      const match = url.match(/video\/(BV[a-zA-Z0-9]+)/);
+      const bvId = match ? match[1] : "";
+      return bvId ? `https://player.bilibili.com/player.html?bvid=${bvId}&autoplay=1&high_quality=1` : null;
+    }
+
+    // Fallback
+    return url;
+  }
+
+  function openLightbox(url: string, title: string) {
+    const embedUrl = getEmbedUrl(url);
+    if (!embedUrl || !container || !lightbox) return;
+
+    container.innerHTML = `
+      <iframe 
+        src="${embedUrl}" 
+        title="${title}" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+        allowfullscreen>
+      </iframe>
+    `;
+
+    lightbox.classList.add("is-open");
+    lightbox.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLightbox() {
+    if (!lightbox || !container) return;
+    lightbox.classList.remove("is-open");
+    lightbox.setAttribute("aria-hidden", "true");
+    container.innerHTML = "";
+    document.body.style.overflow = "";
+  }
+
+  videoCards.forEach((card) => {
+    card.addEventListener("click", () => {
+      const url = card.getAttribute("data-video-url") || "";
+      const title = card.getAttribute("data-video-title") || "";
+      openLightbox(url, title);
+    });
+  });
+
+  closeBtn?.addEventListener("click", closeLightbox);
+  overlay?.addEventListener("click", closeLightbox);
+
+  // Close on Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeLightbox();
+  });
+</script>
 
 <style>
   .videos {
@@ -43,37 +147,164 @@ function videoUrl(video: VideoLink) {
   .video-strip {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: minmax(260px, 38%);
-    gap: 16px;
+    grid-auto-columns: minmax(280px, 38%);
+    gap: 20px;
     overflow-x: auto;
-    padding-bottom: 10px;
+    padding-bottom: 20px;
     scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.15) transparent;
   }
 
   .video-card {
     scroll-snap-align: start;
     display: grid;
-    gap: 12px;
+    gap: 14px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
   }
 
-  .video-card img,
-  .video-card span {
+  .video-img-wrapper {
+    position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    object-fit: cover;
+    background: #191919;
+    border: 1px solid var(--line);
     display: grid;
     place-items: center;
-    border: 1px solid var(--line);
-    background: #191919;
+    overflow: hidden;
+  }
+
+  .video-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 300ms ease, filter 300ms ease;
+  }
+
+  .video-card:hover img {
+    transform: scale(1.04);
+    filter: brightness(0.85);
+  }
+
+  .no-thumb {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 12px;
+  }
+
+  .play-icon {
+    position: absolute;
+    z-index: 2;
+    background: rgba(8, 8, 8, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 1.15rem;
+    padding-left: 3px;
+    opacity: 0.8;
+    transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+  .video-card:hover .play-icon {
+    opacity: 1;
+    transform: scale(1.1);
+    background: var(--gold);
+    color: #000;
+    border-color: var(--gold);
   }
 
   .video-card strong {
     font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  /* Lightbox Styles */
+  .video-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms ease;
+    padding: 24px;
+  }
+
+  .video-lightbox.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .lightbox-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 5, 5, 0.94);
+    backdrop-filter: blur(8px);
+  }
+
+  .lightbox-content {
+    position: relative;
+    z-index: 101;
+    width: min(100%, 960px);
+    aspect-ratio: 16 / 9;
+    background: #000;
+    box-shadow: 0 32px 72px rgba(0, 0, 0, 0.6);
+  }
+
+  .iframe-container {
+    width: 100%;
+    height: 100%;
+  }
+
+  .iframe-container iframe {
+    width: 100%;
+    height: 100%;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: -44px;
+    right: 0;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 2.2rem;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 180ms ease;
+  }
+
+  .lightbox-close:hover {
+    opacity: 1;
   }
 
   @media (max-width: 760px) {
     .video-strip {
       grid-auto-columns: minmax(240px, 84%);
+      gap: 16px;
+    }
+    
+    .video-lightbox {
+      padding: 12px;
+    }
+
+    .lightbox-close {
+      top: -38px;
+      right: 6px;
     }
   }
 </style>

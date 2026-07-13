@@ -1,9 +1,17 @@
 ---
+import { getAdminContext } from "@/lib/admin";
+
 type Props = {
   title: string;
 };
 
 const { title } = Astro.props;
+const env = Astro.locals.runtime?.env;
+const admin = await getAdminContext(env, Astro.request);
+
+if (!admin) {
+  return Astro.redirect("/sam-admin/login");
+}
 ---
 
 <!doctype html>
@@ -15,14 +23,27 @@ const { title } = Astro.props;
   </head>
   <body>
     <aside>
-      <a class="admin-brand" href="/sam-admin">Sam Admin</a>
-      <nav>
-        <a href="/sam-admin">Dashboard</a>
-        <a href="/sam-admin/content">Content</a>
-        <a href="/sam-admin/media">Media</a>
-        <a href="/sam-admin/users">Users</a>
-        <a href="/sam-admin/activity">Activity</a>
-      </nav>
+      <div>
+        <a class="admin-brand" href="/sam-admin">Sam Admin</a>
+        <nav>
+          <a href="/sam-admin">Dashboard</a>
+          <a href="/sam-admin/content">Content</a>
+          <a href="/sam-admin/media">Media</a>
+          {admin.role === "owner" && <a href="/sam-admin/users">Users</a>}
+          {admin.role === "owner" && <a href="/sam-admin/activity">Activity</a>}
+        </nav>
+      </div>
+      
+      <div class="admin-user-sec">
+        <div class="user-info">
+          <span class="user-email">{admin.email}</span>
+          <span class="user-role">{admin.role}</span>
+        </div>
+        <form method="POST" action="/sam-admin/login">
+          <input type="hidden" name="action" value="logout" />
+          <button type="submit" class="logout-btn">Log Out</button>
+        </form>
+      </div>
     </aside>
     <main>
       <slot />
@@ -64,6 +85,53 @@ const { title } = Astro.props;
     padding: 24px;
     border-right: 1px solid var(--admin-line);
     background: #111;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .admin-user-sec {
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-top: 20px;
+    display: grid;
+    gap: 12px;
+  }
+
+  .user-info {
+    display: grid;
+    gap: 2px;
+  }
+
+  .user-email {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    word-break: break-all;
+  }
+
+  .user-role {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #cfa968;
+    letter-spacing: 0.5px;
+  }
+
+  .logout-btn {
+    width: 100%;
+    min-height: 36px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color 180ms ease, color 180ms ease;
+  }
+
+  .logout-btn:hover {
+    border-color: rgba(255, 255, 255, 0.5);
     color: #fff;
   }
 
