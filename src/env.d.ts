@@ -16,5 +16,6 @@ declare namespace App {
     runtime?: {
       env: RuntimeEnv;
     };
+    admin?: import("./lib/admin").AdminContext | null;
   }
 }

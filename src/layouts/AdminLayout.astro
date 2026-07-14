@@ -7,7 +7,7 @@ type Props = {
 
 const { title } = Astro.props;
 const env = Astro.locals.runtime?.env;
-const admin = await getAdminContext(env, Astro.request);
+const admin = Astro.locals.admin || await getAdminContext(env, Astro.request);
 
 if (!admin) {
   return Astro.redirect("/sam-admin/login");
