@@ -20,7 +20,7 @@ After creation, copy the database ID into `wrangler.toml`.
 3. Name it `sam-media-production`.
 
 During development, media can be served through `/media/...`.
-After the final domain exists, connect a custom R2 domain such as `media.example.com`.
+After the final domain exists, connect a custom R2 domain such as `media.samleemuzik.com`.
 
 ## 3. Create Pages Project
 
@@ -55,8 +55,8 @@ In Zero Trust:
 
 1. Open Access > Applications.
 2. Add a self-hosted application.
-3. Use the Pages domain, for example `sam-lee-site.pages.dev`.
+3. Use the Pages domain or custom domain, for example `samleemuzik.com`.
 4. Path: `/sam-admin/*`.
 5. Policy: allow specific Google email addresses.
 
-When the final domain is connected, add the same Access protection for that domain.
+When the final domain is connected, ensure Access protection is active for that domain.
