@@ -54,12 +54,13 @@ function localized(value: TourDate["location"]) {
 
 <style>
   .tour-section {
-    background: #0e0e0e;
+    background: #000000;
+    border-bottom: 1px solid var(--line);
   }
 
   .tour-list {
     display: grid;
-    gap: 12px;
+    gap: 16px;
   }
 
   .tour-item {
@@ -69,29 +70,41 @@ function localized(value: TourDate["location"]) {
     align-items: center;
     padding: 22px;
     border: 1px solid var(--line);
-    background: #141414;
+    background: #0a0a0c;
+    transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+  }
+
+  .tour-item:not(.is-past):hover {
+    border-color: var(--cyan);
+    box-shadow: 0 0 15px rgba(75, 187, 196, 0.25);
+    transform: translateY(-2px);
   }
 
   .tour-item.is-past {
     filter: grayscale(1);
-    opacity: 0.58;
-    background: #181818;
+    opacity: 0.45;
+    background: #080808;
   }
 
   time {
     display: grid;
     gap: 6px;
     color: var(--text-muted);
+    font-weight: 700;
   }
 
   time strong {
-    color: var(--text);
+    color: var(--cyan);
     font-size: 1.4rem;
+    font-weight: 900;
+    text-shadow: 0 0 5px rgba(75, 187, 196, 0.3);
   }
 
   h3 {
     margin: 0 0 8px;
     font-size: clamp(1.35rem, 3vw, 2.2rem);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
   }
 
   p {
@@ -107,6 +120,8 @@ function localized(value: TourDate["location"]) {
     border: 1px solid var(--line);
     color: var(--text-muted);
     font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   @media (max-width: 760px) {

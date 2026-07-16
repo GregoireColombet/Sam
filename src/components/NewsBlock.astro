@@ -53,10 +53,11 @@ const t = labels[locale];
 <style>
   .news {
     background:
-      linear-gradient(90deg, rgba(8, 8, 8, 0.88), rgba(8, 8, 8, 0.44)),
-      var(--news-bg, linear-gradient(135deg, #181818, #0b0b0b));
+      linear-gradient(90deg, rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.45)),
+      var(--news-bg, linear-gradient(135deg, #0e0e12, #000000));
     background-size: cover;
     background-position: center;
+    border-bottom: 1px solid var(--line);
   }
 
   .news-card {
@@ -69,9 +70,11 @@ const t = labels[locale];
 
   .eyebrow {
     margin: 0 0 12px;
-    color: var(--gold);
+    color: var(--pink);
     font-weight: 900;
     text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 8px rgba(255, 0, 127, 0.5);
   }
 
   h2 {
@@ -79,7 +82,8 @@ const t = labels[locale];
     margin: 0;
     font-size: clamp(2.2rem, 6vw, 6rem);
     line-height: 0.92;
-    letter-spacing: 0;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
   }
 
   p {
@@ -92,22 +96,30 @@ const t = labels[locale];
   .countdown {
     display: grid;
     grid-template-columns: repeat(3, minmax(84px, 1fr));
-    gap: 10px;
+    gap: 12px;
   }
 
   .countdown span {
     min-width: 86px;
     padding: 14px;
     border: 1px solid var(--line);
-    background: rgba(0, 0, 0, 0.38);
+    background: rgba(0, 0, 0, 0.75);
     text-align: center;
     color: var(--text-muted);
+    box-shadow: 0 0 10px rgba(75, 187, 196, 0.05);
+    transition: border-color 200ms ease;
+  }
+
+  .countdown span:hover {
+    border-color: var(--cyan);
   }
 
   .countdown strong {
     display: block;
-    color: var(--text);
-    font-size: 2rem;
+    color: var(--cyan);
+    font-size: 2.2rem;
+    font-weight: 900;
+    text-shadow: 0 0 8px rgba(75, 187, 196, 0.4);
   }
 
   @media (max-width: 760px) {

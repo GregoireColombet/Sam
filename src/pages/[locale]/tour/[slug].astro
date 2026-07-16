@@ -59,7 +59,7 @@ function localized(value: { en: string; zhTW: string; zhCN: string }) {
     padding-top: 96px;
     min-height: 74vh;
     background:
-      linear-gradient(180deg, rgba(207, 169, 104, 0.1), transparent 280px),
+      linear-gradient(180deg, rgba(75, 187, 196, 0.08), transparent 280px),
       var(--bg);
   }
 
@@ -68,12 +68,21 @@ function localized(value: { en: string; zhTW: string; zhCN: string }) {
     margin-bottom: 24px;
     color: var(--text-muted);
     font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: color 180ms ease;
+  }
+
+  .back-link:hover {
+    color: var(--cyan);
   }
 
   .tour-meta {
-    color: var(--gold);
+    color: var(--cyan);
     font-size: 1.1rem;
-    font-weight: 800;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
   }
 
   .tour-description {
@@ -84,5 +93,20 @@ function localized(value: { en: string; zhTW: string; zhCN: string }) {
 
   h2 {
     margin: 42px 0 18px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: #fff;
+    position: relative;
+    display: inline-block;
+  }
+
+  h2::after {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 3px;
+    background: var(--pink);
+    margin-top: 6px;
+    box-shadow: 0 0 8px var(--pink);
   }
 </style>

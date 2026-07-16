@@ -70,9 +70,10 @@ const merchExternal = Boolean(merchUrl);
   }
 
   .site-nav.is-scrolled {
-    background: rgba(8, 8, 8, 0.88);
-    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.95);
+    border-color: rgba(75, 187, 196, 0.3);
     backdrop-filter: blur(16px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.8), 0 1px 10px rgba(75, 187, 196, 0.15);
   }
 
   .brand {
@@ -92,12 +93,28 @@ const merchExternal = Boolean(merchUrl);
     display: flex;
     justify-content: center;
     gap: clamp(18px, 3vw, 34px);
-    font-weight: 700;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
-  .desktop-nav a,
+  .desktop-nav a {
+    color: #fff;
+    transition: color 180ms ease, text-shadow 180ms ease;
+  }
+
+  .desktop-nav a:hover {
+    color: var(--cyan);
+    text-shadow: 0 0 8px rgba(75, 187, 196, 0.8);
+  }
+
   .mobile-menu a {
     color: #fff;
+    transition: color 180ms ease;
+  }
+
+  .mobile-menu a:hover {
+    color: var(--cyan);
   }
 
   .nav-actions {
@@ -116,14 +133,23 @@ const merchExternal = Boolean(merchUrl);
     place-items: center;
     min-width: 34px;
     height: 34px;
-    border: 1px solid rgba(255, 255, 255, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     font-size: 0.78rem;
     font-weight: 800;
+    color: #fff;
+    transition: all 180ms ease;
+  }
+
+  .language-switcher a:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
   }
 
   .language-switcher a.active {
-    background: #fff;
-    color: #080808;
+    background: var(--pink);
+    color: #ffffff;
+    border-color: var(--pink);
+    box-shadow: 0 0 10px var(--pink);
     text-shadow: none;
   }
 
@@ -131,9 +157,16 @@ const merchExternal = Boolean(merchUrl);
     display: none;
     width: 42px;
     height: 42px;
-    border: 1px solid rgba(255, 255, 255, 0.32);
-    background: rgba(0, 0, 0, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.4);
     color: #fff;
+    transition: all 180ms ease;
+  }
+
+  .menu-button:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    box-shadow: 0 0 8px rgba(75, 187, 196, 0.4);
   }
 
   .menu-button span {
@@ -164,11 +197,13 @@ const merchExternal = Boolean(merchUrl);
     .mobile-menu {
       grid-column: 1 / -1;
       display: none;
-      padding: 16px 0 6px;
-      border-top: 1px solid rgba(255, 255, 255, 0.14);
-      gap: 16px;
+      padding: 20px 0 10px;
+      border-top: 1px solid rgba(75, 187, 196, 0.25);
+      gap: 18px;
       font-size: 1.35rem;
       font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     .mobile-menu.is-open {

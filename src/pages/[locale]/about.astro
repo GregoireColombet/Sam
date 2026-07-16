@@ -177,7 +177,7 @@ const currentData = localData[locale];
     padding-top: 96px;
     min-height: 80vh;
     background: 
-      linear-gradient(180deg, rgba(207, 169, 104, 0.05), transparent 350px),
+      linear-gradient(180deg, rgba(75, 187, 196, 0.05), transparent 350px),
       var(--bg);
   }
 
@@ -198,14 +198,16 @@ const currentData = localData[locale];
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-transform: uppercase;
+    text-shadow: 0 0 20px rgba(75, 187, 196, 0.2);
   }
 
   .divider {
     width: 60px;
     height: 4px;
-    background: var(--gold);
+    background: var(--pink);
     margin: 24px auto 0;
     border-radius: 2px;
+    box-shadow: 0 0 10px var(--pink);
   }
 
   .about-section {
@@ -234,12 +236,13 @@ const currentData = localData[locale];
     aspect-ratio: 16 / 9;
     border: 1px solid var(--line);
     box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-    transition: transform 0.4s ease, border-color 0.4s ease;
+    transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
   }
 
   .image-wrapper:hover {
     transform: translateY(-8px);
-    border-color: rgba(207, 169, 104, 0.5);
+    border-color: var(--cyan);
+    box-shadow: 0 0 25px rgba(75, 187, 196, 0.35);
   }
 
   .about-image {
@@ -273,6 +276,7 @@ const currentData = localData[locale];
     color: var(--text);
     position: relative;
     padding-bottom: 12px;
+    text-transform: uppercase;
   }
 
   .section-heading::after {
@@ -282,8 +286,9 @@ const currentData = localData[locale];
     left: 0;
     width: 36px;
     height: 3px;
-    background: var(--gold);
+    background: var(--pink);
     border-radius: 1.5px;
+    box-shadow: 0 0 8px var(--pink);
   }
 
   .section-body {
