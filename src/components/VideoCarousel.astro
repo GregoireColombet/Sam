@@ -45,18 +45,28 @@ function videoUrl(video: VideoLink) {
 <!-- Lightbox Modal -->
 <div class="video-lightbox" id="video-lightbox" aria-hidden="true" role="dialog">
   <div class="lightbox-overlay" id="lightbox-overlay"></div>
+  <button class="lightbox-nav prev" id="lightbox-prev" type="button" aria-label="Previous video">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+  </button>
   <div class="lightbox-content">
     <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Close video player">&times;</button>
     <div class="iframe-container" id="iframe-container"></div>
   </div>
+  <button class="lightbox-nav next" id="lightbox-next" type="button" aria-label="Next video">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+  </button>
 </div>
 
 <script>
   const lightbox = document.getElementById("video-lightbox");
   const overlay = document.getElementById("lightbox-overlay");
   const closeBtn = document.getElementById("lightbox-close");
+  const prevBtn = document.getElementById("lightbox-prev");
+  const nextBtn = document.getElementById("lightbox-next");
   const container = document.getElementById("iframe-container");
   const videoCards = document.querySelectorAll(".video-card");
+
+  let currentIndex = -1;
 
   function getEmbedUrl(url: string): string | null {
     if (!url) return null;
@@ -120,14 +130,52 @@ function videoUrl(video: VideoLink) {
     lightbox.setAttribute("aria-hidden", "true");
     container.innerHTML = "";
     document.body.style.overflow = "";
+    currentIndex = -1;
   }
 
-  videoCards.forEach((card) => {
+  function showVideoAtIndex(index: number) {
+    if (index < 0 || index >= videoCards.length) return;
+    currentIndex = index;
+    const card = videoCards[index];
+    const url = card.getAttribute("data-video-url") || "";
+    const title = card.getAttribute("data-video-title") || "";
+    
+    // Update active iframe source instead of adding class list changes
+    const embedUrl = getEmbedUrl(url);
+    if (!embedUrl || !container) return;
+    const iframe = container.querySelector("iframe");
+    if (iframe) {
+      iframe.src = embedUrl;
+      iframe.title = title;
+    } else {
+      openLightbox(url, title);
+    }
+  }
+
+  videoCards.forEach((card, index) => {
     card.addEventListener("click", () => {
+      currentIndex = index;
       const url = card.getAttribute("data-video-url") || "";
       const title = card.getAttribute("data-video-title") || "";
       openLightbox(url, title);
     });
+  });
+
+  if (videoCards.length <= 1) {
+    if (prevBtn) prevBtn.style.display = "none";
+    if (nextBtn) nextBtn.style.display = "none";
+  }
+
+  prevBtn?.addEventListener("click", () => {
+    let nextIdx = currentIndex - 1;
+    if (nextIdx < 0) nextIdx = videoCards.length - 1;
+    showVideoAtIndex(nextIdx);
+  });
+
+  nextBtn?.addEventListener("click", () => {
+    let nextIdx = currentIndex + 1;
+    if (nextIdx >= videoCards.length) nextIdx = 0;
+    showVideoAtIndex(nextIdx);
   });
 
   closeBtn?.addEventListener("click", closeLightbox);
@@ -237,6 +285,7 @@ function videoUrl(video: VideoLink) {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 24px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 220ms ease;
@@ -258,10 +307,38 @@ function videoUrl(video: VideoLink) {
   .lightbox-content {
     position: relative;
     z-index: 101;
-    width: min(100%, 960px);
+    width: 50vw;
     aspect-ratio: 16 / 9;
     background: #000;
     box-shadow: 0 32px 72px rgba(0, 0, 0, 0.6);
+  }
+
+  .lightbox-nav {
+    position: relative;
+    z-index: 102;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 200ms ease;
+  }
+
+  .lightbox-nav:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.08);
+  }
+
+  .lightbox-nav svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
   }
 
   .iframe-container {
@@ -300,6 +377,21 @@ function videoUrl(video: VideoLink) {
     
     .video-lightbox {
       padding: 12px;
+      gap: 12px;
+    }
+
+    .lightbox-content {
+      width: 75vw;
+    }
+
+    .lightbox-nav {
+      width: 38px;
+      height: 38px;
+    }
+
+    .lightbox-nav svg {
+      width: 18px;
+      height: 18px;
     }
 
     .lightbox-close {

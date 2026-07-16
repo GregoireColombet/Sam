@@ -17,6 +17,9 @@ type Labels = {
   music: string;
   tour: string;
   merch: string;
+  about: string;
+  zoommuzikProduction: string;
+  businessInquiries: string;
   purchase: string;
   passed: string;
   comingSoon: string;
@@ -39,6 +42,9 @@ export const labels: Record<Locale, Labels> = {
     music: "Music",
     tour: "Tour",
     merch: "Merchandising",
+    about: "About",
+    zoommuzikProduction: "Zoommuzik production",
+    businessInquiries: "Contact for business inquiries",
     purchase: "Purchase",
     passed: "Passed",
     comingSoon: "Coming soon",
@@ -59,6 +65,9 @@ export const labels: Record<Locale, Labels> = {
     music: "音樂",
     tour: "巡演",
     merch: "周邊商品",
+    about: "關於",
+    zoommuzikProduction: "錞藝音樂製作",
+    businessInquiries: "商務合作信箱",
     purchase: "購票",
     passed: "已結束",
     comingSoon: "即將公布",
@@ -79,6 +88,9 @@ export const labels: Record<Locale, Labels> = {
     music: "音乐",
     tour: "巡演",
     merch: "周边商品",
+    about: "关于",
+    zoommuzikProduction: "錞艺音乐制作",
+    businessInquiries: "商务合作信箱",
     purchase: "购票",
     passed: "已结束",
     comingSoon: "即将公布",
