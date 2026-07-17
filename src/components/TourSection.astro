@@ -1,5 +1,5 @@
 ---
-import { labels, localePath, type Locale } from "@/lib/i18n";
+import { labels, localePath, getLocalized, type Locale } from "@/lib/i18n";
 import type { TourDate } from "@/lib/types";
 
 type Props = {
@@ -10,10 +10,6 @@ type Props = {
 const { locale, tours } = Astro.props;
 const t = labels[locale];
 const now = Date.now();
-
-function localized(value: TourDate["location"]) {
-  return locale === "en" ? value.en : locale === "zh-CN" ? value.zhCN : value.zhTW;
-}
 ---
 
 <section class="section tour-section" id="tour">
@@ -32,9 +28,10 @@ function localized(value: TourDate["location"]) {
                 <strong>{tour.localTime}</strong>
               </time>
               <div>
-                <h3>{localized(tour.location)}</h3>
-                <p>{locale === "en" ? tour.description.en : locale === "zh-CN" ? tour.description.zhCN : tour.description.zhTW}</p>
+                <h3>{getLocalized(tour.location, locale)}</h3>
+                <p>{getLocalized(tour.description, locale)}</p>
               </div>
+
               <div class="tour-action">
                 {isPast ? (
                   <span class="status">{t.passed}</span>

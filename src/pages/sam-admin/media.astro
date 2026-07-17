@@ -1,5 +1,6 @@
 ---
 import AdminLayout from "@/layouts/AdminLayout.astro";
+import { formatBytes } from "@/lib/utils";
 
 export const prerender = false;
 
@@ -23,13 +24,7 @@ if (db) {
   error = "Database binding is not available.";
 }
 
-function formatBytes(bytes: number) {
-  if (bytes === 0) return "0 Bytes";
-  const k = 1024;
-  const sizes = ["Bytes", "KB", "MB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-}
+
 ---
 
 <AdminLayout title="Media Library">
@@ -73,19 +68,12 @@ function formatBytes(bytes: number) {
 </AdminLayout>
 
 <script>
+  import { formatBytes } from "@/lib/utils";
+
   const fileInput = document.getElementById("media-file-input") as HTMLInputElement;
   const dropZone = document.getElementById("media-drop-zone");
   const mediaGrid = document.getElementById("media-grid");
   const emptyMsg = document.getElementById("empty-media-msg");
-
-  // Format helper
-  function formatBytes(bytes: number) {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  }
 
   // Handle upload
   async function uploadFile(file: File) {

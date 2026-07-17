@@ -1,5 +1,8 @@
+import type { LocalizedText } from "./types";
+
 export const locales = ["en", "zh-TW", "zh-CN"] as const;
 export type Locale = (typeof locales)[number];
+
 
 export const defaultLocale: Locale = "zh-TW";
 
@@ -107,3 +110,20 @@ export const labels: Record<Locale, Labels> = {
     backHome: "回首页"
   }
 };
+
+export function getLocalized(value: LocalizedText | undefined | null, locale: Locale): string {
+  if (!value) return "";
+  if (locale === "en") return value.en;
+  if (locale === "zh-CN") return value.zhCN;
+  return value.zhTW;
+}
+
+export function getLocalizedVideoUrl(
+  video: { urlEn: string; urlZhTw: string; urlZhCn: string },
+  locale: Locale
+): string {
+  if (locale === "en") return video.urlEn;
+  if (locale === "zh-CN") return video.urlZhCn;
+  return video.urlZhTw;
+}
+
