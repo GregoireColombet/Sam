@@ -40,7 +40,12 @@ export async function getAdminContext(env: RuntimeEnv | undefined, request: Requ
   const email = getAccessEmail(request);
   if (!email) return null;
 
-  const initialEmail = (env?.INITIAL_ADMIN_EMAIL || "").toLowerCase();
+  const initialEmail = (
+    env?.INITIAL_ADMIN_EMAIL ||
+    (globalThis as any).process?.env?.INITIAL_ADMIN_EMAIL ||
+    (import.meta.env?.INITIAL_ADMIN_EMAIL) ||
+    ""
+  ).toLowerCase().trim();
 
   if (!db) {
     return initialEmail && email === initialEmail ? { email, role: "owner" } : null;
