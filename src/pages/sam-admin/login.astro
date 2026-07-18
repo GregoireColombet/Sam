@@ -17,12 +17,7 @@ let success = "";
 let isSetupMode = false;
 
 // Check if INITIAL_ADMIN_EMAIL is defined and has no password hash set
-const initialEmail = (
-  env?.INITIAL_ADMIN_EMAIL ||
-  (globalThis as any).process?.env?.INITIAL_ADMIN_EMAIL ||
-  (import.meta.env?.INITIAL_ADMIN_EMAIL) ||
-  ""
-).toLowerCase().trim();
+const initialEmail = (env?.INITIAL_ADMIN_EMAIL || "").toLowerCase();
 let initialUserExists = false;
 let initialUserHasPassword = false;
 

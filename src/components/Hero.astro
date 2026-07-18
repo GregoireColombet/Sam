@@ -9,7 +9,6 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
     <source src={videoUrl} type="video/mp4" />
   </video>
   <div class="hero-shade"></div>
-  <div class="hero-grid"></div>
   <div class="hero-content">
     <h1>Sam Lee</h1>
   </div>
@@ -39,43 +38,13 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
 
   .hero-shade {
     background:
-      linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.1) 50%, var(--bg-obsidian, #050508) 100%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.1) 50%, #000000 100%),
       radial-gradient(circle at 50% 44%, rgba(75, 187, 196, 0.25), transparent 45%);
-    z-index: 1;
-  }
-
-  .hero-grid {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-      linear-gradient(rgba(75, 187, 196, 0.2) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(75, 187, 196, 0.2) 1px, transparent 1px);
-    background-size: 50px 50px;
-    background-position: center top;
-    transform: perspective(500px) rotateX(60deg) translateY(-25%) translateZ(0);
-    transform-origin: top center;
-    opacity: 0.45;
-    mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 25%, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%);
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 25%, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%);
-    animation: grid-move 25s linear infinite;
-    pointer-events: none;
-    z-index: 2;
-  }
-
-  @keyframes grid-move {
-    0% {
-      background-position: center 0px;
-    }
-    100% {
-      background-position: center 100px;
-    }
   }
 
   .hero-content {
     position: relative;
-    z-index: 3;
+    z-index: 1;
     text-align: center;
     padding: 96px 24px;
   }
