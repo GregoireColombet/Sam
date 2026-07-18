@@ -4,7 +4,7 @@ import SiteNav from "@/components/SiteNav.astro";
 import Footer from "@/components/Footer.astro";
 import PlatformLinks from "@/components/PlatformLinks.astro";
 import { getLandingContent, getMerchUrl, getTourBySlug } from "@/lib/db";
-import { isLocale, labels, localePath, getLocalized, type Locale } from "@/lib/i18n";
+import { isLocale, labels, localePath, type Locale } from "@/lib/i18n";
 
 export const prerender = false;
 
@@ -22,6 +22,10 @@ const [tourData, landing, merchUrl] = await Promise.all([
   getMerchUrl(env, locale)
 ]);
 const t = labels[locale];
+
+function localized(value: { en: string; zhTW: string; zhCN: string }) {
+  return locale === "en" ? value.en : locale === "zh-CN" ? value.zhCN : value.zhTW;
+}
 ---
 
 <BaseLayout locale={locale} title={`Sam Lee | ${t.tour}`}>
@@ -32,12 +36,11 @@ const t = labels[locale];
         {tourData ? (
           <>
             <a class="back-link" href={`${localePath(locale)}#tour`}>{t.backHome}</a>
-            <h1 class="section-title">{getLocalized(tourData.tour.location, locale)}</h1>
+            <h1 class="section-title">{localized(tourData.tour.location)}</h1>
             <p class="tour-meta">{tourData.tour.localDate} · {tourData.tour.localTime} · {tourData.tour.timezone}</p>
-            <p class="tour-description">{getLocalized(tourData.tour.description, locale)}</p>
+            <p class="tour-description">{localized(tourData.tour.description)}</p>
             <h2>{t.ticketLinks}</h2>
             {tourData.links.length > 0 ? <PlatformLinks links={tourData.links} /> : <div class="empty-state">{t.comingSoon}</div>}
-
           </>
         ) : (
           <>

@@ -1,5 +1,5 @@
 ---
-import { labels, getLocalizedVideoUrl, type Locale } from "@/lib/i18n";
+import { labels, type Locale } from "@/lib/i18n";
 import type { VideoLink } from "@/lib/types";
 
 type Props = {
@@ -9,6 +9,12 @@ type Props = {
 
 const { locale, videos } = Astro.props;
 const t = labels[locale];
+
+function videoUrl(video: VideoLink) {
+  if (locale === "en") return video.urlEn;
+  if (locale === "zh-CN") return video.urlZhCn;
+  return video.urlZhTw;
+}
 ---
 
 <section class="section videos">
@@ -19,9 +25,8 @@ const t = labels[locale];
     ) : (
       <div class="video-strip">
         {videos.map((video) => (
-          <button class="video-card" data-video-url={getLocalizedVideoUrl(video, locale)} data-video-title={video.title} type="button">
+          <button class="video-card" data-video-url={videoUrl(video)} data-video-title={video.title} type="button">
             <span class="video-img-wrapper">
-
               {video.thumbnail ? (
                 <img src={video.thumbnail.url} alt={video.thumbnail.alt || video.title} loading="lazy" />
               ) : (

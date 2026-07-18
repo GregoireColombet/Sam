@@ -1,5 +1,6 @@
 ---
-import { labels, getLocalized, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
+import { labels } from "@/lib/i18n";
 import type { NewsBlock } from "@/lib/types";
 
 type Props = {
@@ -8,8 +9,8 @@ type Props = {
 };
 
 const { locale, news } = Astro.props;
-const title = getLocalized(news.title, locale);
-const body = getLocalized(news.body, locale);
+const title = locale === "en" ? news.title.en : locale === "zh-CN" ? news.title.zhCN : news.title.zhTW;
+const body = locale === "en" ? news.body.en : locale === "zh-CN" ? news.body.zhCN : news.body.zhTW;
 const t = labels[locale];
 ---
 
