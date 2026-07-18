@@ -17,7 +17,13 @@ let success = "";
 let isSetupMode = false;
 
 // Check if INITIAL_ADMIN_EMAIL is defined and has no password hash set
-const initialEmail = (env?.INITIAL_ADMIN_EMAIL || "").toLowerCase();
+const initialEmail = (
+  env?.INITIAL_ADMIN_EMAIL ||
+  (globalThis as any).process?.env?.INITIAL_ADMIN_EMAIL ||
+  (import.meta.env?.INITIAL_ADMIN_EMAIL) ||
+  ""
+).toLowerCase().trim();
+let setupEmail = initialEmail;
 let initialUserExists = false;
 let initialUserHasPassword = false;
 
@@ -29,11 +35,12 @@ if (db && initialEmail) {
 
     if (existing) {
       initialUserExists = true;
-      initialUserHasPassword = !!existing.password_hash;
+      initialUserHasPassword = !!existing.password_hash && existing.password_hash.startsWith("pbkdf2$");
     }
     
     if (!initialUserExists || !initialUserHasPassword) {
       isSetupMode = true;
+      setupEmail = initialEmail;
     }
   } catch (e) {
     console.error("Setup mode check failed, database might be unmigrated:", e);
@@ -50,27 +57,38 @@ if (Astro.request.method === "POST") {
 
     if (action === "setup") {
       const confirmPassword = String(data.get("confirm_password") || "");
+      
+      let userToSetup = null;
+      if (db) {
+        userToSetup = await db.prepare(
+          `select id, password_hash, is_active from admin_users where lower(email) = lower(?) limit 1`
+        ).bind(email).first<{ id: number; password_hash: string | null; is_active: number }>();
+      }
+
+      const isInitialEmail = email === initialEmail;
+      const isExistingUserWithoutPassword = userToSetup && userToSetup.is_active === 1 && (!userToSetup.password_hash || !userToSetup.password_hash.startsWith("pbkdf2$"));
+
       if (!email || !password) {
         error = "Email and password are required.";
-      } else if (email !== initialEmail) {
-        error = `Only the initial admin email (${initialEmail}) can be bootstrapped.`;
+      } else if (!isInitialEmail && !isExistingUserWithoutPassword) {
+        error = "You are not authorized to configure a password for this email.";
       } else if (password.length < 8) {
         error = "Password must be at least 8 characters.";
       } else if (password !== confirmPassword) {
         error = "Passwords do not match.";
       } else if (db) {
         const hashedPassword = await hashPassword(password);
-        if (initialUserExists) {
+        if (userToSetup) {
           await db.prepare(
             `update admin_users set password_hash = ? where lower(email) = lower(?)`
-          ).bind(hashedPassword, initialEmail).run();
+          ).bind(hashedPassword, email).run();
         } else {
           await db.prepare(
             `insert into admin_users (email, role, is_active, password_hash) values (?, 'owner', 1, ?)`
-          ).bind(initialEmail, hashedPassword).run();
+          ).bind(email, hashedPassword).run();
         }
-        await logActivity(env, initialEmail, "setup_password", "admin_user", null, `Initial owner password setup complete`);
-        success = "Setup successful! You can now log in below.";
+        await logActivity(env, email, "setup_password", "admin_user", userToSetup?.id || null, `Password setup complete`);
+        success = "Password configured successfully! You can now log in below.";
         isSetupMode = false;
       }
     } else if (action === "login") {
@@ -81,8 +99,12 @@ if (Astro.request.method === "POST") {
           `select id, email, role, is_active, password_hash from admin_users where lower(email) = lower(?) limit 1`
         ).bind(email).first<{ id: number; email: string; role: string; is_active: number; password_hash: string | null }>();
 
-        if (!user || !user.password_hash || user.is_active !== 1) {
+        if (!user || user.is_active !== 1) {
           error = "Invalid email or password.";
+        } else if (!user.password_hash || !user.password_hash.startsWith("pbkdf2$")) {
+          isSetupMode = true;
+          setupEmail = user.email;
+          success = `Account found! Please set a local password for ${user.email} below.`;
         } else {
           const valid = await verifyPassword(password, user.password_hash);
           if (!valid) {
@@ -146,17 +168,17 @@ if (Astro.request.method === "POST") {
           <form method="POST" class="login-form">
             <input type="hidden" name="action" value="setup" />
             <div class="form-group">
-              <label for="email">Initial Admin Email</label>
+              <label for="email">Admin Email</label>
               <input
                 type="email"
                 id="email"
                 name="email"
                 required
-                value={initialEmail}
+                value={setupEmail}
                 readonly
                 class="readonly-input"
               />
-              <span class="field-hint">Comes from INITIAL_ADMIN_EMAIL config environment variable.</span>
+              <span class="field-hint">Configure local password credentials for this account.</span>
             </div>
             <div class="form-group">
               <label for="password">Create Password</label>
