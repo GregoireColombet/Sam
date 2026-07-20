@@ -55,7 +55,7 @@ export async function getLandingContent(env?: RuntimeEnv): Promise<LandingConten
 
   try {
     const now = new Date().toISOString();
-    const [news, upcoming, past, albums, videos, socials, merch] = await Promise.all([
+    const [news, toursResult, albums, videos, socials, merch] = await Promise.all([
       db.prepare(
         `select n.*, m.r2_key as background_key, m.alt_text as background_alt
          from news_blocks n
@@ -70,19 +70,10 @@ export async function getLandingContent(env?: RuntimeEnv): Promise<LandingConten
         `select t.*, count(l.id) as ticket_link_count
          from tour_dates t
          left join tour_ticket_links l on l.tour_date_id = t.id and l.is_active = 1
-         where t.is_active = 1 and t.starts_at_utc >= ?
+         where t.is_active = 1
          group by t.id
          order by t.starts_at_utc asc`
-      ).bind(now).all<Record<string, unknown>>(),
-      db.prepare(
-        `select t.*, count(l.id) as ticket_link_count
-         from tour_dates t
-         left join tour_ticket_links l on l.tour_date_id = t.id and l.is_active = 1
-         where t.is_active = 1 and t.starts_at_utc < ?
-         group by t.id
-         order by t.starts_at_utc desc
-         limit 3`
-      ).bind(now).all<Record<string, unknown>>(),
+      ).all<Record<string, unknown>>(),
       db.prepare(
         `select a.*, m.r2_key as image_key, m.alt_text as image_alt
          from album_covers a
@@ -131,7 +122,7 @@ export async function getLandingContent(env?: RuntimeEnv): Promise<LandingConten
               : undefined
           }
         : null,
-      tours: [...(upcoming.results || []).map(mapTour), ...(past.results || []).map(mapTour)],
+      tours: (toursResult.results || []).map(mapTour),
       albums: (albums.results || []).map((row) => ({
         id: Number(row.id),
         title: String(row.title || ""),
