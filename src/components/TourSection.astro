@@ -67,7 +67,8 @@ const now = Date.now();
     align-items: center;
     padding: 22px;
     border: 1px solid var(--line);
-    background: #0a0a0c;
+    background: #0a0a0c url('/assets/coming_dates_bg.jpg') no-repeat right center;
+    background-size: cover;
     transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
   }
 
@@ -80,7 +81,8 @@ const now = Date.now();
   .tour-item.is-past {
     filter: grayscale(1);
     opacity: 0.45;
-    background: #080808;
+    background: #080808 url('/assets/past_dates_bg.jpg') no-repeat right center;
+    background-size: cover;
   }
 
   time {
