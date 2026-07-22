@@ -51,8 +51,20 @@ const now = Date.now();
 
 <style>
   .tour-section {
+    background: url('/assets/brushed_bg.jpg') no-repeat center;
+    background-size: cover;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+    color: #000000;
+  }
+
+  .tour-section .section-title {
+    color: #000000;
+    text-shadow: none;
+  }
+
+  .tour-section .section-title::after {
     background: #000000;
-    border-bottom: 1px solid var(--line);
+    box-shadow: none;
   }
 
   .tour-list {
@@ -66,37 +78,36 @@ const now = Date.now();
     gap: 24px;
     align-items: center;
     padding: 22px;
-    border: 1px solid var(--line);
-    background: #0a0a0c url('/assets/coming_dates_bg.jpg') no-repeat right center;
-    background-size: cover;
+    border: 1px solid #000000;
+    background: transparent;
     transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
   }
 
   .tour-item:not(.is-past):hover {
-    border-color: var(--cyan);
-    box-shadow: 0 0 15px rgba(75, 187, 196, 0.25);
+    border-color: #000000;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
   }
 
   .tour-item.is-past {
     filter: grayscale(1);
     opacity: 0.45;
-    background: #080808 url('/assets/past_dates_bg.jpg') no-repeat right center;
-    background-size: cover;
+    background: transparent;
+    border-color: #000000;
   }
 
   time {
     display: grid;
     gap: 6px;
-    color: var(--text-muted);
+    color: #333333;
     font-weight: 700;
   }
 
   time strong {
-    color: var(--cyan);
+    color: #000000;
     font-size: 1.4rem;
     font-weight: 900;
-    text-shadow: 0 0 5px rgba(75, 187, 196, 0.3);
+    text-shadow: none;
   }
 
   h3 {
@@ -104,11 +115,12 @@ const now = Date.now();
     font-size: clamp(1.35rem, 3vw, 2.2rem);
     text-transform: uppercase;
     letter-spacing: 0.02em;
+    color: #000000;
   }
 
   p {
     margin: 0;
-    color: var(--text-muted);
+    color: #333333;
   }
 
   .status {
@@ -116,11 +128,23 @@ const now = Date.now();
     align-items: center;
     min-height: 44px;
     padding: 0 16px;
-    border: 1px solid var(--line);
-    color: var(--text-muted);
+    border: 1px solid #000000;
+    color: #4a4a4a;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+  }
+
+  .tour-section :global(.button) {
+    border-color: #000000;
+    color: #000000;
+    box-shadow: none;
+  }
+
+  .tour-section :global(.button:hover) {
+    background: #000000;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   @media (max-width: 760px) {

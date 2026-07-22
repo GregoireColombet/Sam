@@ -188,8 +188,29 @@ const t = labels[locale];
 
 <style>
   .videos {
+    position: relative;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+    z-index: 1;
+  }
+
+  .videos::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('/assets/brushed_bg.jpg') no-repeat center;
+    background-size: cover;
+    transform: scaleY(-1);
+    z-index: -1;
+  }
+
+  .videos :global(.section-title) {
+    color: #000000;
+    text-shadow: none;
+  }
+
+  .videos :global(.section-title::after) {
     background: #000000;
-    border-bottom: 1px solid var(--line);
+    box-shadow: none;
   }
 
   .video-strip {
@@ -201,7 +222,7 @@ const t = labels[locale];
     padding-bottom: 20px;
     scroll-snap-type: x mandatory;
     scrollbar-width: thin;
-    scrollbar-color: var(--cyan) transparent;
+    scrollbar-color: #000000 transparent;
   }
 
   .video-card {
@@ -220,8 +241,8 @@ const t = labels[locale];
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    background: #0a0a0c;
-    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.15);
     display: grid;
     place-items: center;
     overflow: hidden;
@@ -229,7 +250,7 @@ const t = labels[locale];
   }
 
   .video-card:hover .video-img-wrapper {
-    border-color: var(--pink);
+    border-color: #000000;
   }
 
   .video-card img {
@@ -246,7 +267,7 @@ const t = labels[locale];
 
   .no-thumb {
     font-size: 0.95rem;
-    color: var(--text-muted);
+    color: #4a4a4a;
     text-align: center;
     padding: 12px;
   }
@@ -271,21 +292,22 @@ const t = labels[locale];
   .video-card:hover .play-icon {
     opacity: 1;
     transform: scale(1.1);
-    background: var(--pink);
+    background: #000000;
     color: #ffffff;
-    border-color: var(--pink);
-    box-shadow: 0 0 15px var(--pink);
+    border-color: #000000;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
   }
 
   .video-card strong {
     font-size: 1.05rem;
     font-weight: 700;
     line-height: 1.4;
+    color: #000000;
     transition: color 220ms ease;
   }
 
   .video-card:hover strong {
-    color: var(--cyan);
+    color: #333333;
   }
 
   /* Lightbox Styles */

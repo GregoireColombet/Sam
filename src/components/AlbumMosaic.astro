@@ -28,8 +28,18 @@ const t = labels[locale];
 
 <style>
   .albums {
+    background: rgb(125, 206, 208);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  }
+
+  .albums .section-title {
+    color: #000000;
+    text-shadow: none;
+  }
+
+  .albums .section-title::after {
     background: #000000;
-    border-bottom: 1px solid var(--line);
+    box-shadow: none;
   }
 
   .mosaic {
@@ -52,7 +62,7 @@ const t = labels[locale];
   .mosaic img:hover {
     transform: scale(1.04) translateY(-2px);
     filter: saturate(1.2) contrast(1.1);
-    box-shadow: 0 8px 24px rgba(255, 0, 127, 0.5), 0 0 10px rgba(255, 0, 127, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     position: relative;
     z-index: 10;
   }
