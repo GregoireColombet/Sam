@@ -176,9 +176,9 @@ const currentData = localData[locale];
   .page-main {
     padding-top: 96px;
     min-height: 80vh;
-    background: 
-      linear-gradient(180deg, rgba(75, 187, 196, 0.05), transparent 350px),
-      var(--bg);
+    background: url('/assets/brushed_bg.jpg') no-repeat center;
+    background-size: 100% 100%;
+    color: #000000;
   }
 
   .text-center {
@@ -194,20 +194,18 @@ const currentData = localData[locale];
     font-size: clamp(2.5rem, 6vw, 4.8rem);
     font-weight: 900;
     letter-spacing: -0.02em;
-    background: linear-gradient(135deg, #fff 40%, var(--gold) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #000000;
     text-transform: uppercase;
-    text-shadow: 0 0 20px rgba(75, 187, 196, 0.2);
+    text-shadow: none;
   }
 
   .divider {
     width: 60px;
     height: 4px;
-    background: var(--pink);
+    background: #000000;
     margin: 24px auto 0;
     border-radius: 2px;
-    box-shadow: 0 0 10px var(--pink);
+    box-shadow: none;
   }
 
   .about-section {
@@ -234,15 +232,15 @@ const currentData = localData[locale];
     border-radius: 12px;
     overflow: hidden;
     aspect-ratio: 16 / 9;
-    border: 1px solid var(--line);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    border: 1px solid #000000;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
   }
 
   .image-wrapper:hover {
     transform: translateY(-8px);
-    border-color: var(--cyan);
-    box-shadow: 0 0 25px rgba(75, 187, 196, 0.35);
+    border-color: #000000;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
   }
 
   .about-image {
@@ -259,7 +257,7 @@ const currentData = localData[locale];
   .image-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.3));
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.1));
     pointer-events: none;
   }
 
@@ -273,7 +271,7 @@ const currentData = localData[locale];
     font-size: clamp(1.8rem, 3.5vw, 2.4rem);
     font-weight: 800;
     margin: 0;
-    color: var(--text);
+    color: #000000;
     position: relative;
     padding-bottom: 12px;
     text-transform: uppercase;
@@ -286,9 +284,9 @@ const currentData = localData[locale];
     left: 0;
     width: 36px;
     height: 3px;
-    background: var(--pink);
+    background: #000000;
     border-radius: 1.5px;
-    box-shadow: 0 0 8px var(--pink);
+    box-shadow: none;
   }
 
   .section-body {
@@ -300,7 +298,7 @@ const currentData = localData[locale];
   .paragraph {
     font-size: 1rem;
     line-height: 1.7;
-    color: var(--text-muted);
+    color: #2b2b2b;
     margin: 0;
     text-align: justify;
   }

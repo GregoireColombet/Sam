@@ -40,8 +40,36 @@ const t = labels[locale];
   .page-main {
     padding-top: 96px;
     min-height: 74vh;
-    background:
-      linear-gradient(180deg, rgba(75, 187, 196, 0.08), transparent 280px),
-      var(--bg);
+    background: url('/assets/brushed_bg.jpg') no-repeat center;
+    background-size: 100% 100%;
+    color: #000000;
+  }
+
+  .page-main :global(.section-title) {
+    color: #000000;
+    text-shadow: none;
+  }
+
+  .page-main :global(.section-title::after) {
+    background: #000000;
+    box-shadow: none;
+  }
+
+  .page-main :global(.platform-link) {
+    border-color: #000000;
+    background: rgba(255, 255, 255, 0.2);
+    color: #000000;
+  }
+
+  .page-main :global(.platform-link:hover) {
+    background: #000000;
+    color: #ffffff;
+    border-color: #000000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .page-main :global(.empty-state) {
+    border-color: #000000;
+    color: #000000;
   }
 </style>
