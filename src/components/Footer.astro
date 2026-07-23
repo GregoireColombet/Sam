@@ -125,6 +125,11 @@ const t = labels[locale];
     width: 30px;
     height: 30px;
     object-fit: contain;
+    transition: filter 200ms ease;
+  }
+
+  .socials a:hover img {
+    filter: drop-shadow(0 0 8px rgb(125, 206, 208));
   }
 
   @media (max-width: 640px) {
