@@ -501,7 +501,7 @@ const currentData = localData[locale];
 
     /* Standardize timeline item alignment on mobile */
     .timeline-item {
-      padding-left: 24px !important;
+      padding-left: 48px !important;
       padding-right: 0 !important;
       text-align: left !important;
       min-height: 60px;
@@ -519,6 +519,13 @@ const currentData = localData[locale];
 
     .year-text {
       font-size: 0.95rem;
+    }
+
+    /* Reset grid columns/rows for Section 2 on mobile to stack elements vertically */
+    .section-2 .timeline-container,
+    .section-2 .image-wrapper {
+      grid-column: auto;
+      grid-row: auto;
     }
   }
 </style>
