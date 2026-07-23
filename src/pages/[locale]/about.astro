@@ -21,41 +21,49 @@ const [landing, merchUrl] = await Promise.all([
 
 const t = labels[locale];
 
+const loremEn = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.";
+const loremTw = "這是設計的佔位文本。這是一段大約五十個字的中文預留文字。我們會在稍後將其替換為實際的關於李聖傑生平與音樂歷程的詳細內容。本段文字旨在展示排版與排版效果，確保時間軸和圓圈的佈局在所有語系中都能完美呈現，並與精美的背景風格相得益彰。";
+const loremCn = "这是占位的文本。这是一段大约五十个字的中文预留文字。我们会在稍后将其替换为实际的关于李圣杰生平与音乐历程的详细内容。本段文字旨在展示排版与排版效果，确保时间轴和圆圈的布局在所有系中都能完美呈现，并与精美的背景风格相得益彰。";
+
 const localData = {
   en: {
     title: "About Sam Lee",
     sections: [
       {
         title: "Debut & Music Journey",
-        paragraphs: [
-          "Sam Lee's vocal talent was evident since his student days. In high school, he competed in various singing competitions. As a sophomore in college, he participated in the early show 'Super Newcomer' and won the weekly championship with the song 'I Swear', catching the attention of host Jacky Wu and judge Chris Babida. Both wanted to sign him, and he chose Babida, launching his singing career. The road wasn't smooth; during the wait for his album release, he sang in pubs, making his debut at 'D&F' behind Ming Yao Department Store.",
-          "In 1999, Sam debuted under the stage name 'Li Jie' with his first album 'Cold Coffee', custom-made by Chris Babida, capturing the rich, touching signature style of Sam's love songs. Although they tried to conquer the adult contemporary market, poor sales led to the album being shelved and Sam being frozen by the label. Yet, he never gave up his dream, continuing to sing in famous pubs like EZ5 and Hard Rock to hone his live performance skills. Three years later, he finally released his second album, 'Devotion' (癡心絕對).",
-          "The release of 'Devotion' marked a major turning point in Sam's career. Although initial sales were slow and contract issues temporarily stalled it, the title track 'Devotion' inexplicably became massive in Taiwan and mainland China a year later. From then on, Sam's voice—warm yet characteristic, powerful yet restrained—made him a regular on the charts.",
-          "Two years after the classic 'Devotion', he released his third album, 'Let Go' (手放開), which was met with overwhelming enthusiasm. The hit tracks 'Let Go' and 'Fly Away' cemented his status as the king of love ballads. In 2006, his fourth album 'A Song for You' (關於妳的歌) shipped an astonishing 80,000 copies in its first batch. Instead of resting on his laurels or letting contract disputes break him, Sam began thinking beyond being just a singer-songwriter and decided to start his own music company to fully control his creative process.",
-          "In 2008, Sam founded his own music label, Zoommuzik (錞藝音樂). The label's debut release, 'So Free' (收放自如), dominated download charts, with the hit 'Pass By' (擦肩而過) achieving spectacular success. Sam became widely celebrated as the 'Ballad Master' and the 'Karaoke King' in fans' hearts.",
-          "After years of perseverance, Sam achieved his ultimate dream in 2008: hosting his first solo ticketed concert. He expressed his deepest gratitude to his fans through his authentic voice, hoping his music would continue to accompany them through their special moments. In 2009, he released his first greatest hits compilation, marking his 10th anniversary in the industry."
-        ],
         image: "/assets/about/about_debut.jpg",
-        alt: "Sam Lee performing live on stage"
+        alt: "Sam Lee performing live on stage",
+        items: [
+          { year: "2011", text: loremEn },
+          { year: "2012", text: loremEn },
+          { year: "2013", text: loremEn },
+          { year: "2014", text: loremEn },
+          { year: "2015", text: loremEn }
+        ]
       },
       {
         title: "Tennis Passion",
-        paragraphs: [
-          "Beyond his exceptional music career, Sam Lee is also known for his outstanding achievements in tennis. Intrigued by Pete Sampras on television during junior high, he fell in love with the sport. During college, he actively competed in tournaments and ranked 48th nationally in Taiwan at the age of twenty. He even represented Taiwan in a competitive collegiate match against Keio University in Japan, securing a close victory.",
-          "To encourage physical fitness among entertainers, Sam founded a Celebrity Tennis Team, inviting fellow artists to join and inspiring more people to pick up the racket.",
-          "In 2013, as the president of the Taipei Tennis Association and ambassador for the Autism Foundation, Sam organized the 'Tennis Carnival' charity event. He invited stars and athletes alike to join. He traveled to New York to write and produce the international theme song 'Light' (光) for autistic children. The single and carnival successfully merged music, sports, and philanthropy, with all proceeds donated to the Taiwan Foundation for Autism."
-        ],
         image: "/assets/about/about_tennis.jpg",
-        alt: "Professional tennis court and equipment representing Sam's tennis career"
+        alt: "Professional tennis court and equipment representing Sam's tennis career",
+        items: [
+          { year: "2016", text: loremEn },
+          { year: "2017", text: loremEn },
+          { year: "2018", text: loremEn },
+          { year: "2019", text: loremEn },
+          { year: "2020", text: loremEn }
+        ]
       },
       {
         title: "Zoommuzik Venture",
-        paragraphs: [
-          "Founded in October 2005, Zoommuzik (錞藝音樂) is an independent music label created by Sam Lee. The name 'Zoommuzik' represents a comprehensive music entertainment business: 'Zoom' symbolizes visual focus, while 'Muzik' is derived from German, reflecting Sam's German heritage and his love for music. Breaking away from traditional record industry conventions, Zoommuzik strives to empower complete creative freedom, explore sonic possibilities, and deliver songs that resonate deeply with individual life stories and attitudes.",
-          "In addition to expanding creative boundaries, Zoommuzik operates on a global stage, actively discovering and nurturing talented artists. By leveraging its resources and professional team, the label aims to connect audiences with high-quality music while bridging the gap between music, technology, and sports for cross-border collaboration."
-        ],
         image: "/assets/about/about_venture.jpg",
-        alt: "Modern independent music studio representing Zoommuzik"
+        alt: "Modern independent music studio representing Zoommuzik",
+        items: [
+          { year: "2021", text: loremEn },
+          { year: "2022", text: loremEn },
+          { year: "2023", text: loremEn },
+          { year: "2024", text: loremEn },
+          { year: "2025", text: loremEn }
+        ]
       }
     ]
   },
@@ -64,35 +72,39 @@ const localData = {
     sections: [
       {
         title: "歌手生涯與音樂之路",
-        paragraphs: [
-          "歌唱才能早在學生時代就展露無遺，高中時期就開始四處徵戰，參與各項歌唱比賽；大二時參加了早期的《超級新人王》節目，以一首《I Swear》贏得周冠軍，獲得主持人吳宗憲與評審鮑比達的青睞，兩人不約而同想簽他，最後他選擇與鮑比達老師簽約。就此展開他的歌手生涯，但一路走來不算順遂，在等待發片期間，他先在Pub駐唱，頭一次亮相是在明曜百貨後頭的「D&F」。",
-          "1999年李聖傑以藝名「李傑」出道，由GMM唱片發行了自己的首張專輯《冷咖啡》，由知名的鮑比達老師量身訂做，抓住了李聖傑歌聲裡厚實動人的情歌特色，雖然試圖攻佔抒情成人的市場，可惜最後不敵銷量因素鎩羽而歸而被唱片公司急凍。但他始終沒有放棄他的音樂之夢，繼續在主婦之店、EZ5及Hard Rock等知名pub駐唱，努力透過Live的演出方式來加強磨練自己。終於在相隔三年後，李聖傑發行了第二張專輯—『癡心絕對』。",
-          "『癡心絕對』這張專輯的發行，可說是李聖傑歌唱事業的轉捩點，雖然一開始銷售依然未見起色，而且因合約問題遭到擱置，而成為他生命裡另一波低潮。但卻在一年後，「癡心絕對」單曲莫名其妙地在台灣、內地非常火紅。從此李聖傑以溫和中帶有個性、激昂中更見內斂的歌聲，成為流行歌曲排行榜的常客。",
-          "在經典的【癡心絕對】之後隔了兩年，推出第三張專輯『絕對癡心─手放開』，專輯一推出就受到熱烈歡迎。主打歌“手放開”與“遠走高飛”也正式奠定了他一代“癡心歌王”的穩固地位。2006年當聖傑第四張專輯─『關於妳的歌』推出，更締造了首批出貨量就高達八萬張的驚人成績！李聖傑未因為銷量自滿，也未被兩度合約問題擊垮，他開始思考單純做個音樂創作人/演唱者之外其他的可能性，也下定決心未來要朝自創公司的路邁進，唯有如此才有放手製作自己喜愛音樂的可能。",
-          "成為自由人之後的李聖傑，在2008年創立自己的音樂品牌，成立自己的公司─錞藝音樂。同年李聖傑的創業作─『收放自如』推出後，專輯的超高預購量與主打歌“擦肩而過”在各大電信業者下載排行榜皆所向披靡。李聖傑早已成為歌迷口中的-『情歌聖手』、更可說是許多癡心人的心中的『K歌王子』。",
-          "在音樂路上沉浮多年，李聖傑始終懷抱著對音樂的不變堅持，在2008年，他總算實現了自己在歌壇多年的最大夢想─舉辦自己的個人售票演唱會。他用最真實的情感及動人歌聲，表達了對所有歌迷最深的感謝，也希望他的音樂會繼續陪伴歌迷度過每個特別的時刻，更在2009年發行個人入行十年的第一張精選專輯。"
-        ],
         image: "/assets/about/about_debut.jpg",
-        alt: "李聖傑舞台歌唱表演"
+        alt: "李聖傑舞台歌唱表演",
+        items: [
+          { year: "2011", text: loremTw },
+          { year: "2012", text: loremTw },
+          { year: "2013", text: loremTw },
+          { year: "2014", text: loremTw },
+          { year: "2015", text: loremTw }
+        ]
       },
       {
         title: "網球運動與熱情",
-        paragraphs: [
-          "除了音樂上的卓越演出，不能不提到的是李聖傑在網球上的優異表現。國中時在電視上看了一場山普拉斯的網球轉播賽，從此迷上了網球。念了大學後，李聖傑努力參加各大小比賽，二十歲時擠入全臺灣總排名第四十八名。成績最好時，曾代表臺灣隊赴日與慶應大學進行大學網球對抗賽，最後還險勝。",
-          "李聖傑積極鼓吹圈內藝人們多多運動，所以成立了一個明星網球隊，努力號召了許多圈內同好一同加入，希望未來可以影響更多人一起從事網球運動。",
-          "2013年，身兼臺北網球協會理事長及自閉症基金會代言人的李聖傑，特別舉辦“網球嘉年華”公益活動，邀請藝能界 and 運動界等各界名人共襄盛舉，更遠赴紐約為此公益和自閉症兒童跨海打造國際級活動主題曲《光》。由李聖傑親自擔任《光》的詞曲創作，並借由此單曲與嘉年華活動，將音樂、運動與公益完美結合。其義賣所得全數捐贈予“財團法人臺灣自閉症基金會”。"
-        ],
         image: "/assets/about/about_tennis.jpg",
-        alt: "精美網球拍與球場"
+        alt: "精美網球拍與球場",
+        items: [
+          { year: "2016", text: loremTw },
+          { year: "2017", text: loremTw },
+          { year: "2018", text: loremTw },
+          { year: "2019", text: loremTw },
+          { year: "2020", text: loremTw }
+        ]
       },
       {
         title: "錞藝音樂 Zoommuzik",
-        paragraphs: [
-          "錞藝音樂創立於2005年10月，是由李聖傑一手打造的獨立音樂品牌，英文名Zoommuzik代表著全方位的音樂娛樂事業，Zoom象徵視覺焦點；Muzik則是取自德文，除了有音樂之意也注入李聖傑擁有德國血統的淵源。錞藝音樂跳脫傳統唱片圈的邏輯思考，期許音樂創作更加完整、探索聲音的可能，讓每一首歌更貼近每個人的故事，引起共鳴，進而表達歌手對生活的態度與想法。",
-          "除了開啟更加遼闊的音樂創作空間，錞藝音樂同時也以國際為舞臺，並致力於發掘有天賦的音樂人，以錞藝多年累積的資源與專業團隊，提供音樂人更多元的創作與視野。秉持讓每一位聽眾都能觸擊到優質音樂得宗旨，將音樂、科技與運動完美結合，打造音樂無設限、互動無國界的可能。"
-        ],
         image: "/assets/about/about_venture.jpg",
-        alt: "錞藝音樂工作室"
+        alt: "錞藝音樂工作室",
+        items: [
+          { year: "2021", text: loremTw },
+          { year: "2022", text: loremTw },
+          { year: "2023", text: loremTw },
+          { year: "2024", text: loremTw },
+          { year: "2025", text: loremTw }
+        ]
       }
     ]
   },
@@ -101,35 +113,39 @@ const localData = {
     sections: [
       {
         title: "歌手生涯与音乐之路",
-        paragraphs: [
-          "歌唱才能早在学生时代就展露无遗，高中时期就开始四处征战，参与各项歌唱比赛；大二时参加了早期的《超级新人王》节目，以一首《I Swear》赢得周冠军，获得主持人吴宗宪与评委鲍比达的青睐，两人不约而同想签他，最后他选择与鲍比达老师签约。就此展开他的歌手生涯，但一路走来不算顺遂，在等待发片期间，他先在Pub驻唱，头一次亮相是在明曜百货后头的“D&F”。",
-          "1999年李圣杰以艺名“李杰”出道，由GMM唱片发行了自己的首张专辑《冷咖啡》，由知名的鲍比达老师量身订做，抓住了李圣杰歌声里厚实动人的情歌特色，虽然试图攻占抒情成人的市场，可惜最后不敌销量因素铩羽而归而被唱片公司急冻。但他始终没有放弃他的音乐之梦，继续在主妇之店、EZ5及Hard Rock等知名pub驻唱，努力通过Live的演出方式来加强磨练自己。终于在相隔三年后，李圣杰发行了第二张专辑—《痴心绝对》。",
-          "《痴心绝对》这张专辑的发行，可说是李圣杰歌唱事业的转折点，虽然一开始销售依然未见起色，而且因合约问题遭到搁置，而成为他生命里另一波低潮。但却在一年后，“痴心绝对”单曲莫名其妙地在台湾、内地非常火红。从此李圣杰以温和中带有个性、激昂中更见内敛的歌声，成为流行歌曲排行榜的常客。",
-          "在经典的《痴心绝对》之后隔了两年，推出第三张专辑《绝对痴心─手放开》，专辑一推出就受到热烈欢迎。主打歌“手放开”与“远走高飞”也正式奠定了他一代“痴心歌王”的稳固地位。2006年当圣杰第四张专辑─《关于妳的歌》推出，更缔造了首批出货量就高达八万张的惊人成绩！李圣杰未因为销量自满，也未被两度合约问题击垮，他开始思考单纯做个音乐创作人/演唱者之外其他的可能性，也下定决心未来要朝自创公司的路迈进，唯有如此才有放手制作自己喜爱音乐的可能。",
-          "成为自由人之后的李圣杰，在2008年创立自己的音乐品牌，成立自己的公司─錞艺音乐。同年李圣杰的创业作─《收放自如》推出后，专辑的超高预购量与主打歌“擦肩而过”在各大电信业者下载排行榜皆所向披靡。李圣杰早已成为歌迷口中的-《情歌圣手》、更可说是许多痴心人的心中的《K歌王子》。",
-          "在音乐路上沉浮多年，李圣杰始终怀抱着对音乐的不变坚持，在2008年，他总算实现了自己在歌坛多年的最大梦想─举办自己的个人售票演唱会。他用最真实的情感及动人歌声，表达了对所有歌迷最深的感谢，也希望他的音乐会继续陪伴歌迷度过每个特别的时刻，更在2009年发行个人入行十年的第一张精选专辑。"
-        ],
         image: "/assets/about/about_debut.jpg",
-        alt: "李圣杰舞台歌唱表演"
+        alt: "李圣杰舞台歌唱表演",
+        items: [
+          { year: "2011", text: loremCn },
+          { year: "2012", text: loremCn },
+          { year: "2013", text: loremCn },
+          { year: "2014", text: loremCn },
+          { year: "2015", text: loremCn }
+        ]
       },
       {
         title: "网球运动与热情",
-        paragraphs: [
-          "除了音乐上的卓越演出，不能不提到的是李圣杰在网球上的优异表现。国中时在电视上卡了一场桑普拉斯的网球转播赛，从此迷上了网球。上了大学后，李圣杰努力参加各大小比赛，二十岁时挤入全台湾总排名第四十八名。成绩最好时，曾代表台湾队赴日与庆应大学进行大学网球对抗赛，最后还险胜。",
-          "李圣杰积极鼓吹圈内艺人们多多运动，所以成立了一个明星网球队，努力号召了许多圈内同好一同加入，希望未来可以影响更多人一起从事网球运动。",
-          "2013年，身兼台北网球协会理事长及自闭症基金会代言人的李圣杰，特别举办“网球嘉年华”公益活动，邀请艺能界和运动界等各界名人共襄举，更远赴纽约为此公益和自闭症儿童跨海打造国际级活动主题曲《光》。由李圣杰亲自担任《光》的词曲创作，并借由此单曲与嘉年华活动，将音乐、运动与公益完美结合。其义卖所得全数捐赠予“财团法人台湾自闭症基金会”。"
-        ],
         image: "/assets/about/about_tennis.jpg",
-        alt: "精美网球拍与球场"
+        alt: "精美网球拍与球场",
+        items: [
+          { year: "2016", text: loremCn },
+          { year: "2017", text: loremCn },
+          { year: "2018", text: loremCn },
+          { year: "2019", text: loremCn },
+          { year: "2020", text: loremCn }
+        ]
       },
       {
         title: "錞艺音乐 Zoommuzik",
-        paragraphs: [
-          "錞艺音乐创立于2005年100月，是由李圣杰一手打造的独立音乐品牌，英文名Zoommuzik代表着全方位的音乐娱乐事业，Zoom象征视觉焦点；Muzik则是取自德文，除了有音乐之意也注入李圣杰拥有德国血统的渊源。錞艺音乐跳脱传统唱片圈的逻辑思考，期许音乐创作更加完整、探索声音的可能，让每一首歌更贴近每个人的故事，引起共鸣，进而表达歌手对生活的态度与想法。",
-          "除了开启更加辽阔的音乐创作空间，錞艺音乐同时也以国际为舞台，并致力于发掘有天赋的音乐人，以錞艺多年积累的资源与专业团队，提供音乐人更多元的创作与视野。秉持让每一位听众都能触击到优质音乐的宗旨，将音乐、科技与运动完美结合，打造音乐无设限、互动无国界的可能。"
-        ],
         image: "/assets/about/about_venture.jpg",
-        alt: "錞艺音乐工作室"
+        alt: "錞艺音乐工作室",
+        items: [
+          { year: "2021", text: loremCn },
+          { year: "2022", text: loremCn },
+          { year: "2023", text: loremCn },
+          { year: "2024", text: loremCn },
+          { year: "2025", text: loremCn }
+        ]
       }
     ]
   }
@@ -148,26 +164,78 @@ const currentData = localData[locale];
       </div>
     </section>
 
-    {currentData.sections.map((section, index) => (
-      <section class="section about-section">
-        <div class="container">
-          <div class={`about-grid ${index % 2 === 1 ? 'grid-reverse' : ''}`}>
-            <div class="image-wrapper">
-              <img src={section.image} alt={section.alt} loading="lazy" class="about-image" />
-              <div class="image-overlay"></div>
-            </div>
-            <div class="text-content">
-              <h2 class="section-heading">{section.title}</h2>
-              <div class="section-body">
-                {section.paragraphs.map(p => (
-                  <p class="paragraph">{p}</p>
-                ))}
+    <!-- Section 1: 2011 - 2015 (Image left, Timeline right, brushed bg, pink line) -->
+    <section class="about-section section-1">
+      <div class="container">
+        <div class="about-grid">
+          <div class="image-wrapper">
+            <img src={currentData.sections[0].image} alt={currentData.sections[0].alt} loading="lazy" class="about-image" />
+            <div class="image-overlay"></div>
+          </div>
+          <div class="timeline-container">
+            {currentData.sections[0].items.map((item) => (
+              <div class="timeline-item">
+                <div class="timeline-circle">
+                  <span class="year-text">{item.year}</span>
+                </div>
+                <div class="timeline-content">
+                  <p class="paragraph">{item.text}</p>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
-      </section>
-    ))}
+      </div>
+    </section>
+
+    <!-- Section 2: 2016 - 2020 (Timeline left, Image right, blue bg, blue line) -->
+    <section class="about-section section-2">
+      <div class="container">
+        <div class="about-grid">
+          <div class="timeline-container">
+            {currentData.sections[1].items.map((item) => (
+              <div class="timeline-item">
+                <div class="timeline-circle">
+                  <span class="year-text">{item.year}</span>
+                </div>
+                <div class="timeline-content">
+                  <p class="paragraph">{item.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div class="image-wrapper">
+            <img src={currentData.sections[1].image} alt={currentData.sections[1].alt} loading="lazy" class="about-image" />
+            <div class="image-overlay"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: 2021 - 2025 (Image left, Timeline right, flipped brushed bg, pink line) -->
+    <section class="about-section section-3">
+      <div class="section-flipped-bg"></div>
+      <div class="container">
+        <div class="about-grid">
+          <div class="image-wrapper">
+            <img src={currentData.sections[2].image} alt={currentData.sections[2].alt} loading="lazy" class="about-image" />
+            <div class="image-overlay"></div>
+          </div>
+          <div class="timeline-container">
+            {currentData.sections[2].items.map((item) => (
+              <div class="timeline-item">
+                <div class="timeline-circle">
+                  <span class="year-text">{item.year}</span>
+                </div>
+                <div class="timeline-content">
+                  <p class="paragraph">{item.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
   <Footer locale={locale} socialLinks={landing.socialLinks} />
 </BaseLayout>
@@ -176,8 +244,7 @@ const currentData = localData[locale];
   .page-main {
     padding-top: 96px;
     min-height: 80vh;
-    background: url('/assets/brushed_bg.jpg') no-repeat center;
-    background-size: 100% 100%;
+    background: transparent;
     color: #000000;
   }
 
@@ -186,7 +253,9 @@ const currentData = localData[locale];
   }
 
   .hero-section {
-    padding-bottom: 24px;
+    padding-bottom: 48px;
+    background: url('/assets/brushed_bg.jpg') no-repeat center;
+    background-size: cover;
   }
 
   .page-title {
@@ -209,38 +278,110 @@ const currentData = localData[locale];
   }
 
   .about-section {
-    padding: 64px 0;
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
   }
 
+  /* Section 1: Brushed Background, Pink/Rose line and details */
+  .section-1 {
+    background: url('/assets/brushed_bg.jpg') no-repeat center;
+    background-size: cover;
+    color: #000000;
+    --line-color: var(--rose);
+  }
+
+  /* Section 2: Blue Background, Cyan/Blue line and details */
+  .section-2 {
+    background: linear-gradient(135deg, #060c18 0%, #0d1e36 100%);
+    color: #ffffff;
+    --line-color: var(--cyan);
+  }
+
+  /* Section 3: Flipped Brushed Background, Pink/Rose line and details */
+  .section-3 {
+    background: transparent;
+    color: #000000;
+    --line-color: var(--rose);
+  }
+
+  .section-flipped-bg {
+    position: absolute;
+    inset: 0;
+    background: url('/assets/brushed_bg.jpg') no-repeat center;
+    background-size: cover;
+    transform: scaleX(-1);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .section-3 .container {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Grid Layout */
   .about-grid {
     display: grid;
-    grid-template-columns: 1fr 1.1fr;
-    gap: 64px;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
     align-items: center;
+    position: relative;
   }
 
-  .grid-reverse {
-    direction: rtl;
+  /* Desktop layout ordering */
+  .section-1 .image-wrapper,
+  .section-3 .image-wrapper {
+    grid-column: 1;
+  }
+  .section-1 .timeline-container,
+  .section-3 .timeline-container {
+    grid-column: 2;
   }
 
-  .grid-reverse .text-content {
-    direction: ltr;
+  .section-2 .timeline-container {
+    grid-column: 1;
+  }
+  .section-2 .image-wrapper {
+    grid-column: 2;
   }
 
+  /* Continuous timeline line on desktop */
+  .about-grid::before {
+    content: "";
+    position: absolute;
+    top: -80px;
+    bottom: -80px;
+    left: 50%;
+    width: 4px;
+    background-color: var(--line-color);
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+
+  /* Image wrappers */
   .image-wrapper {
     position: relative;
     border-radius: 12px;
     overflow: hidden;
-    aspect-ratio: 16 / 9;
-    border: 1px solid #000000;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    aspect-ratio: 16 / 10;
+    border: 2px solid currentColor;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    z-index: 3;
+  }
+
+  .section-2 .image-wrapper {
+    box-shadow: 0 10px 30px rgba(75, 187, 196, 0.15);
   }
 
   .image-wrapper:hover {
     transform: translateY(-8px);
-    border-color: #000000;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+  }
+
+  .section-2 .image-wrapper:hover {
+    box-shadow: 0 15px 35px rgba(75, 187, 196, 0.25);
   }
 
   .about-image {
@@ -257,64 +398,173 @@ const currentData = localData[locale];
   .image-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.1));
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.15));
     pointer-events: none;
   }
 
-  .text-content {
+  /* Timeline Container and Items */
+  .timeline-container {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-  }
-
-  .section-heading {
-    font-size: clamp(1.8rem, 3.5vw, 2.4rem);
-    font-weight: 800;
-    margin: 0;
-    color: #000000;
+    gap: 48px;
     position: relative;
-    padding-bottom: 12px;
-    text-transform: uppercase;
+    z-index: 3;
   }
 
-  .section-heading::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 36px;
-    height: 3px;
-    background: #000000;
-    border-radius: 1.5px;
-    box-shadow: none;
-  }
-
-  .section-body {
+  .timeline-item {
+    position: relative;
+    min-height: 80px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    justify-content: center;
+  }
+
+  /* Alignments for Desktop */
+  .section-1 .timeline-item,
+  .section-3 .timeline-item {
+    padding-left: 56px;
+    text-align: left;
+  }
+
+  .section-2 .timeline-item {
+    padding-right: 56px;
+    text-align: right;
+  }
+
+  /* Timeline Circles showing year */
+  .timeline-circle {
+    position: absolute;
+    top: 50%;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--line-color);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 5;
+  }
+
+  /* Desktop circle positioning */
+  .section-1 .timeline-circle,
+  .section-3 .timeline-circle {
+    left: 0;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+  }
+
+  .section-2 .timeline-circle {
+    right: 0;
+    transform: translate(50%, -50%);
+    background-color: #0b1528;
+  }
+
+  .year-text {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: currentColor;
+  }
+
+  .section-1 .year-text,
+  .section-3 .year-text {
+    color: #000000;
+  }
+
+  .section-2 .year-text {
+    color: #ffffff;
+  }
+
+  .timeline-content {
+    background: transparent;
   }
 
   .paragraph {
     font-size: 1rem;
-    line-height: 1.7;
-    color: #2b2b2b;
+    line-height: 1.6;
     margin: 0;
+    opacity: 0.9;
     text-align: justify;
   }
 
-  @media (max-width: 960px) {
-    .about-grid {
-      grid-template-columns: 1fr;
-      gap: 36px;
-    }
+  .section-1 .paragraph,
+  .section-3 .paragraph {
+    color: #2b2b2b;
+  }
 
-    .grid-reverse {
-      direction: ltr;
+  .section-2 .paragraph {
+    color: #e2e8f0;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 960px) {
+    .hero-section {
+      padding-bottom: 24px;
     }
 
     .about-section {
-      padding: 40px 0;
+      padding: 48px 0;
+    }
+
+    .about-grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    /* Reset desktop column ordering on mobile */
+    .section-1 .image-wrapper,
+    .section-2 .image-wrapper,
+    .section-3 .image-wrapper {
+      grid-column: auto;
+      order: 1;
+    }
+
+    .section-1 .timeline-container,
+    .section-2 .timeline-container,
+    .section-3 .timeline-container {
+      grid-column: auto;
+      order: 2;
+      padding-left: 52px;
+    }
+
+    /* Hide the desktop center line on mobile */
+    .about-grid::before {
+      display: none;
+    }
+
+    /* Create left-aligned line on the timeline container on mobile */
+    .timeline-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 4px;
+      background-color: var(--line-color);
+      z-index: 2;
+    }
+
+    /* Standardize timeline item alignment on mobile */
+    .timeline-item {
+      padding-left: 24px !important;
+      padding-right: 0 !important;
+      text-align: left !important;
+      min-height: 60px;
+    }
+
+    /* Standardize circles on mobile */
+    .timeline-circle {
+      left: 0 !important;
+      right: auto !important;
+      transform: translate(-50%, -50%) !important;
+      width: 56px;
+      height: 56px;
+      border-width: 2.5px;
+    }
+
+    .year-text {
+      font-size: 0.95rem;
     }
   }
 </style>
