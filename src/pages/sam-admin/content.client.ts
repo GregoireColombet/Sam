@@ -673,3 +673,85 @@ socialsForm?.addEventListener("submit", async (e) => {
     alert("Error: " + err.message);
   }
 });
+
+// ==========================================
+// MUSIC PLATFORMS LIST
+// ==========================================
+const musicForm = document.getElementById("music-links-form") as HTMLFormElement;
+const musicContainer = document.getElementById("music-links-container");
+const btnAddMusicRow = document.getElementById("btn-add-music-row");
+
+function addMusicRow() {
+  const key = Date.now() + Math.random().toString(36).substring(7);
+  const row = document.createElement("div");
+  row.className = "sortable-row";
+  row.innerHTML = `
+    <div class="drag-handle">⋮⋮</div>
+    <div class="form-group">
+      <label>Platform Name</label>
+      <input type="text" class="music-name" required placeholder="e.g. Spotify" />
+    </div>
+    <div class="form-group" style="flex: 2;">
+      <label>Target URL</label>
+      <input type="url" class="music-url" required placeholder="https://..." />
+    </div>
+    <div class="form-group">
+      <label>Logo Icon</label>
+      <div class="media-picker-control" data-field="music_logo_${key}">
+        <input type="hidden" class="music-media-id" required />
+        <div class="picker-preview select-sm">
+          <span class="no-img">No Image</span>
+        </div>
+        <div class="picker-actions">
+          <button type="button" class="btn-select-media btn-xs">Select</button>
+        </div>
+      </div>
+    </div>
+    <div class="form-group checkbox-cell">
+      <input type="checkbox" class="music-active" checked id="music-active-${key}" />
+      <label for="music-active-${key}">Active</label>
+    </div>
+    <button type="button" class="btn-remove-row remove-btn">Remove</button>
+  `;
+
+  row.querySelector(".btn-remove-row")?.addEventListener("click", () => {
+    row.remove();
+  });
+
+  musicContainer?.appendChild(row);
+}
+
+btnAddMusicRow?.addEventListener("click", addMusicRow);
+document.querySelectorAll("#music-links-container .btn-remove-row").forEach((btn: any) => {
+  btn.addEventListener("click", () => btn.closest(".sortable-row").remove());
+});
+
+musicForm?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const rows = musicContainer?.querySelectorAll(".sortable-row");
+  const musicList: any[] = [];
+
+  rows?.forEach((row) => {
+    const name = (row.querySelector(".music-name") as HTMLInputElement).value;
+    const url = (row.querySelector(".music-url") as HTMLInputElement).value;
+    const logo_media_id = Number((row.querySelector(".music-media-id") as HTMLInputElement).value);
+    const is_active = (row.querySelector(".music-active") as HTMLInputElement).checked;
+
+    if (name && url && logo_media_id) {
+      musicList.push({ name, url, logo_media_id, is_active });
+    }
+  });
+
+  try {
+    const res = await fetch("/sam-admin/api/music", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ musicLinks: musicList })
+    });
+    if (!res.ok) throw new Error("Failed to save music platform links.");
+    alert("Music platform links updated successfully!");
+    window.location.reload();
+  } catch (err: any) {
+    alert("Error: " + err.message);
+  }
+});

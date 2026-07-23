@@ -365,6 +365,40 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
     }
   }
 
+  // 8.5 Music Links CRUD
+  if (path === "music") {
+    if (method === "GET") {
+      const result = await db.prepare(
+        `select p.*, m.r2_key, m.alt_text
+         from music_platform_links p
+         left join media_assets m on m.id = p.logo_media_id
+         order by p.sort_order asc`
+      ).all();
+      return json(result.results || []);
+    }
+    if (method === "POST") {
+      try {
+        const body = await request.json() as { musicLinks: any[] };
+        const batch = [db.prepare(`delete from music_platform_links`)];
+        
+        body.musicLinks.forEach((link, index) => {
+          batch.push(
+            db.prepare(
+              `insert into music_platform_links (name, url, logo_media_id, sort_order, is_active)
+               values (?, ?, ?, ?, ?)`
+            ).bind(link.name, link.url, link.logo_media_id, index, link.is_active ? 1 : 0)
+          );
+        });
+        
+        await db.batch(batch);
+        await logActivity(env, admin.email, "update_music_links", "music_platform_links", null, `Updated ${body.musicLinks.length} music platform links`);
+        return json({ ok: true });
+      } catch (e: any) {
+        return json({ error: e.message }, { status: 500 });
+      }
+    }
+  }
+
   // 9. Site Settings (Merch)
   if (path === "settings") {
     if (method === "GET") {

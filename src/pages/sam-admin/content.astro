@@ -12,20 +12,22 @@ let tours: any[] = [];
 let albums: any[] = [];
 let videos: any[] = [];
 let socials: any[] = [];
+let musicLinks: any[] = [];
 let settings: any = null;
 let mediaList: any[] = [];
 let error = "";
 
 if (db) {
   try {
-    const [newsRow, toursResult, albumsResult, videosResult, socialsResult, settingsRow, mediaResult] = await Promise.all([
+    const [newsRow, toursResult, albumsResult, videosResult, socialsResult, settingsRow, mediaResult, musicLinksResult] = await Promise.all([
       db.prepare(`select * from news_blocks where id = 1`).first<any>(),
       db.prepare(`select * from tour_dates order by starts_at_utc desc`).all<any>(),
       db.prepare(`select * from album_covers order by sort_order asc`).all<any>(),
       db.prepare(`select * from video_links order by sort_order asc`).all<any>(),
       db.prepare(`select * from social_links order by sort_order asc`).all<any>(),
       db.prepare(`select * from site_settings where id = 1`).first<any>(),
-      db.prepare(`select * from media_assets order by created_at desc`).all<any>()
+      db.prepare(`select * from media_assets order by created_at desc`).all<any>(),
+      db.prepare(`select * from music_platform_links order by sort_order asc`).all<any>()
     ]);
 
     news = newsRow || {
@@ -37,6 +39,7 @@ if (db) {
     albums = albumsResult.results || [];
     videos = videosResult.results || [];
     socials = socialsResult.results || [];
+    musicLinks = musicLinksResult.results || [];
     settings = settingsRow || { merch_url_en: "", merch_url_zh_tw: "", merch_url_zh_cn: "", merch_is_active: 0 };
     mediaList = mediaResult.results || [];
   } catch (e: any) {
@@ -65,7 +68,7 @@ function getMediaUrl(id: number | null) {
   <div class="tab-buttons">
     <button class="tab-btn active" data-tab="news">News Block</button>
     <button class="tab-btn" data-tab="tours">Tour Dates</button>
-    <button class="tab-btn" data-tab="albums">Album Covers</button>
+    <button class="tab-btn" data-tab="albums">Music & Albums</button>
     <button class="tab-btn" data-tab="videos">Videos</button>
     <button class="tab-btn" data-tab="socials-merch">Socials & Merch</button>
   </div>
@@ -250,6 +253,50 @@ function getMediaUrl(id: number | null) {
         </div>
         
         <button type="submit" class="btn-submit">Save Albums Layout</button>
+      </form>
+
+      <form id="music-links-form" class="admin-form card-form" style="margin-top: 2rem;">
+        <div class="actions-bar">
+          <h2>Music Streaming Platforms</h2>
+          <button type="button" class="btn-primary" id="btn-add-music-row">Add Music Platform</button>
+        </div>
+        <p class="admin-muted">Add streaming platforms (e.g. Spotify, Apple Music) displayed on the music page. Select logo PNGs/SVGs and input URLs.</p>
+
+        <div class="sortable-list" id="music-links-container">
+          {musicLinks.map((link, index) => (
+            <div class="sortable-row" data-index={index}>
+              <div class="drag-handle">⋮⋮</div>
+              <div class="form-group">
+                <label>Platform Name</label>
+                <input type="text" class="music-name" value={link.name} required placeholder="Spotify, Apple Music" />
+              </div>
+              <div class="form-group">
+                <label>Target URL</label>
+                <input type="url" class="music-url" value={link.url} required placeholder="https://..." />
+              </div>
+              <div class="form-group">
+                <label>Logo Icon</label>
+                <div class="media-picker-control" data-field={`music_logo_${index}`}>
+                  <input type="hidden" class="music-media-id" value={link.logo_media_id} />
+                  <div class="picker-preview select-sm">
+                    <img src={getMediaUrl(link.logo_media_id)} alt={link.name} />
+                  </div>
+                  <div class="picker-actions">
+                    <button type="button" class="btn-select-media btn-xs">Select</button>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group checkbox-cell">
+                <input type="checkbox" class="music-active" checked={link.is_active === 1} id={`music-active-${index}`} />
+                <label for={`music-active-${index}`}>Active</label>
+              </div>
+              <button type="button" class="btn-remove-row remove-btn">Remove</button>
+            </div>
+          ))}
+          {musicLinks.length === 0 && <div class="empty-list-msg">No music platform links configured. Click "Add Music Platform".</div>}
+        </div>
+
+        <button type="submit" class="btn-submit">Save Music Platforms</button>
       </form>
     </div>
 
