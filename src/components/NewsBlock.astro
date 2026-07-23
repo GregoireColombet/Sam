@@ -51,10 +51,29 @@ const t = labels[locale];
 
 <style>
   .news {
+    position: relative;
     background: rgb(240, 127, 128);
+    overflow: hidden;
+  }
+
+  .news::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: var(--news-bg);
+    background-size: cover;
+    background-position: center;
+    filter: grayscale(100%);
+    opacity: 0.35; /* 65% transparency */
+    pointer-events: none;
   }
 
   .news-card {
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 28px;
