@@ -192,6 +192,10 @@ const currentData = localData[locale];
     <section class="about-section section-2">
       <div class="container">
         <div class="about-grid">
+          <div class="image-wrapper">
+            <img src={currentData.sections[1].image} alt={currentData.sections[1].alt} loading="lazy" class="about-image" />
+            <div class="image-overlay"></div>
+          </div>
           <div class="timeline-container">
             {currentData.sections[1].items.map((item) => (
               <div class="timeline-item">
@@ -203,10 +207,6 @@ const currentData = localData[locale];
                 </div>
               </div>
             ))}
-          </div>
-          <div class="image-wrapper">
-            <img src={currentData.sections[1].image} alt={currentData.sections[1].alt} loading="lazy" class="about-image" />
-            <div class="image-overlay"></div>
           </div>
         </div>
       </div>
@@ -263,7 +263,7 @@ const currentData = localData[locale];
     font-size: clamp(2.5rem, 6vw, 4.8rem);
     font-weight: 900;
     letter-spacing: -0.02em;
-    color: var(--rose);
+    color: #000000;
     text-transform: uppercase;
     text-shadow: none;
   }
@@ -332,21 +332,14 @@ const currentData = localData[locale];
     position: relative;
   }
 
-  /* Desktop layout ordering */
-  .section-1 .image-wrapper,
-  .section-3 .image-wrapper {
-    grid-column: 1;
-  }
-  .section-1 .timeline-container,
-  .section-3 .timeline-container {
-    grid-column: 2;
-  }
-
+  /* Desktop layout ordering for Section 2 (swaps columns) */
   .section-2 .timeline-container {
     grid-column: 1;
+    grid-row: 1;
   }
   .section-2 .image-wrapper {
     grid-column: 2;
+    grid-row: 1;
   }
 
   /* Continuous timeline line on desktop */
@@ -461,10 +454,6 @@ const currentData = localData[locale];
     color: #000000;
   }
 
-  .timeline-content {
-    background: transparent;
-  }
-
   .paragraph {
     font-size: 1rem;
     line-height: 1.6;
@@ -489,19 +478,7 @@ const currentData = localData[locale];
       gap: 40px;
     }
 
-    /* Reset desktop column ordering on mobile */
-    .section-1 .image-wrapper,
-    .section-2 .image-wrapper,
-    .section-3 .image-wrapper {
-      grid-column: auto;
-      order: 1;
-    }
-
-    .section-1 .timeline-container,
-    .section-2 .timeline-container,
-    .section-3 .timeline-container {
-      grid-column: auto;
-      order: 2;
+    .timeline-container {
       padding-left: 52px;
     }
 
