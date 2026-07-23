@@ -9,7 +9,7 @@ const db = env?.DB;
 // If already logged in, redirect to admin index
 const admin = await getAdminContext(env, Astro.request);
 if (admin) {
-  return Astro.redirect("/sam-admin");
+  return Astro.redirect("/sam-admin/");
 }
 
 let error = "";
@@ -136,7 +136,7 @@ if (Astro.request.method === "POST") {
               expires: expires
             });
 
-            return Astro.redirect("/sam-admin");
+            return Astro.redirect("/sam-admin/");
           }
         }
       } else {
