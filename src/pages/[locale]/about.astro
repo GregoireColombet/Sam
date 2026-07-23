@@ -263,7 +263,7 @@ const currentData = localData[locale];
     font-size: clamp(2.5rem, 6vw, 4.8rem);
     font-weight: 900;
     letter-spacing: -0.02em;
-    color: #000000;
+    color: var(--rose);
     text-transform: uppercase;
     text-shadow: none;
   }
@@ -285,17 +285,17 @@ const currentData = localData[locale];
 
   /* Section 1: Brushed Background, Pink/Rose line and details */
   .section-1 {
-    background: url('/assets/brushed_bg.jpg') no-repeat center;
+    background: url('/assets/brushed_bg.jpg') no-repeat center center;
     background-size: cover;
     color: #000000;
     --line-color: var(--rose);
   }
 
-  /* Section 2: Blue Background, Cyan/Blue line and details */
+  /* Section 2: Blue Background, dark details for light background contrast */
   .section-2 {
-    background: linear-gradient(135deg, #060c18 0%, #0d1e36 100%);
-    color: #ffffff;
-    --line-color: var(--cyan);
+    background-color: rgb(125, 206, 208);
+    color: #000000;
+    --line-color: #154c56;
   }
 
   /* Section 3: Flipped Brushed Background, Pink/Rose line and details */
@@ -307,8 +307,11 @@ const currentData = localData[locale];
 
   .section-flipped-bg {
     position: absolute;
-    inset: 0;
-    background: url('/assets/brushed_bg.jpg') no-repeat center;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/assets/brushed_bg.jpg') no-repeat center center;
     background-size: cover;
     transform: scaleX(-1);
     z-index: 1;
@@ -371,17 +374,9 @@ const currentData = localData[locale];
     z-index: 3;
   }
 
-  .section-2 .image-wrapper {
-    box-shadow: 0 10px 30px rgba(75, 187, 196, 0.15);
-  }
-
   .image-wrapper:hover {
     transform: translateY(-8px);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-  }
-
-  .section-2 .image-wrapper:hover {
-    box-shadow: 0 15px 35px rgba(75, 187, 196, 0.25);
   }
 
   .about-image {
@@ -444,6 +439,7 @@ const currentData = localData[locale];
     border: 3px solid var(--line-color);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     z-index: 5;
+    background-color: #ffffff;
   }
 
   /* Desktop circle positioning */
@@ -451,29 +447,18 @@ const currentData = localData[locale];
   .section-3 .timeline-circle {
     left: 0;
     transform: translate(-50%, -50%);
-    background-color: #ffffff;
   }
 
   .section-2 .timeline-circle {
     right: 0;
     transform: translate(50%, -50%);
-    background-color: #0b1528;
   }
 
   .year-text {
     font-size: 1.1rem;
     font-weight: 800;
     letter-spacing: -0.02em;
-    color: currentColor;
-  }
-
-  .section-1 .year-text,
-  .section-3 .year-text {
     color: #000000;
-  }
-
-  .section-2 .year-text {
-    color: #ffffff;
   }
 
   .timeline-content {
@@ -486,15 +471,7 @@ const currentData = localData[locale];
     margin: 0;
     opacity: 0.9;
     text-align: justify;
-  }
-
-  .section-1 .paragraph,
-  .section-3 .paragraph {
     color: #2b2b2b;
-  }
-
-  .section-2 .paragraph {
-    color: #e2e8f0;
   }
 
   /* Responsive Design */
