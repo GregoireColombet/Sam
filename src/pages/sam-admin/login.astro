@@ -55,7 +55,12 @@ if (Astro.request.method === "POST") {
     const email = String(data.get("email") || "").toLowerCase().trim();
     const password = String(data.get("password") || "");
 
-    if (action === "setup") {
+    if (action === "logout") {
+      Astro.cookies.delete("sam_session", {
+        path: "/"
+      });
+      return Astro.redirect("/sam-admin/login");
+    } else if (action === "setup") {
       const confirmPassword = String(data.get("confirm_password") || "");
       
       let userToSetup = null;
@@ -124,7 +129,7 @@ if (Astro.request.method === "POST") {
 
             // Set secure cookie
             Astro.cookies.set("sam_session", sessionToken, {
-              path: "/sam-admin",
+              path: "/",
               httpOnly: true,
               secure: true,
               sameSite: "lax",
