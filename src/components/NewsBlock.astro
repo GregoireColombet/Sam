@@ -61,13 +61,18 @@ const t = labels[locale];
     position: relative;
     background: var(--night-graphite);
     overflow: hidden;
-    max-width: min(100% - 32px, 960px);
+    width: calc(100% - 2 * clamp(34px, 5vw, 100px));
     margin: 0 auto;
     padding: 48px 24px;
     border-left: 1px solid rgba(130, 232, 231, 0.4);
     border-right: 1px solid rgba(130, 232, 231, 0.4);
     border-top: none;
     border-bottom: none;
+  }
+
+  .news :global(.container) {
+    width: 100%;
+    max-width: none;
   }
 
   .news-content {
