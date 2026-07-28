@@ -210,11 +210,15 @@ const t = labels[locale];
     width: calc(100% - 2 * clamp(34px, 5vw, 100px));
     margin: 0 auto;
     padding: 48px 24px;
-    border-left: 1px solid rgba(130, 232, 231, 0.4);
-    border-right: 1px solid rgba(130, 232, 231, 0.4);
-    border-top: none;
-    border-bottom: none;
+    border: none;
     background: transparent;
+  }
+
+  @media (min-width: 768px) {
+    .videos {
+      border-left: 1px solid rgba(130, 232, 231, 0.4);
+      border-right: 1px solid rgba(130, 232, 231, 0.4);
+    }
   }
 
   .videos :global(.container) {
