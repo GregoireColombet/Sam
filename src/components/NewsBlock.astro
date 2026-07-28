@@ -14,20 +14,27 @@ const t = labels[locale];
 ---
 
 <section class="news section">
-  <div class="container news-card">
-    <div>
+  <div class={`container news-content ${news.background ? 'has-image' : ''}`}>
+    <div class="news-text">
       <p class="eyebrow">News</p>
       <h2>{title}</h2>
       <p>{body}</p>
     </div>
-    {news.countdownAtUtc && (
+    {news.background && (
+      <div class="news-image-container">
+        <img src={news.background.url} alt={news.background.alt || title} class="news-image" />
+      </div>
+    )}
+  </div>
+  {news.countdownAtUtc && (
+    <div class="countdown-container">
       <div class="countdown" data-countdown={news.countdownAtUtc}>
         <span><strong data-days>0</strong>{t.days}</span>
         <span><strong data-hours>0</strong>{t.hours}</span>
         <span><strong data-minutes>0</strong>{t.minutes}</span>
       </div>
-    )}
-  </div>
+    </div>
+  )}
 </section>
 
 <script>
@@ -63,14 +70,34 @@ const t = labels[locale];
     border-bottom: none;
   }
 
-  .news-card {
-    position: relative;
-    z-index: 1;
+  .news-content {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 28px;
-    align-items: end;
-    min-height: 360px;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+
+  @media (min-width: 768px) {
+    .news-content.has-image {
+      grid-template-columns: 3fr 2fr;
+    }
+  }
+
+  .news-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .news-image {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid rgba(130, 232, 231, 0.2);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
   }
 
   .eyebrow {
@@ -96,6 +123,13 @@ const t = labels[locale];
     color: var(--ice-white);
     font-size: 1.05rem;
     line-height: 1.7;
+  }
+
+  .countdown-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+    width: 100%;
   }
 
   .countdown {
@@ -125,11 +159,5 @@ const t = labels[locale];
     font-size: 2.2rem;
     font-weight: 900;
     text-shadow: 0 0 8px rgba(130, 232, 231, 0.4);
-  }
-
-  @media (max-width: 760px) {
-    .news-card {
-      grid-template-columns: 1fr;
-    }
   }
 </style>

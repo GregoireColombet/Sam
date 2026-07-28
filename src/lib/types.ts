@@ -60,5 +60,4 @@ export type LandingContent = {
   albums: AlbumCover[];
   videos: VideoLink[];
   socialLinks: PlatformLink[];
-  merchUrl: string | null;
 };

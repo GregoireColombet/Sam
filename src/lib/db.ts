@@ -55,7 +55,7 @@ export async function getLandingContent(env?: RuntimeEnv): Promise<LandingConten
 
   try {
     const now = new Date().toISOString();
-    const [news, toursResult, albums, videos, socials, merch] = await Promise.all([
+    const [news, toursResult, albums, videos, socials] = await Promise.all([
       db.prepare(
         `select n.*, m.r2_key as background_key, m.alt_text as background_alt
          from news_blocks n
@@ -94,9 +94,7 @@ export async function getLandingContent(env?: RuntimeEnv): Promise<LandingConten
          join media_assets m on m.id = s.logo_media_id
          where s.is_active = 1
          order by s.sort_order asc, s.id asc`
-      ).all<Record<string, unknown>>(),
-      db.prepare(`select merch_url_en, merch_url_zh_tw, merch_url_zh_cn from site_settings where id = 1`)
-        .first<Record<string, unknown>>()
+      ).all<Record<string, unknown>>()
     ]);
 
     return {
@@ -133,8 +131,7 @@ export async function getLandingContent(env?: RuntimeEnv): Promise<LandingConten
         }
       })),
       videos: (videos.results || []).map((row) => mapVideo(row, env)),
-      socialLinks: (socials.results || []).map((row) => mapPlatform(row, env)),
-      merchUrl: merch?.merch_url_zh_tw ? String(merch.merch_url_zh_tw) : null
+      socialLinks: (socials.results || []).map((row) => mapPlatform(row, env))
     };
   } catch {
     return emptyLandingContent();
@@ -225,7 +222,6 @@ export function emptyLandingContent(): LandingContent {
     tours: [],
     albums: [],
     videos: [],
-    socialLinks: [],
-    merchUrl: null
+    socialLinks: []
   };
 }
