@@ -39,23 +39,23 @@ if (merchUrl) {
   .page-main {
     padding-top: 96px;
     min-height: 74vh;
-    background: url('/assets/brushed_bg.jpg') no-repeat center;
-    background-size: 100% 100%;
-    color: #000000;
+    background: transparent;
+    color: var(--ice-white);
   }
 
   .page-main :global(.section-title) {
-    color: #000000;
-    text-shadow: none;
+    display: block;
+    color: var(--aqua-glow);
   }
 
   .page-main :global(.section-title::after) {
-    background: #000000;
-    box-shadow: none;
+    width: 40%;
+    background: var(--aqua-glow);
+    box-shadow: 0 -4px 10px var(--aqua-glow);
   }
 
   .page-main :global(.empty-state) {
-    border-color: #000000;
-    color: #000000;
+    border-color: var(--line);
+    color: var(--text-muted);
   }
 </style>

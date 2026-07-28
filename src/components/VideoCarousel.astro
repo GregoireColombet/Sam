@@ -17,21 +17,25 @@ const t = labels[locale];
     {videos.length === 0 ? (
       <div class="empty-state">{t.videoComingSoon}</div>
     ) : (
-      <div class="video-strip">
-        {videos.map((video) => (
-          <button class="video-card" data-video-url={getLocalizedVideoUrl(video, locale)} data-video-title={video.title} type="button">
-            <span class="video-img-wrapper">
+      <div class="carousel-wrapper">
+        <button class="carousel-arrow prev" data-carousel-prev aria-label="Previous videos" type="button">◀</button>
+        <div class="video-strip">
+          {videos.map((video) => (
+            <button class="video-card" data-video-url={getLocalizedVideoUrl(video, locale)} data-video-title={video.title} type="button">
+              <span class="video-img-wrapper">
 
-              {video.thumbnail ? (
-                <img src={video.thumbnail.url} alt={video.thumbnail.alt || video.title} loading="lazy" />
-              ) : (
-                <span class="no-thumb">{video.title}</span>
-              )}
-              <span class="play-icon" aria-hidden="true">▶</span>
-            </span>
-            <strong>{video.title}</strong>
-          </button>
-        ))}
+                {video.thumbnail ? (
+                  <img src={video.thumbnail.url} alt={video.thumbnail.alt || video.title} loading="lazy" />
+                ) : (
+                  <span class="no-thumb">{video.title}</span>
+                )}
+                <span class="play-icon" aria-hidden="true">▶</span>
+              </span>
+              <strong>{video.title}</strong>
+            </button>
+          ))}
+        </div>
+        <button class="carousel-arrow next" data-carousel-next aria-label="Next videos" type="button">▶</button>
       </div>
     )}
   </div>
@@ -184,6 +188,19 @@ const t = labels[locale];
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeLightbox();
   });
+
+  // Carousel arrow navigation
+  const carouselPrevBtn = document.querySelector("[data-carousel-prev]");
+  const carouselNextBtn = document.querySelector("[data-carousel-next]");
+  const videoStrip = document.querySelector(".video-strip");
+  if (videoStrip && carouselPrevBtn && carouselNextBtn) {
+    carouselPrevBtn.addEventListener("click", () => {
+      videoStrip.scrollBy({ left: -320, behavior: "smooth" });
+    });
+    carouselNextBtn.addEventListener("click", () => {
+      videoStrip.scrollBy({ left: 320, behavior: "smooth" });
+    });
+  }
 </script>
 
 <style>
@@ -191,13 +208,44 @@ const t = labels[locale];
     position: relative;
     z-index: 1;
     max-width: min(100% - 32px, 960px);
-    margin: 48px auto;
+    margin: 24px auto;
     padding: 48px 24px;
-    border: 1px solid rgba(130, 232, 231, 0.4);
+    border-left: 1px solid rgba(130, 232, 231, 0.4);
+    border-right: 1px solid rgba(130, 232, 231, 0.4);
+    border-top: none;
+    border-bottom: none;
     background: transparent;
   }
 
+  .carousel-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .carousel-arrow {
+    background: transparent;
+    border: none;
+    color: var(--aqua-glow);
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 10;
+    transition: transform 180ms ease, opacity 180ms ease;
+    opacity: 0.8;
+    line-height: 1;
+  }
+
+  .carousel-arrow:hover {
+    transform: scale(1.2);
+    opacity: 1;
+    text-shadow: 0 0 8px var(--aqua-glow);
+  }
+
   .video-strip {
+    flex: 1;
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: minmax(280px, 38%);
