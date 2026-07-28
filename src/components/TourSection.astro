@@ -51,19 +51,8 @@ const now = Date.now();
 
 <style>
   .tour-section {
-    background: url('/assets/brushed_bg.jpg') no-repeat center;
-    background-size: 100% 100%;
-    color: #000000;
-  }
-
-  .tour-section .section-title {
-    color: #000000;
-    text-shadow: none;
-  }
-
-  .tour-section .section-title::after {
-    background: #000000;
-    box-shadow: none;
+    background: transparent;
+    color: var(--ice-white);
   }
 
   .tour-list {
@@ -77,14 +66,14 @@ const now = Date.now();
     gap: 24px;
     align-items: center;
     padding: 22px;
-    border: 1px solid #000000;
-    background: transparent;
+    border: 1px solid var(--line);
+    background: var(--night-graphite);
     transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
   }
 
   .tour-item:not(.is-past):hover {
-    border-color: #000000;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    border-color: var(--aqua-glow);
+    box-shadow: 0 6px 15px rgba(130, 232, 231, 0.2);
     transform: translateY(-2px);
   }
 
@@ -92,18 +81,18 @@ const now = Date.now();
     filter: grayscale(1);
     opacity: 0.45;
     background: transparent;
-    border-color: #000000;
+    border-color: var(--line);
   }
 
   time {
     display: grid;
     gap: 6px;
-    color: #333333;
+    color: var(--text-muted);
     font-weight: 700;
   }
 
   time strong {
-    color: #000000;
+    color: var(--ice-white);
     font-size: 1.4rem;
     font-weight: 900;
     text-shadow: none;
@@ -114,12 +103,12 @@ const now = Date.now();
     font-size: clamp(1.35rem, 3vw, 2.2rem);
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    color: #000000;
+    color: var(--ice-white);
   }
 
   p {
     margin: 0;
-    color: #333333;
+    color: var(--text-muted);
   }
 
   .status {
@@ -127,23 +116,11 @@ const now = Date.now();
     align-items: center;
     min-height: 44px;
     padding: 0 16px;
-    border: 1px solid #000000;
-    color: #4a4a4a;
+    border: 1px solid var(--line);
+    color: var(--text-muted);
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-  }
-
-  .tour-section :global(.button) {
-    border-color: #000000;
-    color: #000000;
-    box-shadow: none;
-  }
-
-  .tour-section :global(.button:hover) {
-    background: #000000;
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   @media (max-width: 760px) {

@@ -70,10 +70,46 @@ const merchExternal = Boolean(merchUrl);
   }
 
   .site-nav.is-scrolled {
-    background: rgba(0, 0, 0, 0.95);
-    border-color: rgba(75, 187, 196, 0.3);
+    background: rgba(216, 244, 243, 0.95);
+    border-color: rgba(0, 128, 128, 0.2);
     backdrop-filter: blur(16px);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.8), 0 1px 10px rgba(75, 187, 196, 0.15);
+    box-shadow: 0 4px 30px rgba(15, 20, 24, 0.1), 0 1px 10px rgba(0, 128, 128, 0.15);
+    color: var(--dark);
+    text-shadow: none;
+  }
+
+  .site-nav.is-scrolled .brand-logo {
+    filter: none;
+  }
+
+  .site-nav.is-scrolled .desktop-nav a {
+    color: var(--dark);
+  }
+
+  .site-nav.is-scrolled .desktop-nav a:hover {
+    color: var(--coral-red-dark);
+    text-shadow: none;
+  }
+
+  .site-nav.is-scrolled .language-switcher a {
+    border-color: rgba(15, 20, 24, 0.25);
+    color: var(--dark);
+  }
+
+  .site-nav.is-scrolled .language-switcher a:hover {
+    border-color: var(--coral-red-dark);
+    color: var(--coral-red-dark);
+  }
+
+  .site-nav.is-scrolled .menu-button {
+    border-color: rgba(15, 20, 24, 0.25);
+    background: rgba(15, 20, 24, 0.05);
+    color: var(--dark);
+  }
+
+  .site-nav.is-scrolled .menu-button:hover {
+    border-color: var(--coral-red-dark);
+    color: var(--coral-red-dark);
   }
 
   .brand {
@@ -87,6 +123,7 @@ const merchExternal = Boolean(merchUrl);
     width: auto;
     display: block;
     filter: invert(1) brightness(1.2);
+    transition: filter 180ms ease;
   }
 
   .desktop-nav {

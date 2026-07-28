@@ -245,7 +245,7 @@ const currentData = localData[locale];
     padding-top: 96px;
     min-height: 80vh;
     background: transparent;
-    color: #000000;
+    color: var(--ice-white);
   }
 
   .text-center {
@@ -254,8 +254,7 @@ const currentData = localData[locale];
 
   .hero-section {
     padding-bottom: 48px;
-    background: url('/assets/brushed_bg.jpg') no-repeat center;
-    background-size: cover;
+    background: transparent;
   }
 
   .page-title {
@@ -263,7 +262,7 @@ const currentData = localData[locale];
     font-size: clamp(2.5rem, 6vw, 4.8rem);
     font-weight: 900;
     letter-spacing: -0.02em;
-    color: #000000;
+    color: var(--aqua-glow);
     text-transform: uppercase;
     text-shadow: none;
   }
@@ -271,7 +270,7 @@ const currentData = localData[locale];
   .divider {
     width: 60px;
     height: 4px;
-    background: #000000;
+    background: var(--coral-red);
     margin: 24px auto 0;
     border-radius: 2px;
     box-shadow: none;
@@ -283,39 +282,29 @@ const currentData = localData[locale];
     overflow: hidden;
   }
 
-  /* Section 1: Brushed Background, Pink/Rose line and details */
+  /* Section 1: Pink/Rose line and details */
   .section-1 {
-    background: url('/assets/brushed_bg.jpg') no-repeat center center;
-    background-size: cover;
-    color: #000000;
-    --line-color: var(--rose);
+    background: transparent;
+    color: var(--ice-white);
+    --line-color: var(--coral-red);
   }
 
   /* Section 2: Blue Background, dark details for light background contrast */
   .section-2 {
-    background-color: rgb(125, 206, 208);
-    color: #000000;
-    --line-color: #154c56;
+    background-color: transparent;
+    color: var(--ice-white);
+    --line-color: var(--aqua-glow);
   }
 
-  /* Section 3: Flipped Brushed Background, Pink/Rose line and details */
+  /* Section 3: Pink/Rose line and details */
   .section-3 {
     background: transparent;
-    color: #000000;
-    --line-color: var(--rose);
+    color: var(--ice-white);
+    --line-color: var(--coral-red);
   }
 
   .section-flipped-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('/assets/brushed_bg.jpg') no-repeat center center;
-    background-size: cover;
-    transform: scaleX(-1);
-    z-index: 1;
-    pointer-events: none;
+    display: none;
   }
 
   .section-3 .container {
@@ -432,7 +421,7 @@ const currentData = localData[locale];
     border: 3px solid var(--line-color);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     z-index: 5;
-    background-color: #ffffff;
+    background-color: var(--night-graphite);
   }
 
   /* Desktop circle positioning */
@@ -451,7 +440,7 @@ const currentData = localData[locale];
     font-size: 1.1rem;
     font-weight: 800;
     letter-spacing: -0.02em;
-    color: #000000;
+    color: var(--ice-white);
   }
 
   .paragraph {
@@ -460,7 +449,7 @@ const currentData = localData[locale];
     margin: 0;
     opacity: 0.9;
     text-align: justify;
-    color: #2b2b2b;
+    color: var(--ice-white);
   }
 
   /* Responsive Design */

@@ -10,7 +10,7 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
   </video>
   <div class="hero-shade"></div>
   <div class="hero-content">
-    <h1>Sam Lee</h1>
+    <img class="hero-logo" src="/assets/logo_white.png" alt="Sam Lee" />
   </div>
 </section>
 
@@ -38,8 +38,8 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
 
   .hero-shade {
     background:
-      linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.1) 50%, #000000 100%),
-      radial-gradient(circle at 50% 44%, rgba(75, 187, 196, 0.25), transparent 45%);
+      linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.1) 50%, #0F1418 100%),
+      radial-gradient(circle at 50% 44%, rgba(130, 232, 231, 0.25), transparent 45%);
   }
 
   .hero-content {
@@ -47,15 +47,15 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
     z-index: 1;
     text-align: center;
     padding: 96px 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
-  h1 {
-    margin: 0;
-    font-size: clamp(4rem, 15vw, 12rem);
-    line-height: 0.86;
-    font-weight: 950;
-    letter-spacing: -0.02em;
-    text-transform: uppercase;
-    text-shadow: 0 0 15px rgba(255, 0, 127, 0.65), 0 0 40px rgba(75, 187, 196, 0.45);
+  .hero-logo {
+    max-width: min(80vw, 640px);
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 0 25px rgba(130, 232, 231, 0.3));
   }
 </style>

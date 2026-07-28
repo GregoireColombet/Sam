@@ -39,7 +39,7 @@ const t = labels[locale];
   .footer {
     padding: 36px 0;
     border-top: 1px solid var(--line);
-    background: #000000;
+    background: var(--night-graphite);
   }
 
   .footer-inner {
@@ -126,10 +126,11 @@ const t = labels[locale];
     height: 30px;
     object-fit: contain;
     transition: filter 200ms ease;
+    filter: brightness(0) saturate(100%) invert(67%) sepia(21%) saturate(5427%) hue-rotate(318deg) brightness(101%) contrast(101%);
   }
 
   .socials a:hover img {
-    filter: drop-shadow(0 0 8px rgb(125, 206, 208));
+    filter: brightness(0) saturate(100%) invert(13%) sepia(74%) saturate(3847%) hue-rotate(334deg) brightness(85%) contrast(100%) drop-shadow(0 0 8px rgba(113, 15, 40, 0.8));
   }
 
   @media (max-width: 640px) {

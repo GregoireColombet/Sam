@@ -13,7 +13,7 @@ const body = getLocalized(news.body, locale);
 const t = labels[locale];
 ---
 
-<section class="news section" style={news.background ? `--news-bg: url('${news.background.url}')` : undefined}>
+<section class="news section">
   <div class="container news-card">
     <div>
       <p class="eyebrow">News</p>
@@ -52,23 +52,8 @@ const t = labels[locale];
 <style>
   .news {
     position: relative;
-    background: rgb(240, 127, 128);
+    background: transparent;
     overflow: hidden;
-  }
-
-  .news::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: var(--news-bg);
-    background-size: cover;
-    background-position: center;
-    filter: grayscale(100%);
-    opacity: 0.35; /* 65% transparency */
-    pointer-events: none;
   }
 
   .news-card {
@@ -83,7 +68,7 @@ const t = labels[locale];
 
   .eyebrow {
     margin: 0 0 12px;
-    color: #8b0000;
+    color: var(--coral-red);
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -96,12 +81,12 @@ const t = labels[locale];
     line-height: 0.92;
     letter-spacing: -0.02em;
     text-transform: uppercase;
-    color: #000000;
+    color: var(--aqua-glow);
   }
 
   p {
     max-width: 680px;
-    color: #2b2b2b;
+    color: var(--ice-white);
     font-size: 1.05rem;
     line-height: 1.7;
   }
@@ -115,8 +100,8 @@ const t = labels[locale];
   .countdown span {
     min-width: 86px;
     padding: 14px;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    background: #121212;
+    border: 1px solid var(--line);
+    background: var(--night-graphite);
     text-align: center;
     color: var(--text-muted);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -124,15 +109,15 @@ const t = labels[locale];
   }
 
   .countdown span:hover {
-    border-color: #000000;
+    border-color: var(--aqua-glow);
   }
 
   .countdown strong {
     display: block;
-    color: var(--cyan);
+    color: var(--aqua-glow);
     font-size: 2.2rem;
     font-weight: 900;
-    text-shadow: 0 0 8px rgba(75, 187, 196, 0.4);
+    text-shadow: 0 0 8px rgba(130, 232, 231, 0.4);
   }
 
   @media (max-width: 760px) {

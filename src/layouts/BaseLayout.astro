@@ -65,17 +65,26 @@ const { locale, title = "Sam Lee", description = "Official website of Sam Lee." 
 <style is:global>
   :root {
     color-scheme: dark;
-    --bg: #000000;
-    --bg-soft: #0a0a0c;
-    --bg-muted: #15151c;
-    --text: #ffffff;
+    --dark: #0F1418;
+    --night-graphite: #151B20;
+    --aqua-glow: #82E8E7;
+    --aqua-glow-dark: #008080;
+    --future-mist: #D8F4F3;
+    --coral-red: #FF747D;
+    --coral-red-dark: #710f28;
+    --ice-white: #FAFAFA;
+
+    --bg: var(--dark);
+    --bg-soft: var(--night-graphite);
+    --bg-muted: var(--night-graphite);
+    --text: var(--ice-white);
     --text-muted: #9ca3af;
-    --line: rgba(75, 187, 196, 0.2);
-    --gold: #4bbbc4;
-    --rose: #ff007f;
-    --jade: #4bbbc4;
-    --cyan: #4bbbc4;
-    --pink: #ff007f;
+    --line: rgba(130, 232, 231, 0.2);
+    --gold: var(--aqua-glow);
+    --rose: var(--coral-red);
+    --jade: var(--aqua-glow);
+    --cyan: var(--aqua-glow);
+    --pink: var(--coral-red);
     --grey: #2a2a30;
     --max: 1160px;
     font-family:
@@ -133,8 +142,8 @@ const { locale, title = "Sam Lee", description = "Official website of Sam Lee." 
     font-weight: 900;
     letter-spacing: -0.02em;
     text-transform: uppercase;
-    color: #fff;
-    text-shadow: 0 0 8px rgba(75, 187, 196, 0.4), 0 0 20px rgba(75, 187, 196, 0.1);
+    color: var(--aqua-glow);
+    text-shadow: 0 0 8px rgba(130, 232, 231, 0.4), 0 0 20px rgba(130, 232, 231, 0.1);
     position: relative;
     display: inline-block;
   }
@@ -144,9 +153,9 @@ const { locale, title = "Sam Lee", description = "Official website of Sam Lee." 
     display: block;
     width: 60px;
     height: 4px;
-    background: var(--pink);
+    background: var(--coral-red);
     margin-top: 8px;
-    box-shadow: 0 0 10px var(--pink);
+    box-shadow: 0 0 10px var(--coral-red);
   }
 
   .muted {
@@ -203,13 +212,13 @@ const { locale, title = "Sam Lee", description = "Official website of Sam Lee." 
     justify-content: center;
     min-height: 44px;
     padding: 0 22px;
-    border: 2px solid var(--cyan);
-    background: transparent;
-    color: var(--cyan);
+    border: 2px solid var(--coral-red);
+    background: var(--night-graphite);
+    color: var(--ice-white);
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    box-shadow: 0 0 8px rgba(75, 187, 196, 0.2);
+    box-shadow: 0 0 8px rgba(255, 116, 125, 0.2);
     transition:
       transform 180ms ease,
       background 180ms ease,
@@ -219,9 +228,9 @@ const { locale, title = "Sam Lee", description = "Official website of Sam Lee." 
 
   .button:hover {
     transform: translateY(-2px);
-    background: var(--cyan);
-    color: #000000;
-    box-shadow: 0 0 16px rgba(75, 187, 196, 0.6);
+    background: var(--coral-red-dark);
+    color: var(--ice-white);
+    box-shadow: 0 0 16px rgba(113, 15, 40, 0.6);
   }
 
   @media (max-width: 720px) {
