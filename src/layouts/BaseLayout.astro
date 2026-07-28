@@ -36,7 +36,7 @@ const { locale, title = "Sam Lee", description = "Official website of Sam Lee." 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Chiron+Sung+HK:wght@200..900&family=Victor+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Chiron+Sung+HK:wght@200..900&family=Syncopate:wght@400;700&display=swap" rel="stylesheet" />
   </head>
   <body>
     <slot />
@@ -112,12 +112,12 @@ const { locale, title = "Sam Lee", description = "Official website of Sam Lee." 
       sans-serif;
   }
 
-  /* English titles override: Victor Mono for news, video, album, and other section/page titles */
+  /* English titles override: Syncopate for news, video, album, and other section/page titles */
   html[lang="en"] .section-title,
   html[lang="en"] .page-title,
   html[lang="en"] .news-text h2,
   html[lang="en"] .news-text .eyebrow {
-    font-family: "Victor Mono", monospace;
+    font-family: "Syncopate", sans-serif;
   }
 
   * {
