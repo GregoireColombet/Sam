@@ -37,6 +37,7 @@ type Labels = {
   ticketLinks: string;
   choosePlatform: string;
   backHome: string;
+  video: string;
 };
 
 export const labels: Record<Locale, Labels> = {
@@ -61,7 +62,8 @@ export const labels: Record<Locale, Labels> = {
     minutes: "Minutes",
     ticketLinks: "Ticketing platforms",
     choosePlatform: "Choose a platform",
-    backHome: "Back home"
+    backHome: "Back home",
+    video: "Video"
   },
   "zh-TW": {
     home: "首頁",
@@ -84,7 +86,8 @@ export const labels: Record<Locale, Labels> = {
     minutes: "分鐘",
     ticketLinks: "購票平台",
     choosePlatform: "選擇平台",
-    backHome: "回首頁"
+    backHome: "回首頁",
+    video: "影音"
   },
   "zh-CN": {
     home: "首页",
@@ -107,7 +110,8 @@ export const labels: Record<Locale, Labels> = {
     minutes: "分钟",
     ticketLinks: "购票平台",
     choosePlatform: "选择平台",
-    backHome: "回首页"
+    backHome: "回首页",
+    video: "影音"
   }
 };
 
