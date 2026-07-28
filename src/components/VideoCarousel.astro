@@ -192,26 +192,6 @@ const t = labels[locale];
     z-index: 1;
   }
 
-  .videos::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('/assets/brushed_bg.jpg') no-repeat center;
-    background-size: 100% 100%;
-    transform: scaleY(-1);
-    z-index: -1;
-  }
-
-  .videos :global(.section-title) {
-    color: #000000;
-    text-shadow: none;
-  }
-
-  .videos :global(.section-title::after) {
-    background: #000000;
-    box-shadow: none;
-  }
-
   .video-strip {
     display: grid;
     grid-auto-flow: column;
@@ -221,7 +201,7 @@ const t = labels[locale];
     padding-bottom: 20px;
     scroll-snap-type: x mandatory;
     scrollbar-width: thin;
-    scrollbar-color: #000000 transparent;
+    scrollbar-color: var(--aqua-glow) transparent;
   }
 
   .video-card {
@@ -240,8 +220,8 @@ const t = labels[locale];
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
     display: grid;
     place-items: center;
     overflow: hidden;
@@ -249,7 +229,7 @@ const t = labels[locale];
   }
 
   .video-card:hover .video-img-wrapper {
-    border-color: #000000;
+    border-color: var(--aqua-glow);
   }
 
   .video-card img {
@@ -266,7 +246,7 @@ const t = labels[locale];
 
   .no-thumb {
     font-size: 0.95rem;
-    color: #4a4a4a;
+    color: var(--text-muted);
     text-align: center;
     padding: 12px;
   }
@@ -291,22 +271,22 @@ const t = labels[locale];
   .video-card:hover .play-icon {
     opacity: 1;
     transform: scale(1.1);
-    background: #000000;
-    color: #ffffff;
-    border-color: #000000;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    background: var(--dark);
+    color: var(--aqua-glow);
+    border-color: var(--aqua-glow);
+    box-shadow: 0 0 15px rgba(130, 232, 231, 0.4);
   }
 
   .video-card strong {
     font-size: 1.05rem;
     font-weight: 700;
     line-height: 1.4;
-    color: #000000;
+    color: var(--ice-white);
     transition: color 220ms ease;
   }
 
   .video-card:hover strong {
-    color: #333333;
+    color: var(--coral-red);
   }
 
   /* Lightbox Styles */

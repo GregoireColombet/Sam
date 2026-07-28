@@ -145,17 +145,17 @@ const { locale, title = "Sam Lee", description = "Official website of Sam Lee." 
     color: var(--aqua-glow);
     text-shadow: 0 0 8px rgba(130, 232, 231, 0.4), 0 0 20px rgba(130, 232, 231, 0.1);
     position: relative;
-    display: inline-block;
+    display: block;
   }
 
   .section-title::after {
     content: "";
     display: block;
-    width: 60px;
+    width: 35%;
     height: 4px;
-    background: var(--coral-red);
+    background: var(--aqua-glow);
     margin-top: 8px;
-    box-shadow: 0 0 10px var(--coral-red);
+    box-shadow: 0 -4px 10px var(--aqua-glow);
   }
 
   .muted {
@@ -228,9 +228,9 @@ const { locale, title = "Sam Lee", description = "Official website of Sam Lee." 
 
   .button:hover {
     transform: translateY(-2px);
-    background: var(--coral-red-dark);
+    background: rgba(255, 116, 125, 0.6);
     color: var(--ice-white);
-    box-shadow: 0 0 16px rgba(113, 15, 40, 0.6);
+    box-shadow: 0 0 16px rgba(255, 116, 125, 0.4);
   }
 
   @media (max-width: 720px) {
