@@ -34,10 +34,10 @@ const videos = mediaList.filter((asset) => asset.content_type.startsWith("video/
       <h1>Media Library</h1>
       <p class="admin-muted">Upload and manage image assets and video assets hosted on Cloudflare.</p>
     </div>
-    <label class="upload-btn">
+    <label class="upload-btn" for="media-file-input">
       Upload File
-      <input type="file" id="media-file-input" accept="image/png, image/jpeg, image/webp" style="display: none;" />
     </label>
+    <input type="file" id="media-file-input" accept="image/png, image/jpeg, image/webp" style="display: none;" />
   </div>
 
   {error && <div class="admin-alert admin-alert-error">{error}</div>}
@@ -211,6 +211,7 @@ const videos = mediaList.filter((asset) => asset.content_type.startsWith("video/
       btn.textContent = originalText;
       btn.style.opacity = "";
       btn.style.pointerEvents = "";
+      if (fileInput) fileInput.value = "";
     }
   }
 
