@@ -1,4 +1,5 @@
 import type {
+  BonusSettings,
   LandingContent,
   PlatformLink,
   TourDate,
@@ -224,4 +225,36 @@ export function emptyLandingContent(): LandingContent {
     videos: [],
     socialLinks: []
   };
+}
+
+export async function getBonusSettings(env?: RuntimeEnv): Promise<BonusSettings | null> {
+  const db = env?.DB;
+  if (!db) return null;
+  try {
+    const settings = await db.prepare(
+      `select s.bonus_title_en, s.bonus_title_zh_tw, s.bonus_title_zh_cn,
+              s.bonus_text_en, s.bonus_text_zh_tw, s.bonus_text_zh_cn,
+              s.bonus_media_id, m.r2_key as bonus_media_key, m.alt_text as bonus_media_alt
+       from site_settings s
+       left join media_assets m on m.id = s.bonus_media_id
+       where s.id = 1`
+    ).first<Record<string, unknown>>();
+    if (!settings) return null;
+    return {
+      title: {
+        en: String(settings.bonus_title_en || ""),
+        zhTW: String(settings.bonus_title_zh_tw || ""),
+        zhCN: String(settings.bonus_title_zh_cn || "")
+      },
+      text: {
+        en: String(settings.bonus_text_en || ""),
+        zhTW: String(settings.bonus_text_zh_tw || ""),
+        zhCN: String(settings.bonus_text_zh_cn || "")
+      },
+      mediaId: settings.bonus_media_id ? Number(settings.bonus_media_id) : null,
+      imageUrl: settings.bonus_media_key ? mediaUrl(env, String(settings.bonus_media_key)) : ""
+    };
+  } catch {
+    return null;
+  }
 }

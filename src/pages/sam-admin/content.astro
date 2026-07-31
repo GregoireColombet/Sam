@@ -40,7 +40,12 @@ if (db) {
     videos = videosResult.results || [];
     socials = socialsResult.results || [];
     musicLinks = musicLinksResult.results || [];
-    settings = settingsRow || { merch_url_en: "", merch_url_zh_tw: "", merch_url_zh_cn: "", merch_is_active: 0 };
+    settings = settingsRow || {
+      merch_url_en: "", merch_url_zh_tw: "", merch_url_zh_cn: "", merch_is_active: 0,
+      bonus_title_en: "", bonus_title_zh_tw: "", bonus_title_zh_cn: "",
+      bonus_text_en: "", bonus_text_zh_tw: "", bonus_text_zh_cn: "",
+      bonus_media_id: null
+    };
     mediaList = mediaResult.results || [];
   } catch (e: any) {
     error = e.message;
@@ -71,6 +76,7 @@ function getMediaUrl(id: number | null) {
     <button class="tab-btn" data-tab="albums">Music & Albums</button>
     <button class="tab-btn" data-tab="videos">Moment</button>
     <button class="tab-btn" data-tab="socials-merch">Socials & Merch</button>
+    <button class="tab-btn" data-tab="bonus">Bonus page</button>
   </div>
 
   <!-- Tab Contents -->
@@ -443,6 +449,66 @@ function getMediaUrl(id: number | null) {
         </div>
 
         <button type="submit" class="btn-submit">Save Social Links</button>
+      </form>
+    </div>
+
+    <!-- BONUS TAB -->
+    <div class="tab-pane" id="tab-bonus">
+      <form id="bonus-form" class="admin-form card-form">
+        <h2>Bonus Page Settings</h2>
+        <p class="admin-muted">Manage the Title, Text, and Image displayed when clicking the "Extra bonus" button.</p>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Title (English)</label>
+            <input type="text" name="bonus_title_en" value={settings.bonus_title_en || ""} required />
+          </div>
+          <div class="form-group">
+            <label>Title (Traditional Chinese)</label>
+            <input type="text" name="bonus_title_zh_tw" value={settings.bonus_title_zh_tw || ""} required />
+          </div>
+          <div class="form-group">
+            <label>Title (Simplified Chinese)</label>
+            <input type="text" name="bonus_title_zh_cn" value={settings.bonus_title_zh_cn || ""} required />
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Text (English)</label>
+            <textarea name="bonus_text_en" rows="3" required>{settings.bonus_text_en || ""}</textarea>
+          </div>
+          <div class="form-group">
+            <label>Text (Traditional Chinese)</label>
+            <textarea name="bonus_text_zh_tw" rows="3" required>{settings.bonus_text_zh_tw || ""}</textarea>
+          </div>
+          <div class="form-group">
+            <label>Text (Simplified Chinese)</label>
+            <textarea name="bonus_text_zh_cn" rows="3" required>{settings.bonus_text_zh_cn || ""}</textarea>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Bonus Image</label>
+            <div class="media-picker-control" data-field="bonus_media_id">
+              <input type="hidden" name="bonus_media_id" value={settings.bonus_media_id || ""} />
+              <div class="picker-preview">
+                {settings.bonus_media_id ? (
+                  <img src={getMediaUrl(settings.bonus_media_id)} alt="Selected Bonus Image" />
+                ) : (
+                  <span class="no-img">No Image Selected</span>
+                )}
+              </div>
+              <div class="picker-actions">
+                <button type="button" class="btn-select-media">Select Image</button>
+                <button type="button" class="btn-clear-media" style={settings.bonus_media_id ? "" : "display:none;"}>Clear</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Save Bonus Settings</button>
       </form>
     </div>
 

@@ -2,8 +2,8 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import SiteNav from "@/components/SiteNav.astro";
 import Footer from "@/components/Footer.astro";
-import { getLandingContent, getMerchUrl } from "@/lib/db";
-import { isLocale, type Locale } from "@/lib/i18n";
+import { getLandingContent, getMerchUrl, getBonusSettings } from "@/lib/db";
+import { isLocale, type Locale, getLocalized } from "@/lib/i18n";
 
 export const prerender = false;
 
@@ -14,9 +14,10 @@ if (!isLocale(requestedLocale)) {
 
 const locale: Locale = requestedLocale;
 const env = Astro.locals.runtime?.env;
-const [landing, merchUrl] = await Promise.all([
+const [landing, merchUrl, bonusSettings] = await Promise.all([
   getLandingContent(env),
-  getMerchUrl(env, locale)
+  getMerchUrl(env, locale),
+  getBonusSettings(env)
 ]);
 
 const pageTitles = {
@@ -33,6 +34,10 @@ const textContent = {
 
 const title = pageTitles[locale];
 const paragraphText = textContent[locale];
+
+const bonusTitle = getLocalized(bonusSettings?.title, locale);
+const bonusText = getLocalized(bonusSettings?.text, locale);
+const bonusImageUrl = bonusSettings?.imageUrl || "";
 ---
 
 <BaseLayout locale={locale} title={`Sam Lee | ${title}`}>
@@ -53,11 +58,94 @@ const paragraphText = textContent[locale];
         <div class="neon-punk-container">
           <img src="/assets/about/about_venture.jpg" alt="Sam Lee Future Journey" class="future-image" />
         </div>
+        
+        {bonusTitle && (
+          <div class="bonus-button-container">
+            <button id="bonus-btn" class="bonus-btn" style="display: none;">Extra bonus</button>
+          </div>
+        )}
       </div>
     </section>
+
+    {bonusTitle && (
+      <div id="bonus-modal" class="bonus-modal">
+        <div class="bonus-modal-content">
+          <button id="bonus-modal-close" class="bonus-modal-close" aria-label="Close">&times;</button>
+          {bonusImageUrl && <img src={bonusImageUrl} alt={bonusTitle} class="bonus-modal-image" />}
+          <h2 class="bonus-modal-title">{bonusTitle}</h2>
+          <div class="bonus-modal-divider"></div>
+          <p class="bonus-modal-text">{bonusText}</p>
+        </div>
+      </div>
+    )}
   </main>
   <Footer locale={locale} socialLinks={landing.socialLinks} />
 </BaseLayout>
+
+<script>
+  const bonusBtn = document.getElementById("bonus-btn");
+  const bonusModal = document.getElementById("bonus-modal");
+  const bonusClose = document.getElementById("bonus-modal-close");
+
+  let timer: number | null = null;
+  let isTimerRunning = false;
+  let hasLeftBottomSinceClose = true;
+
+  function checkScroll() {
+    const windowHeight = window.innerHeight;
+    const scrollY = window.scrollY;
+    const documentHeight = document.documentElement.scrollHeight;
+    
+    // Check if scrolled to the bottom (within 15px threshold)
+    const isAtBottom = (windowHeight + scrollY) >= (documentHeight - 15);
+
+    if (isAtBottom) {
+      if (!isTimerRunning && hasLeftBottomSinceClose && bonusBtn && bonusBtn.style.display === "none" && bonusModal && !bonusModal.classList.contains("open")) {
+        isTimerRunning = true;
+        timer = window.setTimeout(() => {
+          if (bonusBtn) {
+            bonusBtn.style.display = "inline-block";
+            bonusBtn.style.animation = "fadeIn 0.5s ease forwards";
+          }
+          isTimerRunning = false;
+        }, 10000); // 10 seconds
+      }
+    } else {
+      if (isTimerRunning) {
+        if (timer) clearTimeout(timer);
+        isTimerRunning = false;
+      }
+      if (bonusBtn && bonusBtn.style.display === "none" && bonusModal && !bonusModal.classList.contains("open")) {
+        hasLeftBottomSinceClose = true;
+      }
+    }
+  }
+
+  window.addEventListener("scroll", checkScroll);
+  // Initial check on load
+  checkScroll();
+
+  bonusBtn?.addEventListener("click", () => {
+    if (bonusModal) {
+      bonusModal.classList.add("open");
+    }
+  });
+
+  bonusClose?.addEventListener("click", () => {
+    if (bonusModal) {
+      bonusModal.classList.remove("open");
+    }
+    if (bonusBtn) {
+      bonusBtn.style.display = "none";
+    }
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+    isTimerRunning = false;
+    hasLeftBottomSinceClose = false;
+  });
+</script>
 
 <style>
   .page-main {
@@ -155,5 +243,125 @@ const paragraphText = textContent[locale];
 
   .neon-punk-container:hover .future-image {
     transform: scale(1.02);
+  }
+
+  .bonus-button-container {
+    text-align: center;
+    margin-top: 40px;
+    min-height: 50px;
+  }
+
+  .bonus-btn {
+    background: transparent;
+    border: 2px solid var(--aqua-glow);
+    color: var(--aqua-glow);
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(130, 232, 231, 0.3);
+  }
+
+  .bonus-btn:hover {
+    background: var(--aqua-glow);
+    color: #0d0d11;
+    box-shadow: 0 0 25px var(--aqua-glow);
+    transform: translateY(-2px);
+  }
+
+  .bonus-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .bonus-modal.open {
+    display: flex;
+    opacity: 1;
+  }
+
+  .bonus-modal-content {
+    background: #0d0d11;
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    max-width: 600px;
+    width: 100%;
+    position: relative;
+    padding: 40px 30px 30px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(130, 232, 231, 0.15);
+    transform: scale(0.9);
+    transition: transform 0.4s ease;
+  }
+
+  .bonus-modal.open .bonus-modal-content {
+    transform: scale(1);
+  }
+
+  .bonus-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: var(--coral-red, #FF747D);
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .bonus-modal-close:hover {
+    transform: scale(1.1);
+    color: #ff4d58;
+  }
+
+  .bonus-modal-image {
+    width: 100%;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid var(--line);
+  }
+
+  .bonus-modal-title {
+    font-size: 2rem;
+    color: var(--aqua-glow);
+    margin: 0 0 10px;
+    font-weight: normal;
+  }
+
+  .bonus-modal-divider {
+    width: 60px;
+    height: 3px;
+    background: var(--aqua-glow);
+    margin: 0 auto 20px;
+  }
+
+  .bonus-modal-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--ice-white);
+    opacity: 0.9;
+    margin: 0;
+    white-space: pre-line;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 </style>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="520" viewBox="0 0 1600 520" role="img" aria-labelledby="title desc">
+  <title id="title">SAM LEE logo</title>
+  <desc id="desc">A custom geometric SAM LEE logo in black.</desc>
+
+  <g fill="none" stroke="#000000" stroke-width="14" stroke-linecap="square" stroke-linejoin="round">
+    <!-- S (Corrected / Non-inverted) -->
+    <path d="M325 155 H145 Q120 155 120 180 Q120 205 145 205 H275 Q300 205 300 230 Q300 255 275 255 H120"/>
+    <!-- A -->
+    <path d="M405 285 L485 155 L565 285"/>
+    <!-- M -->
+    <path d="M650 285 V155 L735 235 L820 155 V285"/>
+    
+    <!-- L -->
+    <path d="M965 155 V285 H1105"/>
+
+    <!-- First E (Only 3 horizontal lines) -->
+    <path d="M1195 165 H1325"/>
+    <path d="M1195 220 H1325"/>
+    <path d="M1195 275 H1325"/>
+
+    <!-- Second E (Only 3 horizontal lines) -->
+    <path d="M1400 165 H1530"/>
+    <path d="M1400 220 H1530"/>
+    <path d="M1400 275 H1530"/>
+  </g>
+</svg>

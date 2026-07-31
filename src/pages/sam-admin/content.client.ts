@@ -591,14 +591,17 @@ const merchForm = document.getElementById("merch-form") as HTMLFormElement;
 merchForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const formData = new FormData(merchForm);
-  const body = {
-    merch_url_en: formData.get("merch_url_en"),
-    merch_url_zh_tw: formData.get("merch_url_zh_tw"),
-    merch_url_zh_cn: formData.get("merch_url_zh_cn"),
-    merch_is_active: formData.get("merch_is_active") === "on"
-  };
-
   try {
+    const resGet = await fetch("/sam-admin/api/settings");
+    const existing = resGet.ok ? await resGet.json() as any : {};
+    const body = {
+      ...existing,
+      merch_url_en: formData.get("merch_url_en"),
+      merch_url_zh_tw: formData.get("merch_url_zh_tw"),
+      merch_url_zh_cn: formData.get("merch_url_zh_cn"),
+      merch_is_active: formData.get("merch_is_active") === "on"
+    };
+
     const res = await fetch("/sam-admin/api/settings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -606,6 +609,39 @@ merchForm?.addEventListener("submit", async (e) => {
     });
     if (!res.ok) throw new Error("Failed to save settings.");
     alert("Shop settings saved successfully!");
+  } catch (err: any) {
+    alert("Error: " + err.message);
+  }
+});
+
+// ==========================================
+// BONUS SETTINGS
+// ==========================================
+const bonusForm = document.getElementById("bonus-form") as HTMLFormElement;
+bonusForm?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(bonusForm);
+  try {
+    const resGet = await fetch("/sam-admin/api/settings");
+    const existing = resGet.ok ? await resGet.json() as any : {};
+    const body = {
+      ...existing,
+      bonus_title_en: formData.get("bonus_title_en"),
+      bonus_title_zh_tw: formData.get("bonus_title_zh_tw"),
+      bonus_title_zh_cn: formData.get("bonus_title_zh_cn"),
+      bonus_text_en: formData.get("bonus_text_en"),
+      bonus_text_zh_tw: formData.get("bonus_text_zh_tw"),
+      bonus_text_zh_cn: formData.get("bonus_text_zh_cn"),
+      bonus_media_id: formData.get("bonus_media_id") ? Number(formData.get("bonus_media_id")) : null
+    };
+
+    const res = await fetch("/sam-admin/api/settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error("Failed to save settings.");
+    alert("Bonus page settings saved successfully!");
   } catch (err: any) {
     alert("Error: " + err.message);
   }

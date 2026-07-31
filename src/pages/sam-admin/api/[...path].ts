@@ -489,7 +489,7 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
     }
   }
 
-  // 9. Site Settings (Merch)
+  // 9. Site Settings (Merch & Bonus Page)
   if (path === "settings") {
     if (method === "GET") {
       const settings = await db.prepare(`select * from site_settings where id = 1`).first();
@@ -499,19 +499,37 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
       try {
         const body = await request.json() as any;
         await db.prepare(
-          `insert into site_settings (id, merch_url_en, merch_url_zh_tw, merch_url_zh_cn, merch_is_active)
-           values (1, ?, ?, ?, ?)
+          `insert into site_settings (
+             id, merch_url_en, merch_url_zh_tw, merch_url_zh_cn, merch_is_active,
+             bonus_title_en, bonus_title_zh_tw, bonus_title_zh_cn,
+             bonus_text_en, bonus_text_zh_tw, bonus_text_zh_cn, bonus_media_id
+           )
+           values (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
            on conflict(id) do update set
              merch_url_en=excluded.merch_url_en,
              merch_url_zh_tw=excluded.merch_url_zh_tw,
              merch_url_zh_cn=excluded.merch_url_zh_cn,
              merch_is_active=excluded.merch_is_active,
+             bonus_title_en=excluded.bonus_title_en,
+             bonus_title_zh_tw=excluded.bonus_title_zh_tw,
+             bonus_title_zh_cn=excluded.bonus_title_zh_cn,
+             bonus_text_en=excluded.bonus_text_en,
+             bonus_text_zh_tw=excluded.bonus_text_zh_tw,
+             bonus_text_zh_cn=excluded.bonus_text_zh_cn,
+             bonus_media_id=excluded.bonus_media_id,
              updated_at=current_timestamp`
         ).bind(
           body.merch_url_en || null,
           body.merch_url_zh_tw || null,
           body.merch_url_zh_cn || null,
-          body.merch_is_active ? 1 : 0
+          body.merch_is_active ? 1 : 0,
+          body.bonus_title_en || null,
+          body.bonus_title_zh_tw || null,
+          body.bonus_title_zh_cn || null,
+          body.bonus_text_en || null,
+          body.bonus_text_zh_tw || null,
+          body.bonus_text_zh_cn || null,
+          body.bonus_media_id || null
         ).run();
 
         await logActivity(env, admin.email, "update_settings", "site_settings", 1);

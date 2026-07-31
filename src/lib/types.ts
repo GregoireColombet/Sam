@@ -61,3 +61,11 @@ export type LandingContent = {
   videos: VideoLink[];
   socialLinks: PlatformLink[];
 };
+
+export type BonusSettings = {
+  title: LocalizedText;
+  text: LocalizedText;
+  imageUrl: string;
+  mediaId: number | null;
+};
+
