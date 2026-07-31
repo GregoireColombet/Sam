@@ -20,20 +20,61 @@ function slugify(text: string): string {
 
 export const ALL: APIRoute = async ({ request, params, locals }) => {
   const env = locals.runtime?.env;
+  const path = params.path || "status";
+  const db = env?.DB;
+  const bucket = env?.MEDI_BUCKET || env?.MEDIA_BUCKET;
+  const method = request.method;
+
+  // Allow authorization via CRON_SECRET for the garbage collect endpoint
+  const authHeader = request.headers.get("Authorization");
+  const isCronAuthorized = (env as any)?.CRON_SECRET && authHeader === `Bearer ${(env as any).CRON_SECRET}`;
+
+  if (method === "POST" && path === "media/gc" && isCronAuthorized) {
+    if (!db) return json({ error: "Database not configured" }, { status: 503 });
+    if (!bucket) return json({ error: "Media storage is not configured" }, { status: 503 });
+
+    try {
+      const d1Assets = await db.prepare(`select r2_key from media_assets`).all<{ r2_key: string }>();
+      const validKeys = new Set((d1Assets.results || []).map(row => row.r2_key));
+
+      let listed = await bucket.list();
+      const orphanedKeys: string[] = [];
+
+      while (true) {
+        for (const file of listed.objects) {
+          if (file.key.startsWith("uploads/") && !validKeys.has(file.key)) {
+            orphanedKeys.push(file.key);
+          }
+        }
+        if (listed.truncated) {
+          listed = await bucket.list({ cursor: listed.cursor });
+        } else {
+          break;
+        }
+      }
+
+      const deleted: string[] = [];
+      for (const key of orphanedKeys) {
+        await bucket.delete(key);
+        deleted.push(key);
+      }
+
+      await logActivity(env, "system-cron", "garbage_collect", "media_asset", null, `Purged ${deleted.length} orphaned R2 files.`);
+      return json({ ok: true, purged: deleted });
+    } catch (e: any) {
+      return json({ error: e.message }, { status: 500 });
+    }
+  }
+
   const admin = await getAdminContext(env, request);
 
   if (!admin) {
     return json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const db = env?.DB;
-  const bucket = env?.MEDI_BUCKET || env?.MEDIA_BUCKET;
   if (!db) {
     return json({ error: "Database not configured" }, { status: 503 });
   }
-
-  const path = params.path || "status";
-  const method = request.method;
 
   // 1. Status Check
   if (method === "GET" && path === "status") {

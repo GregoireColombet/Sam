@@ -1,7 +1,7 @@
 name = "sam"
 compatibility_date = "2026-07-13"
 compatibility_flags = ["nodejs_compat"]
-main = "./dist/_worker.js/index.js"
+main = "./worker.js"
 
 [assets]
 directory = "./dist"
@@ -19,3 +19,6 @@ bucket_name = "sam-media-production"
 PUBLIC_MEDIA_BASE_URL = "/media"
 INITIAL_ADMIN_EMAIL = "greg.clb@gmail.com"
 ADMIN_PATH = "/sam-admin"
+
+[triggers]
+crons = ["0 3 * * 1"]
