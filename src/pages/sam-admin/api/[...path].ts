@@ -4,6 +4,7 @@ import { getAdminContext, json, logActivity } from "@/lib/admin";
 export const prerender = false;
 
 const allowedImageTypes = new Set(["image/png", "image/jpeg", "image/webp"]);
+const allowedVideoTypes = new Set(["video/mp4", "video/webm", "video/ogg", "video/quicktime"]);
 
 function slugify(text: string): string {
   return text
@@ -69,8 +70,8 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
       const file = form.get("file");
       const alt = String(form.get("alt") || "");
       if (!(file instanceof File)) return json({ error: "Missing file" }, { status: 400 });
-      if (!allowedImageTypes.has(file.type)) {
-        return json({ error: "Only PNG, JPG, JPEG, and WebP images are allowed" }, { status: 400 });
+      if (!allowedImageTypes.has(file.type) && !allowedVideoTypes.has(file.type)) {
+        return json({ error: "Only PNG, JPG, JPEG, WebP images and MP4, WEBM, OGG, MOV videos are allowed" }, { status: 400 });
       }
 
       const extension = file.name.split(".").pop()?.toLowerCase() || "bin";
@@ -103,17 +104,65 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
 
       if (!asset) return json({ error: "Media asset not found" }, { status: 404 });
 
-      // Try deleting from R2 first
+      // Try deleting from D1 first (blocks if referenced due to foreign key check)
+      await db.batch([
+        db.prepare(`PRAGMA foreign_keys = ON;`),
+        db.prepare(`delete from media_assets where id = ?`).bind(body.id)
+      ]);
+
+      // If D1 deletion succeeded, try deleting from R2 next
       if (bucket) {
-        await bucket.delete(asset.r2_key);
+        try {
+          await bucket.delete(asset.r2_key);
+        } catch (r2Err) {
+          console.error("R2 deletion error:", r2Err);
+          // R2 file will be cleaned up by garbage collection
+        }
       }
 
-      // Delete from D1
-      await db.prepare(`delete from media_assets where id = ?`).bind(body.id).run();
       await logActivity(env, admin.email, "delete_media", "media_asset", body.id, asset.file_name);
       return json({ ok: true });
     } catch (e: any) {
       return json({ error: "Cannot delete media. It might be referenced by other content." }, { status: 409 });
+    }
+  }
+
+  if (method === "POST" && path === "media/gc") {
+    if (!bucket) return json({ error: "Media storage is not configured" }, { status: 503 });
+
+    try {
+      // 1. Get all valid keys in D1
+      const d1Assets = await db.prepare(`select r2_key from media_assets`).all<{ r2_key: string }>();
+      const validKeys = new Set((d1Assets.results || []).map(row => row.r2_key));
+
+      // 2. List all files in R2 bucket
+      let listed = await bucket.list();
+      const orphanedKeys: string[] = [];
+
+      while (true) {
+        for (const file of listed.objects) {
+          if (file.key.startsWith("uploads/") && !validKeys.has(file.key)) {
+            orphanedKeys.push(file.key);
+          }
+        }
+        if (listed.truncated) {
+          listed = await bucket.list({ cursor: listed.cursor });
+        } else {
+          break;
+        }
+      }
+
+      // 3. Delete orphaned files from R2
+      const deleted: string[] = [];
+      for (const key of orphanedKeys) {
+        await bucket.delete(key);
+        deleted.push(key);
+      }
+
+      await logActivity(env, admin.email, "garbage_collect", "media_asset", null, `Purged ${deleted.length} orphaned R2 files.`);
+      return json({ ok: true, purged: deleted });
+    } catch (e: any) {
+      return json({ error: e.message }, { status: 500 });
     }
   }
 

@@ -69,7 +69,7 @@ function getMediaUrl(id: number | null) {
     <button class="tab-btn active" data-tab="news">News Block</button>
     <button class="tab-btn" data-tab="tours">Tour Dates</button>
     <button class="tab-btn" data-tab="albums">Music & Albums</button>
-    <button class="tab-btn" data-tab="videos">Videos</button>
+    <button class="tab-btn" data-tab="videos">Moment</button>
     <button class="tab-btn" data-tab="socials-merch">Socials & Merch</button>
   </div>
 
@@ -300,14 +300,14 @@ function getMediaUrl(id: number | null) {
       </form>
     </div>
 
-    <!-- VIDEOS TAB -->
+    <!-- VIDEOS TAB (MOMENT) -->
     <div class="tab-pane" id="tab-videos">
       <form id="videos-form" class="admin-form card-form">
         <div class="actions-bar">
-          <h2>Carousel Playable Videos</h2>
-          <button type="button" class="btn-primary" id="btn-add-video-row">Add Video</button>
+          <h2>Carousel Playable Moments</h2>
+          <button type="button" class="btn-primary" id="btn-add-video-row">Add Moment</button>
         </div>
-        <p class="admin-muted">Set up playable video thumbnails. Provide standard urls from YouTube, Vimeo, or R2 links. You can configure localized URLs for Simplified Chinese regions if needed.</p>
+        <p class="admin-muted">Set up playable moments. Select a video from your uploaded video assets and choose an image for its thumbnail cover.</p>
 
         <div class="sortable-list" id="videos-container">
           {videos.map((vid, index) => (
@@ -321,7 +321,7 @@ function getMediaUrl(id: number | null) {
                   </div>
                   <div class="form-group">
                     <label>Thumbnail Cover</label>
-                    <div class="media-picker-control" data-field={`video_thumb_${index}`}>
+                    <div class="media-picker-control" data-media-type="image" data-field={`video_thumb_${index}`}>
                       <input type="hidden" class="video-thumbnail-id" value={vid.thumbnail_media_id || ""} />
                       <div class="picker-preview select-sm">
                         {vid.thumbnail_media_id ? (
@@ -343,23 +343,27 @@ function getMediaUrl(id: number | null) {
 
                 <div class="form-grid pt-2">
                   <div class="form-group">
-                    <label>URL (English)</label>
-                    <input type="url" class="video-url-en" value={vid.url_en} required placeholder="https://youtube.com/watch?v=..." />
-                  </div>
-                  <div class="form-group">
-                    <label>URL (Traditional Chinese)</label>
-                    <input type="url" class="video-url-zh-tw" value={vid.url_zh_tw} required placeholder="https://youtube.com/watch?v=..." />
-                  </div>
-                  <div class="form-group">
-                    <label>URL (Simplified Chinese)</label>
-                    <input type="url" class="video-url-zh-cn" value={vid.url_zh_cn} required placeholder="e.g. Bilibili link for CN region" />
+                    <label>Choose Video File (Cloudflare)</label>
+                    <div class="media-picker-control" data-media-type="video" data-field={`video_asset_${index}`}>
+                      <input type="hidden" class="video-asset-url" value={vid.url_en || ""} required />
+                      <div class="picker-preview select-sm" style="width: 150px; height: 45px; display: flex; align-items: center; justify-content: center; background: var(--admin-bg);">
+                        {vid.url_en ? (
+                          <span class="video-chosen" style="font-size: 0.75rem; word-break: break-all; padding: 4px; text-align: center;" title={vid.url_en}>{vid.url_en.split("/").pop()}</span>
+                        ) : (
+                          <span class="no-img">No Video Selected</span>
+                        )}
+                      </div>
+                      <div class="picker-actions">
+                        <button type="button" class="btn-select-media btn-xs">Select Video</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
               <button type="button" class="btn-remove-row remove-btn">Remove</button>
             </div>
           ))}
-          {videos.length === 0 && <div class="empty-list-msg">No videos configured. Click "Add Video" to populate.</div>}
+          {videos.length === 0 && <div class="empty-list-msg">No moments configured. Click "Add Moment" to populate.</div>}
         </div>
 
         <button type="submit" class="btn-submit">Save Video Carousel</button>
@@ -457,12 +461,18 @@ function getMediaUrl(id: number | null) {
         </div>
         <div class="modal-media-grid" id="modal-media-grid">
           {mediaList.map((m) => (
-            <div class="modal-media-item" data-id={m.id} data-url={`${baseMediaUrl}/${m.r2_key}`} data-name={m.file_name}>
-              <img src={`${baseMediaUrl}/${m.r2_key}`} alt={m.alt_text || m.file_name} />
+            <div class="modal-media-item" data-id={m.id} data-url={`${baseMediaUrl}/${m.r2_key}`} data-name={m.file_name} data-media-type={m.content_type.startsWith("video/") ? "video" : "image"}>
+              {m.content_type.startsWith("video/") ? (
+                <div class="video-placeholder-preview" style="aspect-ratio: 4/3; background: #111; display: grid; place-items: center; position: relative; width: 100%; height: 100%; min-height: 80px;">
+                  <span style="font-size: 1.5rem;">📹</span>
+                </div>
+              ) : (
+                <img src={`${baseMediaUrl}/${m.r2_key}`} alt={m.alt_text || m.file_name} />
+              )}
               <span class="modal-item-name" title={m.file_name}>{m.file_name}</span>
             </div>
           ))}
-          {mediaList.length === 0 && <div class="admin-muted" style="grid-column: 1/-1; text-align: center; padding: 24px;">No media assets. Go to "Media" tab to upload images first.</div>}
+          {mediaList.length === 0 && <div class="admin-muted" style="grid-column: 1/-1; text-align: center; padding: 24px;">No media assets available. Go to the Media Library to upload files first.</div>}
         </div>
       </div>
     </div>

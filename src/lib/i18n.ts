@@ -20,7 +20,9 @@ type Labels = {
   music: string;
   tour: string;
   merch: string;
-  about: string;
+  past: string;
+  present: string;
+  future: string;
   zoommuzikProduction: string;
   businessInquiries: string;
   purchase: string;
@@ -46,7 +48,9 @@ export const labels: Record<Locale, Labels> = {
     music: "Music",
     tour: "Tour",
     merch: "Merchandising",
-    about: "About",
+    past: "Past",
+    present: "Present",
+    future: "Future",
     zoommuzikProduction: "Zoommuzik production",
     businessInquiries: "Contact for business inquiries",
     purchase: "Purchase",
@@ -63,14 +67,16 @@ export const labels: Record<Locale, Labels> = {
     ticketLinks: "Ticketing platforms",
     choosePlatform: "Choose a platform",
     backHome: "Back home",
-    video: "Video"
+    video: " Moments"
   },
   "zh-TW": {
     home: "首頁",
     music: "音樂",
     tour: "巡演",
     merch: "周邊商品",
-    about: "關於",
+    past: "過去",
+    present: "現在",
+    future: "未來",
     zoommuzikProduction: "錞藝音樂製作",
     businessInquiries: "商務合作信箱",
     purchase: "購票",
@@ -87,14 +93,16 @@ export const labels: Record<Locale, Labels> = {
     ticketLinks: "購票平台",
     choosePlatform: "選擇平台",
     backHome: "回首頁",
-    video: "影音"
+    video: " 精彩瞬間"
   },
   "zh-CN": {
     home: "首页",
     music: "音乐",
     tour: "巡演",
     merch: "周边商品",
-    about: "关于",
+    past: "过去",
+    present: "现在",
+    future: "未来",
     zoommuzikProduction: "錞艺音乐制作",
     businessInquiries: "商务合作信箱",
     purchase: "购票",
@@ -111,7 +119,7 @@ export const labels: Record<Locale, Labels> = {
     ticketLinks: "购票平台",
     choosePlatform: "选择平台",
     backHome: "回首页",
-    video: "影音"
+    video: " 精彩瞬间"
   }
 };
 

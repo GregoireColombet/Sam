@@ -1,0 +1,159 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SiteNav from "@/components/SiteNav.astro";
+import Footer from "@/components/Footer.astro";
+import { getLandingContent, getMerchUrl } from "@/lib/db";
+import { isLocale, type Locale } from "@/lib/i18n";
+
+export const prerender = false;
+
+const requestedLocale = Astro.params.locale;
+if (!isLocale(requestedLocale)) {
+  return Astro.redirect("/zh-TW/future");
+}
+
+const locale: Locale = requestedLocale;
+const env = Astro.locals.runtime?.env;
+const [landing, merchUrl] = await Promise.all([
+  getLandingContent(env),
+  getMerchUrl(env, locale)
+]);
+
+const pageTitles = {
+  en: "Future",
+  "zh-TW": "未來",
+  "zh-CN": "未来"
+};
+
+const textContent = {
+  en: "Looking ahead, the future shines bright with new creative visions, upcoming tour schedules, and technological integration. The journey ahead promises groundbreaking music projects and even closer bonds with fans around the globe. Guided by a commitment to musical excellence and innovation, Sam Lee is set to explore new genres and digital spaces, creating immersive experiences that will define the next chapter of his musical legacy.",
+  "zh-TW": "展望未來，隨著全新的創作願景、即將公佈的巡演行程以及技術整合，未來散發著明亮的光芒。未來的旅程承諾將帶來突破性的音樂企劃，與全球樂迷建立更緊密的連結。在對音樂卓越與創新的承諾指引下，李聖傑將探索新的音樂風格與數位空間，創造出定義他音樂生涯下一章節的沉浸式體驗。",
+  "zh-CN": "展望未来，随着全新的创作愿景、即将公布的巡演行程以及技术整合，未来散发着明亮的光芒。未来的旅程承诺将带来突破性的音乐企划，与全球乐迷建立更紧密的联结。在对音乐卓越与创新的承诺指引下，李圣杰将探索新的音乐风格与数位空间，创造出定义他音乐生涯下一章节的沉浸式体验。"
+};
+
+const title = pageTitles[locale];
+const paragraphText = textContent[locale];
+---
+
+<BaseLayout locale={locale} title={`Sam Lee | ${title}`}>
+  <SiteNav locale={locale} merchUrl={merchUrl} />
+  <main class="page-main">
+    <section class="section hero-section">
+      <div class="container text-center">
+        <h1 class="page-title">{title}</h1>
+        <div class="divider"></div>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="container">
+        <div class="text-wrapper">
+          <p class="paragraph">{paragraphText}</p>
+        </div>
+        <div class="neon-punk-container">
+          <img src="/assets/about/about_venture.jpg" alt="Sam Lee Future Journey" class="future-image" />
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer locale={locale} socialLinks={landing.socialLinks} />
+</BaseLayout>
+
+<style>
+  .page-main {
+    padding-top: 96px;
+    min-height: 80vh;
+    background: transparent;
+    color: var(--ice-white);
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .hero-section {
+    padding-bottom: 24px;
+    background: transparent;
+  }
+
+  .page-title {
+    margin: 0;
+    font-size: clamp(2.5rem, 6vw, 4.8rem);
+    font-weight: normal;
+    letter-spacing: -0.02em;
+    color: var(--aqua-glow);
+    text-transform: uppercase;
+    text-shadow: none;
+  }
+
+  .divider {
+    width: 40%;
+    height: 4px;
+    background: var(--aqua-glow);
+    margin: 24px auto 0;
+    border-radius: 2px;
+    box-shadow: 0 -4px 10px var(--aqua-glow);
+  }
+
+  .content-section {
+    padding: 24px 0 80px;
+  }
+
+  .text-wrapper {
+    max-width: 800px;
+    margin: 0 auto 40px;
+  }
+
+  .paragraph {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    margin: 0;
+    opacity: 0.9;
+    text-align: justify;
+    color: var(--ice-white);
+  }
+
+  .neon-punk-container {
+    position: relative;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--line);
+    box-shadow: 0 0 20px rgba(130, 232, 231, 0.2), 0 10px 30px rgba(0, 0, 0, 0.5);
+    background: #0d0d11;
+  }
+
+  .future-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: grayscale(100%) contrast(1.4) brightness(0.85);
+    transition: transform 0.6s ease;
+  }
+
+  /* Neon punk overlay using aqua_glow (#82E8E7) and coral-red (#FF747D) */
+  .neon-punk-container::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(130, 232, 231, 0.8), rgba(255, 116, 125, 0.8));
+    mix-blend-mode: color;
+    pointer-events: none;
+  }
+
+  /* Add a subtle glow overlay */
+  .neon-punk-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--aqua-glow), var(--coral-red));
+    mix-blend-mode: overlay;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .neon-punk-container:hover .future-image {
+    transform: scale(1.02);
+  }
+</style>

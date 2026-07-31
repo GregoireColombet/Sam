@@ -24,14 +24,15 @@ if (db) {
   error = "Database binding is not available.";
 }
 
-
+const pictures = mediaList.filter((asset) => asset.content_type.startsWith("image/"));
+const videos = mediaList.filter((asset) => asset.content_type.startsWith("video/"));
 ---
 
 <AdminLayout title="Media Library">
   <div class="media-header">
     <div>
       <h1>Media Library</h1>
-      <p class="admin-muted">Upload and manage image assets for news backgrounds, album covers, and social logos.</p>
+      <p class="admin-muted">Upload and manage image assets and video assets hosted on Cloudflare.</p>
     </div>
     <label class="upload-btn">
       Upload File
@@ -41,29 +42,66 @@ if (db) {
 
   {error && <div class="admin-alert admin-alert-error">{error}</div>}
 
-  <!-- Drop Zone -->
-  <div class="drop-zone" id="media-drop-zone">
-    <span class="drop-zone-text">Drag and drop files here or click "Upload File" (PNG, JPG, WEBP only)</span>
+  <!-- Tab Buttons -->
+  <div class="tab-buttons">
+    <button class="tab-btn active" data-tab="pictures">Pictures</button>
+    <button class="tab-btn" data-tab="videos">Videos</button>
   </div>
 
-  <div class="media-grid" id="media-grid">
-    {mediaList.length === 0 ? (
-      <div class="empty-media" id="empty-media-msg">No media assets uploaded yet.</div>
-    ) : (
-      mediaList.map((asset) => (
-        <div class="media-card" data-asset-id={asset.id}>
-          <div class="media-preview">
-            <img src={`${baseMediaUrl}/${asset.r2_key}`} alt={asset.alt_text || asset.file_name} />
-          </div>
-          <div class="media-details">
-            <strong class="media-name" title={asset.file_name}>{asset.file_name}</strong>
-            <span class="media-meta">{formatBytes(asset.size_bytes)} · {asset.content_type.split("/")[1].toUpperCase()}</span>
-            <input type="text" class="media-url-input" readonly value={`${baseMediaUrl}/${asset.r2_key}`} title="Click to copy URL" />
-            <button class="delete-btn" data-id={asset.id}>Delete</button>
-          </div>
-        </div>
-      ))
-    )}
+  <div class="tab-contents">
+    <!-- PICTURES TAB -->
+    <div class="tab-pane active" id="tab-pictures">
+      <div class="drop-zone" id="media-drop-zone-pictures" data-type="pictures">
+        <span class="drop-zone-text">Drag and drop pictures here or click "Upload File" (PNG, JPG, WEBP only)</span>
+      </div>
+
+      <div class="media-grid" id="pictures-grid">
+        {pictures.length === 0 ? (
+          <div class="empty-media" id="empty-pictures-msg">No pictures uploaded yet.</div>
+        ) : (
+          pictures.map((asset) => (
+            <div class="media-card" data-asset-id={asset.id}>
+              <div class="media-preview">
+                <img src={`${baseMediaUrl}/${asset.r2_key}`} alt={asset.alt_text || asset.file_name} />
+              </div>
+              <div class="media-details">
+                <strong class="media-name" title={asset.file_name}>{asset.file_name}</strong>
+                <span class="media-meta">{formatBytes(asset.size_bytes)} · {asset.content_type.split("/")[1].toUpperCase()}</span>
+                <input type="text" class="media-url-input" readonly value={`${baseMediaUrl}/${asset.r2_key}`} title="Click to copy URL" />
+                <button class="delete-btn" data-id={asset.id}>Delete</button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+
+    <!-- VIDEOS TAB -->
+    <div class="tab-pane" id="tab-videos">
+      <div class="drop-zone" id="media-drop-zone-videos" data-type="videos">
+        <span class="drop-zone-text">Drag and drop videos here or click "Upload File" (MP4, WEBM, OGG, MOV only)</span>
+      </div>
+
+      <div class="media-grid" id="videos-grid">
+        {videos.length === 0 ? (
+          <div class="empty-media" id="empty-videos-msg">No videos uploaded yet.</div>
+        ) : (
+          videos.map((asset) => (
+            <div class="media-card" data-asset-id={asset.id}>
+              <div class="media-preview">
+                <video src={`${baseMediaUrl}/${asset.r2_key}`} muted preload="metadata" controls style="max-width: 100%; max-height: 100%; object-fit: contain;"></video>
+              </div>
+              <div class="media-details">
+                <strong class="media-name" title={asset.file_name}>{asset.file_name}</strong>
+                <span class="media-meta">{formatBytes(asset.size_bytes)} · {asset.content_type.split("/")[1].toUpperCase()}</span>
+                <input type="text" class="media-url-input" readonly value={`${baseMediaUrl}/${asset.r2_key}`} title="Click to copy URL" />
+                <button class="delete-btn" data-id={asset.id}>Delete</button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   </div>
 </AdminLayout>
 
@@ -71,9 +109,30 @@ if (db) {
   import { formatBytes } from "@/lib/utils";
 
   const fileInput = document.getElementById("media-file-input") as HTMLInputElement;
-  const dropZone = document.getElementById("media-drop-zone");
-  const mediaGrid = document.getElementById("media-grid");
-  const emptyMsg = document.getElementById("empty-media-msg");
+  const tabBtns = document.querySelectorAll(".tab-btn");
+  const tabPanes = document.querySelectorAll(".tab-pane");
+
+  // Tab switching logic
+  tabBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = btn.getAttribute("data-tab");
+      if (!target) return;
+
+      tabBtns.forEach((b) => b.classList.remove("active"));
+      tabPanes.forEach((p) => p.classList.remove("active"));
+
+      btn.classList.add("active");
+      document.getElementById(`tab-${target}`)?.classList.add("active");
+
+      // Dynamically adjust accept attribute
+      if (target === "pictures") {
+        fileInput.setAttribute("accept", "image/png, image/jpeg, image/webp");
+      } else {
+        fileInput.setAttribute("accept", "video/mp4, video/webm, video/ogg, video/quicktime");
+      }
+    });
+  });
+
 
   // Handle upload
   async function uploadFile(file: File) {
@@ -102,17 +161,27 @@ if (db) {
       }
 
       const data = await response.json() as any;
+      const isVideo = file.type.startsWith("video/");
       
-      // Remove empty message if it exists
+      const targetGridId = isVideo ? "videos-grid" : "pictures-grid";
+      const targetEmptyMsgId = isVideo ? "empty-videos-msg" : "empty-pictures-msg";
+      
+      const grid = document.getElementById(targetGridId);
+      const emptyMsg = document.getElementById(targetEmptyMsgId);
       if (emptyMsg) emptyMsg.remove();
 
       // Prepend to grid
       const card = document.createElement("div");
       card.className = "media-card";
       card.setAttribute("data-asset-id", data.id);
+      
+      const previewHtml = isVideo
+        ? `<video src="${data.url}" muted preload="metadata" controls style="max-width: 100%; max-height: 100%; object-fit: contain;"></video>`
+        : `<img src="${data.url}" alt="${file.name}" />`;
+
       card.innerHTML = `
         <div class="media-preview">
-          <img src="${data.url}" alt="${file.name}" />
+          ${previewHtml}
         </div>
         <div class="media-details">
           <strong class="media-name" title="${file.name}">${file.name}</strong>
@@ -131,10 +200,10 @@ if (db) {
       });
 
       // Delete action for new card
-      card.querySelector(".delete-btn")?.addEventListener("click", () => handleDelete(data.id, file.name));
+      card.querySelector(".delete-btn")?.addEventListener("click", () => handleDelete(data.id, file.name, isVideo));
 
-      if (mediaGrid) {
-        mediaGrid.insertBefore(card, mediaGrid.firstChild);
+      if (grid) {
+        grid.insertBefore(card, grid.firstChild);
       }
     } catch (e: any) {
       alert("Error: " + e.message);
@@ -146,7 +215,7 @@ if (db) {
   }
 
   // Handle delete
-  async function handleDelete(id: number, name: string) {
+  async function handleDelete(id: number, name: string, isVideo: boolean) {
     if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
 
     try {
@@ -165,12 +234,16 @@ if (db) {
       const card = document.querySelector(`[data-asset-id="${id}"]`);
       card?.remove();
       
-      if (mediaGrid?.children.length === 0) {
+      const gridId = isVideo ? "videos-grid" : "pictures-grid";
+      const emptyMsgId = isVideo ? "empty-videos-msg" : "empty-pictures-msg";
+      const grid = document.getElementById(gridId);
+      
+      if (grid?.children.length === 0) {
         const msg = document.createElement("div");
         msg.className = "empty-media";
-        msg.id = "empty-media-msg";
-        msg.textContent = "No media assets uploaded yet.";
-        mediaGrid.appendChild(msg);
+        msg.id = emptyMsgId;
+        msg.textContent = isVideo ? "No videos uploaded yet." : "No pictures uploaded yet.";
+        grid.appendChild(msg);
       }
     } catch (e: any) {
       alert("Error: " + e.message);
@@ -188,7 +261,8 @@ if (db) {
   document.querySelectorAll(".delete-btn").forEach((btn) => {
     const id = Number(btn.getAttribute("data-id"));
     const name = btn.closest(".media-card")?.querySelector(".media-name")?.textContent || "this asset";
-    btn.addEventListener("click", () => handleDelete(id, name));
+    const isVideo = btn.closest(".media-card")?.querySelector("video") !== null;
+    btn.addEventListener("click", () => handleDelete(id, name, isVideo));
   });
 
   // Setup Copy to Clipboard for server-rendered assets
@@ -200,8 +274,8 @@ if (db) {
     });
   });
 
-  // Drag and drop events
-  if (dropZone) {
+  // Drag and drop events for both zones
+  document.querySelectorAll(".drop-zone").forEach((dropZone) => {
     ["dragenter", "dragover"].forEach((eventName) => {
       dropZone.addEventListener(eventName, (e) => {
         e.preventDefault();
@@ -216,14 +290,14 @@ if (db) {
       }, false);
     });
 
-    dropZone.addEventListener("drop", (e: DragEvent) => {
+    dropZone.addEventListener("drop", ((e: DragEvent) => {
       const dt = e.dataTransfer;
       const files = dt?.files;
       if (files && files.length > 0) {
         uploadFile(files[0]);
       }
-    });
-  }
+    }) as EventListener);
+  });
 </script>
 
 <style is:global>
@@ -259,6 +333,44 @@ if (db) {
     background: rgba(229, 83, 83, 0.08);
     color: #d64a4a;
     margin-bottom: 24px;
+  }
+
+  /* Tabs Styling */
+  .tab-buttons {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid var(--admin-line);
+    margin-bottom: 24px;
+  }
+
+  .tab-btn {
+    min-height: 40px;
+    padding: 0 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--admin-muted);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 180ms ease;
+  }
+
+  .tab-btn:hover {
+    color: var(--admin-text);
+  }
+
+  .tab-btn.active {
+    color: #7d5b2f;
+    border-color: #7d5b2f;
+  }
+
+  .tab-pane {
+    display: none;
+  }
+
+  .tab-pane.active {
+    display: block;
   }
 
   .drop-zone {
@@ -302,7 +414,7 @@ if (db) {
 
   .media-preview {
     aspect-ratio: 4 / 3;
-    background: #fdfdfd;
+    background: #000;
     border-bottom: 1px solid var(--admin-line);
     display: flex;
     align-items: center;

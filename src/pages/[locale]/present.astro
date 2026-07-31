@@ -1,0 +1,145 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SiteNav from "@/components/SiteNav.astro";
+import Footer from "@/components/Footer.astro";
+import { getLandingContent, getMerchUrl } from "@/lib/db";
+import { isLocale, type Locale } from "@/lib/i18n";
+
+export const prerender = false;
+
+const requestedLocale = Astro.params.locale;
+if (!isLocale(requestedLocale)) {
+  return Astro.redirect("/zh-TW/present");
+}
+
+const locale: Locale = requestedLocale;
+const env = Astro.locals.runtime?.env;
+const [landing, merchUrl] = await Promise.all([
+  getLandingContent(env),
+  getMerchUrl(env, locale)
+]);
+
+const pageTitles = {
+  en: "Present",
+  "zh-TW": "現在",
+  "zh-CN": "现在"
+};
+
+const textContentPart1 = {
+  en: "Today, Sam Lee continues to evolve, pushing the boundaries of live performances and music production. With a passion that burns as bright as ever, he brings new life to the stage with every performance, capturing the hearts of old and new fans alike.",
+  "zh-TW": "今天，李聖傑持續進化，推動現場演出與音樂製作的界限。憑藉著一如既往炙熱的熱情，他在每一次的演出中都為舞台注入全新的生命力，深深吸引著新舊樂迷的心。",
+  "zh-CN": "今天，李圣杰持续进化，推动现场演出与音乐制作的界限。凭借着一如既往炙热的热情，他在每一次的演出中都为舞台注入全新的生命力，深深吸引着新旧乐迷的心。"
+};
+
+const textContentPart2 = {
+  en: "Through his independent label Zoommuzik, he is dedicated to delivering high-quality musical experiences. By blending traditional emotional ballads with modern sound production, he maintains a direct and heartfelt connection with audiences in the present moment.",
+  "zh-TW": "透過他的獨立廠牌錞藝音樂，他致力於帶來高品質的音樂體驗。藉由將傳統的情感民謠與現代聲音製作融合，他在此時此刻與聽眾保持著最直接且真摯的連結。",
+  "zh-CN": "透过他的独立厂牌錞艺音乐，他致力于带来高质量的音乐体验。藉由将传统的情感民谣与现代声音制作融合，他在此时此刻与听众保持着最直接且真挚的联结。"
+};
+
+const title = pageTitles[locale];
+const part1 = textContentPart1[locale];
+const part2 = textContentPart2[locale];
+---
+
+<BaseLayout locale={locale} title={`Sam Lee | ${title}`}>
+  <SiteNav locale={locale} merchUrl={merchUrl} />
+  <main class="page-main">
+    <section class="section hero-section">
+      <div class="container text-center">
+        <h1 class="page-title">{title}</h1>
+        <div class="divider"></div>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="container">
+        <div class="text-wrapper text-top">
+          <p class="paragraph">{part1}</p>
+        </div>
+        <div class="image-wrapper">
+          <img src="/assets/about/about_tennis.jpg" alt="Sam Lee Present Journey" class="present-image" />
+        </div>
+        <div class="text-wrapper text-bottom">
+          <p class="paragraph">{part2}</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer locale={locale} socialLinks={landing.socialLinks} />
+</BaseLayout>
+
+<style>
+  .page-main {
+    padding-top: 96px;
+    min-height: 80vh;
+    background: transparent;
+    color: var(--ice-white);
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .hero-section {
+    padding-bottom: 24px;
+    background: transparent;
+  }
+
+  .page-title {
+    margin: 0;
+    font-size: clamp(2.5rem, 6vw, 4.8rem);
+    font-weight: normal;
+    letter-spacing: -0.02em;
+    color: var(--aqua-glow);
+    text-transform: uppercase;
+    text-shadow: none;
+  }
+
+  .divider {
+    width: 40%;
+    height: 4px;
+    background: var(--aqua-glow);
+    margin: 24px auto 0;
+    border-radius: 2px;
+    box-shadow: 0 -4px 10px var(--aqua-glow);
+  }
+
+  .content-section {
+    padding: 24px 0 80px;
+  }
+
+  .image-wrapper {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--line);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    margin: 40px 0;
+  }
+
+  .present-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+
+  .image-wrapper:hover .present-image {
+    transform: scale(1.02);
+  }
+
+  .text-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .paragraph {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    margin: 0;
+    opacity: 0.9;
+    text-align: justify;
+    color: var(--ice-white);
+  }
+</style>

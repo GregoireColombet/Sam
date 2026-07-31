@@ -24,7 +24,9 @@ const merchExternal = Boolean(merchUrl);
     <a href={merchHref} target={merchExternal ? "_blank" : undefined} rel={merchExternal ? "noopener noreferrer" : undefined}>
       {t.merch}
     </a>
-    <a href={localePath(locale, "/about")}>{t.about}</a>
+    <a href={localePath(locale, "/past")}>{t.past}</a>
+    <a href={localePath(locale, "/present")}>{t.present}</a>
+    <a href={localePath(locale, "/future")}>{t.future}</a>
   </nav>
   <div class="nav-actions">
     <div class="language-switcher" aria-label="Language selector">
@@ -46,7 +48,9 @@ const merchExternal = Boolean(merchUrl);
     <a href={merchHref} target={merchExternal ? "_blank" : undefined} rel={merchExternal ? "noopener noreferrer" : undefined}>
       {t.merch}
     </a>
-    <a href={localePath(locale, "/about")}>{t.about}</a>
+    <a href={localePath(locale, "/past")}>{t.past}</a>
+    <a href={localePath(locale, "/present")}>{t.present}</a>
+    <a href={localePath(locale, "/future")}>{t.future}</a>
   </nav>
 </header>
 

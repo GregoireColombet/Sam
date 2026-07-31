@@ -26,8 +26,19 @@ const modalMediaItems = document.querySelectorAll(".modal-media-item");
 
 let activePickerField: string | null = null;
 
-function openMediaPicker(fieldName: string) {
+function openMediaPicker(fieldName: string, mediaType: string = "image") {
   activePickerField = fieldName;
+  
+  modalMediaItems.forEach((item: any) => {
+    const itemType = item.getAttribute("data-media-type") || "image";
+    if (itemType === mediaType) {
+      item.style.display = "";
+    } else {
+      item.style.display = "none";
+    }
+  });
+
+  if (mediaSearch) mediaSearch.value = "";
   mediaModal?.classList.add("open");
 }
 
@@ -61,11 +72,17 @@ modalMediaItems.forEach((item: any) => {
     const pickerControl = document.querySelector(`[data-field="${activePickerField}"]`);
     if (pickerControl) {
       const input = pickerControl.querySelector("input[type='hidden']") as HTMLInputElement;
-      const imgContainer = pickerControl.querySelector(".picker-preview") as HTMLElement;
+      const previewContainer = pickerControl.querySelector(".picker-preview") as HTMLElement;
       const clearBtn = pickerControl.querySelector(".btn-clear-media") as HTMLElement;
 
-      input.value = id;
-      imgContainer.innerHTML = `<img src="${url}" alt="Selected Image" />`;
+      const targetType = pickerControl.getAttribute("data-media-type") || "image";
+      input.value = targetType === "video" ? url : id;
+
+      if (targetType === "video") {
+        previewContainer.innerHTML = `<span class="video-chosen" style="font-size: 0.75rem; word-break: break-all; padding: 4px; text-align: center;">${url.split("/").pop()}</span>`;
+      } else {
+        previewContainer.innerHTML = `<img src="${url}" alt="Selected Image" />`;
+      }
       if (clearBtn) clearBtn.style.display = "";
     }
 
@@ -81,8 +98,9 @@ document.body.addEventListener("click", (e) => {
   if (target.classList.contains("btn-select-media")) {
     const pickerControl = target.closest(".media-picker-control");
     const field = pickerControl?.getAttribute("data-field");
+    const mediaType = pickerControl?.getAttribute("data-media-type") || "image";
     if (field) {
-      openMediaPicker(field);
+      openMediaPicker(field, mediaType);
     }
   }
 
@@ -475,7 +493,7 @@ function addVideoRow() {
         </div>
         <div class="form-group">
           <label>Thumbnail Cover</label>
-          <div class="media-picker-control" data-field="video_thumb_${key}">
+          <div class="media-picker-control" data-media-type="image" data-field="video_thumb_${key}">
             <input type="hidden" class="video-thumbnail-id" />
             <div class="picker-preview select-sm">
               <span class="no-img">No Image</span>
@@ -493,16 +511,16 @@ function addVideoRow() {
 
       <div class="form-grid pt-2">
         <div class="form-group">
-          <label>URL (English)</label>
-          <input type="url" class="video-url-en" required placeholder="https://youtube.com/watch?v=..." />
-        </div>
-        <div class="form-group">
-          <label>URL (Traditional Chinese)</label>
-          <input type="url" class="video-url-zh-tw" required placeholder="https://youtube.com/watch?v=..." />
-        </div>
-        <div class="form-group">
-          <label>URL (Simplified Chinese)</label>
-          <input type="url" class="video-url-zh-cn" required placeholder="e.g. Bilibili link for CN region" />
+          <label>Choose Video File (Cloudflare)</label>
+          <div class="media-picker-control" data-media-type="video" data-field="video_asset_${key}">
+            <input type="hidden" class="video-asset-url" required />
+            <div class="picker-preview select-sm" style="width: 150px; height: 45px; display: flex; align-items: center; justify-content: center; background: var(--admin-bg);">
+              <span class="no-img">No Video Selected</span>
+            </div>
+            <div class="picker-actions">
+              <button type="button" class="btn-select-media btn-xs">Select Video</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -532,15 +550,16 @@ videosForm?.addEventListener("submit", async (e) => {
       ? Number((row.querySelector(".video-thumbnail-id") as HTMLInputElement).value) 
       : null;
     const is_active = (row.querySelector(".video-active") as HTMLInputElement).checked;
-    const urlEn = (row.querySelector(".video-url-en") as HTMLInputElement).value;
-    const urlZhTw = (row.querySelector(".video-url-zh-tw") as HTMLInputElement).value;
-    const urlZhCn = (row.querySelector(".video-url-zh-cn") as HTMLInputElement).value;
+    
+    const urlEn = (row.querySelector(".video-asset-url") as HTMLInputElement).value;
+    const urlZhTw = urlEn;
+    const urlZhCn = urlEn;
 
-    const providerEn = urlEn.includes("vimeo") ? "vimeo" : "youtube";
-    const providerZhTw = urlZhTw.includes("vimeo") ? "vimeo" : "youtube";
-    const providerZhCn = urlZhCn.includes("bilibili") ? "bilibili" : urlZhCn.includes("vimeo") ? "vimeo" : "youtube";
+    const providerEn = "cloudflare";
+    const providerZhTw = "cloudflare";
+    const providerZhCn = "cloudflare";
 
-    if (title && urlEn && urlZhTw && urlZhCn) {
+    if (title && urlEn) {
       videosList.push({
         title,
         thumbnail_media_id,

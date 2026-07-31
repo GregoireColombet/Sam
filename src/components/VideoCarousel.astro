@@ -67,6 +67,14 @@ const t = labels[locale];
 
   let currentIndex = -1;
 
+  function isDirectVideoUrl(url: string): boolean {
+    if (!url) return false;
+    return (
+      url.match(/\.(mp4|webm|ogg|mov|m4v)($|\?)/i) !== null ||
+      (url.includes("/uploads/") && !url.includes("youtube") && !url.includes("vimeo") && !url.includes("bilibili"))
+    );
+  }
+
   function getEmbedUrl(url: string): string | null {
     if (!url) return null;
     
@@ -105,22 +113,34 @@ const t = labels[locale];
   }
 
   function openLightbox(url: string, title: string) {
-    const embedUrl = getEmbedUrl(url);
-    if (!embedUrl || !container || !lightbox) return;
+    if (!container || !lightbox) return;
 
-    container.innerHTML = `
-      <iframe 
-        src="${embedUrl}" 
-        title="${title}" 
-        style="width: 100%; height: 100%; display: block; border: 0;"
-        scrolling="no" 
-        border="0" 
-        frameborder="no" 
-        framespacing="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-        allowfullscreen="true">
-      </iframe>
-    `;
+    if (isDirectVideoUrl(url)) {
+      container.innerHTML = `
+        <video 
+          src="${url}" 
+          controls 
+          autoplay 
+          style="width: 100%; height: 100%; display: block; background: #000;"
+        ></video>
+      `;
+    } else {
+      const embedUrl = getEmbedUrl(url);
+      if (!embedUrl) return;
+      container.innerHTML = `
+        <iframe 
+          src="${embedUrl}" 
+          title="${title}" 
+          style="width: 100%; height: 100%; display: block; border: 0;"
+          scrolling="no" 
+          border="0" 
+          frameborder="no" 
+          framespacing="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          allowfullscreen="true">
+        </iframe>
+      `;
+    }
 
     lightbox.classList.add("is-open");
     lightbox.setAttribute("aria-hidden", "false");
@@ -143,16 +163,7 @@ const t = labels[locale];
     const url = card.getAttribute("data-video-url") || "";
     const title = card.getAttribute("data-video-title") || "";
     
-    // Update active iframe source instead of adding class list changes
-    const embedUrl = getEmbedUrl(url);
-    if (!embedUrl || !container) return;
-    const iframe = container.querySelector("iframe");
-    if (iframe) {
-      iframe.src = embedUrl;
-      iframe.title = title;
-    } else {
-      openLightbox(url, title);
-    }
+    openLightbox(url, title);
   }
 
   videoCards.forEach((card, index) => {
