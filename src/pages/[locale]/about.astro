@@ -9,7 +9,7 @@ export const prerender = false;
 
 const requestedLocale = Astro.params.locale;
 if (!isLocale(requestedLocale)) {
-  return Astro.redirect("/zh-TW/future");
+  return Astro.redirect("/zh-TW/about");
 }
 
 const locale: Locale = requestedLocale;
@@ -20,52 +20,107 @@ const [landing, merchUrl, bonusSettings] = await Promise.all([
   getBonusSettings(env)
 ]);
 
-const pageTitles = {
+const pastTitles = {
+  en: "Past",
+  "zh-TW": "過去",
+  "zh-CN": "过去"
+};
+
+const presentTitles = {
+  en: "Present",
+  "zh-TW": "現在",
+  "zh-CN": "现在"
+};
+
+const futureTitles = {
   en: "Future",
   "zh-TW": "未來",
   "zh-CN": "未来"
 };
 
-const textContent = {
+const pastText = {
+  en: "Sam Lee's musical journey began with a passion that defined a generation. From his early debut to performing on stages worldwide, the past represents the foundation of his deep connection with fans through unforgettable classic love songs and albums. Over the years, his dedication to the art of singing and his distinct vocal tone has built a legacy that continues to resonate with listeners across all walks of life.",
+  "zh-TW": "李聖傑的音樂旅程始於定義了一個世代的熱情。從早期的出道到在世界各地的舞台上演出，過去代表了他與樂迷之間深厚連結的基石，帶來無數令人難忘的經典情情歌與專輯。多年來，他對歌唱藝術的專注與獨特嗓音，鑄就了這段持續在所有聽眾心中共鳴的經典傳傳奇。",
+  "zh-CN": "李圣杰的音乐旅程始于定义了一个世代的热情。从早期的出道到在世界各地的舞台上演出，过去代表了他与乐迷之间深厚联结的基石，带来无数令人难忘的经典情歌与专辑。多年来，他对歌唱艺术的专注与独特嗓音，铸就了这段持续在所有听众心中共鸣的经典传奇。"
+};
+
+const presentTextPart1 = {
+  en: "Today, Sam Lee continues to evolve, pushing the boundaries of live performances and music production. With a passion that burns as bright as ever, he brings new life to the stage with every performance, capturing the hearts of old and new fans alike.",
+  "zh-TW": "今天，李聖傑持續進化，推動現場演出與音樂製作的界限。憑藉著一如既往炙熱的熱情，他在每一次的演出中都為舞台注入全新的生命力，深深吸引著新舊樂迷的心。",
+  "zh-CN": "今天，李圣杰持续进化，推动现场演出与音乐制作的界限。凭借着一如既往炙热的热情，他在每一次的演出中都为舞台注入全新的生命力，深深吸引着新旧乐迷的心。"
+};
+
+const presentTextPart2 = {
+  en: "Through his independent label Zoommuzik, he is dedicated to delivering high-quality musical experiences. By blending traditional emotional ballads with modern sound production, he maintains a direct and heartfelt connection with audiences in the present moment.",
+  "zh-TW": "透過他的獨立廠牌錞藝音樂，他致力於帶來高品質的音樂體驗。藉由將傳統的情感民謠與現代聲音製作融合，他在此時此刻與聽眾保持著最直接且真摯的連結。",
+  "zh-CN": "透过他的独立厂牌錞艺音乐，他致力于带来高质量的音乐体验。藉由将传统的情感民谣与现代声音制作融合，他在此时此刻与听众保持着最直接且真挚的联结。"
+};
+
+const futureText = {
   en: "Looking ahead, the future shines bright with new creative visions, upcoming tour schedules, and technological integration. The journey ahead promises groundbreaking music projects and even closer bonds with fans around the globe. Guided by a commitment to musical excellence and innovation, Sam Lee is set to explore new genres and digital spaces, creating immersive experiences that will define the next chapter of his musical legacy.",
   "zh-TW": "展望未來，隨著全新的創作願景、即將公佈的巡演行程以及技術整合，未來散發著明亮的光芒。未來的旅程承諾將帶來突破性的音樂企劃，與全球樂迷建立更緊密的連結。在對音樂卓越與創新的承諾指引下，李聖傑將探索新的音樂風格與數位空間，創造出定義他音樂生涯下一章節的沉浸式體驗。",
   "zh-CN": "展望未来，随着全新的创作愿景、即将公布的巡演行程以及技术整合，未来散发着明亮的光芒。未来的旅程承诺将带来突破性的音乐企划，与全球乐迷建立更紧密的联结。在对音乐卓越与创新的承诺指引下，李圣杰将探索新的音乐风格与数位空间，创造出定义他音乐生涯下一章节的沉浸式体验。"
 };
-
-const title = pageTitles[locale];
-const paragraphText = textContent[locale];
 
 const bonusTitle = getLocalized(bonusSettings?.title, locale);
 const bonusText = getLocalized(bonusSettings?.text, locale);
 const bonusImageUrl = bonusSettings?.imageUrl || "";
 ---
 
-<BaseLayout locale={locale} title={`Sam Lee | ${title}`}>
+<BaseLayout locale={locale} title={`Sam Lee | About`}>
   <SiteNav locale={locale} merchUrl={merchUrl} />
   <main class="page-main">
-    <section class="section hero-section">
-      <div class="container text-center">
-        <h1 class="page-title">{title}</h1>
-        <div class="divider"></div>
-      </div>
-    </section>
-
-    <section class="content-section">
-      <div class="container">
-        <div class="text-wrapper">
-          <p class="paragraph">{paragraphText}</p>
-        </div>
-        <div class="neon-punk-container">
-          <img src="/assets/about/about_venture.jpg" alt="Sam Lee Future Journey" class="future-image" />
-        </div>
-        
-        {bonusTitle && (
-          <div class="bonus-button-container">
-            <button id="bonus-btn" class="bonus-btn" style="display: none;">Extra bonus</button>
+    <div class="about-container">
+      
+      <!-- Past Section -->
+      <section class="about-section direction-row">
+        <div class="media-column">
+          <div class="image-wrapper">
+            <img src="/assets/about/about_debut.jpg" alt="Sam Lee Past Journey" class="past-image" />
           </div>
-        )}
-      </div>
-    </section>
+        </div>
+        <div class="text-column">
+          <h2 class="section-title">{pastTitles[locale]}</h2>
+          <div class="section-divider"></div>
+          <p class="paragraph">{pastText[locale]}</p>
+        </div>
+      </section>
+
+      <!-- Present Section -->
+      <section class="about-section direction-row-reverse">
+        <div class="media-column">
+          <div class="image-wrapper">
+            <img src="/assets/about/about_tennis.jpg" alt="Sam Lee Present Journey" class="present-image" />
+          </div>
+        </div>
+        <div class="text-column">
+          <h2 class="section-title">{presentTitles[locale]}</h2>
+          <div class="section-divider"></div>
+          <p class="paragraph">{presentTextPart1[locale]}</p>
+          <p class="paragraph mt-4">{presentTextPart2[locale]}</p>
+        </div>
+      </section>
+
+      <!-- Future Section -->
+      <section class="about-section direction-row">
+        <div class="media-column">
+          <div class="neon-punk-container">
+            <img src="/assets/about/about_venture.jpg" alt="Sam Lee Future Journey" class="future-image" />
+          </div>
+        </div>
+        <div class="text-column">
+          <h2 class="section-title">{futureTitles[locale]}</h2>
+          <div class="section-divider"></div>
+          <p class="paragraph">{futureText[locale]}</p>
+        </div>
+      </section>
+
+      {bonusTitle && (
+        <div class="bonus-button-container">
+          <button id="bonus-btn" class="bonus-btn" style="display: none;">Extra bonus</button>
+        </div>
+      )}
+    </div>
 
     {bonusTitle && (
       <div id="bonus-modal" class="bonus-modal">
@@ -149,56 +204,91 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
 
 <style>
   .page-main {
-    padding-top: 96px;
+    padding-top: 120px;
     min-height: 80vh;
     background: transparent;
     color: var(--ice-white);
   }
 
-  .text-center {
-    text-align: center;
+  .about-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
   }
 
-  .hero-section {
-    padding-bottom: 24px;
-    background: transparent;
+  .about-section {
+    display: flex;
+    align-items: center;
+    gap: 60px;
   }
 
-  .page-title {
-    margin: 0;
-    font-size: clamp(2.5rem, 6vw, 4.8rem);
+  .direction-row {
+    flex-direction: row;
+  }
+
+  .direction-row-reverse {
+    flex-direction: row-reverse;
+  }
+
+  .media-column {
+    flex: 0 0 40%;
+    width: 40%;
+  }
+
+  .text-column {
+    flex: 1;
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 4vw, 3rem);
     font-weight: normal;
     letter-spacing: -0.02em;
     color: var(--aqua-glow);
     text-transform: uppercase;
-    text-shadow: none;
+    margin: 0 0 16px;
   }
 
-  .divider {
-    width: 40%;
+  .section-divider {
+    width: 80px;
     height: 4px;
     background: var(--aqua-glow);
-    margin: 24px auto 0;
+    margin-bottom: 24px;
     border-radius: 2px;
-    box-shadow: 0 -4px 10px var(--aqua-glow);
+    box-shadow: 0 0 10px var(--aqua-glow);
   }
 
-  .content-section {
-    padding: 24px 0 80px;
+  .image-wrapper {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--line);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   }
 
-  .text-wrapper {
-    max-width: 800px;
-    margin: 0 auto 40px;
+  .past-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: grayscale(100%);
+    transition: transform 0.6s ease;
   }
 
-  .paragraph {
-    font-size: 1.15rem;
-    line-height: 1.8;
-    margin: 0;
-    opacity: 0.9;
-    text-align: justify;
-    color: var(--ice-white);
+  .image-wrapper:hover .past-image {
+    transform: scale(1.02);
+  }
+
+  .present-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+
+  .image-wrapper:hover .present-image {
+    transform: scale(1.02);
   }
 
   .neon-punk-container {
@@ -219,7 +309,6 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
     transition: transform 0.6s ease;
   }
 
-  /* Neon punk overlay using aqua_glow (#82E8E7) and coral-red (#FF747D) */
   .neon-punk-container::after {
     content: "";
     position: absolute;
@@ -229,7 +318,6 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
     pointer-events: none;
   }
 
-  /* Add a subtle glow overlay */
   .neon-punk-container::before {
     content: "";
     position: absolute;
@@ -243,6 +331,19 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
 
   .neon-punk-container:hover .future-image {
     transform: scale(1.02);
+  }
+
+  .paragraph {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    margin: 0;
+    opacity: 0.9;
+    text-align: justify;
+    color: var(--ice-white);
+  }
+
+  .mt-4 {
+    margin-top: 1.5rem;
   }
 
   .bonus-button-container {
@@ -309,6 +410,19 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
   }
 
   @media (max-width: 768px) {
+    .about-section {
+      flex-direction: column !important;
+      gap: 30px;
+    }
+
+    .media-column {
+      width: 100%;
+    }
+
+    .about-container {
+      gap: 60px;
+    }
+
     .bonus-modal-content {
       width: 90%;
       max-width: 90%;

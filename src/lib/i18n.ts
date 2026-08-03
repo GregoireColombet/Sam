@@ -23,6 +23,7 @@ type Labels = {
   past: string;
   present: string;
   future: string;
+  about: string;
   zoommuzikProduction: string;
   businessInquiries: string;
   purchase: string;
@@ -51,6 +52,7 @@ export const labels: Record<Locale, Labels> = {
     past: "Past",
     present: "Present",
     future: "Future",
+    about: "About",
     zoommuzikProduction: "Zoommuzik production",
     businessInquiries: "Contact for business inquiries",
     purchase: "Purchase",
@@ -77,6 +79,7 @@ export const labels: Record<Locale, Labels> = {
     past: "過去",
     present: "現在",
     future: "未來",
+    about: "關於",
     zoommuzikProduction: "錞藝音樂製作",
     businessInquiries: "商務合作信箱",
     purchase: "購票",
@@ -103,6 +106,7 @@ export const labels: Record<Locale, Labels> = {
     past: "过去",
     present: "现在",
     future: "未来",
+    about: "关于",
     zoommuzikProduction: "錞艺音乐制作",
     businessInquiries: "商务合作信箱",
     purchase: "购票",
