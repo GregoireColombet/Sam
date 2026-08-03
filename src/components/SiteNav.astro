@@ -78,6 +78,33 @@ const merchExternal = Boolean(merchUrl);
     text-shadow: none;
   }
 
+  .site-nav.menu-is-open {
+    background: #0F1418 !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+    text-shadow: none !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .site-nav.menu-is-open .brand-logo {
+    filter: invert(1) brightness(1.2) !important;
+  }
+
+  .site-nav.menu-is-open .menu-button {
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #fff !important;
+  }
+
+  .site-nav.menu-is-open .language-switcher a {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #fff !important;
+  }
+
+  .site-nav.menu-is-open .mobile-menu a {
+    color: #fff !important;
+  }
+
   .site-nav.is-scrolled .brand-logo {
     filter: none;
   }
