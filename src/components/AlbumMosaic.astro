@@ -354,7 +354,7 @@ const t = labels[locale];
     border-radius: 4px;
   }
 
-  .platform-btn {
+  :global(.platform-btn) {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -369,21 +369,21 @@ const t = labels[locale];
     font-size: 0.95rem;
   }
 
-  .platform-btn:hover {
+  :global(.platform-btn:hover) {
     background: rgba(130, 232, 231, 0.1);
     border-color: rgba(130, 232, 231, 0.6);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(130, 232, 231, 0.15);
   }
 
-  .platform-icon {
+  :global(.platform-icon) {
     width: 16px;
     height: 16px;
     object-fit: contain;
     display: block;
   }
 
-  .platform-name {
+  :global(.platform-name) {
     line-height: 1;
     display: inline-flex;
     align-items: center;
