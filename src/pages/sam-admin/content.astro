@@ -19,7 +19,7 @@ let error = "";
 
 if (db) {
   try {
-    const [newsRow, toursResult, albumsResult, videosResult, socialsResult, settingsRow, mediaResult, musicLinksResult] = await Promise.all([
+    const [newsRow, toursResult, albumsResult, videosResult, socialsResult, settingsRow, mediaResult, musicLinksResult, albumLinksResult] = await Promise.all([
       db.prepare(`select * from news_blocks where id = 1`).first<any>(),
       db.prepare(`select * from tour_dates order by starts_at_utc desc`).all<any>(),
       db.prepare(`select * from album_covers order by sort_order asc`).all<any>(),
@@ -27,7 +27,8 @@ if (db) {
       db.prepare(`select * from social_links order by sort_order asc`).all<any>(),
       db.prepare(`select * from site_settings where id = 1`).first<any>(),
       db.prepare(`select * from media_assets order by created_at desc`).all<any>(),
-      db.prepare(`select * from music_platform_links order by sort_order asc`).all<any>()
+      db.prepare(`select * from music_platform_links order by sort_order asc`).all<any>(),
+      db.prepare(`select * from album_platform_links`).all<any>()
     ]);
 
     news = newsRow || {
@@ -36,7 +37,11 @@ if (db) {
       background_media_id: null, countdown_at_utc: "", is_active: 0
     };
     tours = toursResult.results || [];
-    albums = albumsResult.results || [];
+    const allAlbumLinks = albumLinksResult.results || [];
+    albums = (albumsResult.results || []).map((album: any) => ({
+      ...album,
+      links: allAlbumLinks.filter((l: any) => l.album_id === album.id)
+    }));
     videos = videosResult.results || [];
     socials = socialsResult.results || [];
     musicLinks = musicLinksResult.results || [];
@@ -253,6 +258,21 @@ function getMediaUrl(id: number | null) {
                 <label for={`album-active-${index}`}>Active</label>
               </div>
               <button type="button" class="btn-remove-row remove-btn">Remove</button>
+              
+              <div class="album-platform-links-section" style="grid-column: 1 / -1; margin-top: 12px; padding: 12px; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--line); border-radius: 4px; display: flex; flex-direction: column; gap: 8px; width: 100%;">
+                <h4 style="margin: 0; font-size: 0.9rem; color: var(--ice-white);">Platform Custom Links</h4>
+                <div class="album-links-list" style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+                  {musicLinks.map((platform) => {
+                    const existingLink = album.links?.find((l: any) => l.platform_id === platform.id || l.platformId === platform.id);
+                    return (
+                      <div class="album-platform-link-row" data-platform-id={platform.id} style="display: flex; align-items: center; gap: 8px;">
+                        <span style="min-width: 120px; font-size: 0.85rem; color: var(--text-muted);">{platform.name}</span>
+                        <input type="url" class="album-platform-url" value={existingLink ? existingLink.url : ""} placeholder="https://... (leave blank to omit)" style="flex: 1; padding: 6px 12px; font-size: 0.85rem; background: var(--night-pitch); border: 1px solid var(--line); color: var(--ice-white); border-radius: 4px;" />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           ))}
           {albums.length === 0 && <div class="empty-list-msg">No album covers listed. Click "Add Cover" to populate.</div>}
@@ -270,7 +290,7 @@ function getMediaUrl(id: number | null) {
 
         <div class="sortable-list" id="music-links-container">
           {musicLinks.map((link, index) => (
-            <div class="sortable-row" data-index={index}>
+            <div class="sortable-row" data-index={index} data-id={link.id}>
               <div class="drag-handle">⋮⋮</div>
               <div class="form-group">
                 <label>Platform Name</label>
@@ -641,6 +661,25 @@ function getMediaUrl(id: number | null) {
       </div>
     </div>
   </div>
+
+  <!-- PLATFORM WARNING MODAL (HIDDEN BY DEFAULT) -->
+  <div class="admin-modal" id="platform-warning-modal">
+    <div class="modal-content" style="max-width: 450px;">
+      <header class="modal-header">
+        <h3>Platform Deletion Error</h3>
+        <button type="button" class="btn-close-modal" id="btn-close-warning-modal">&times;</button>
+      </header>
+      <div class="modal-body" style="padding: 1.5rem; text-align: center;">
+        <p id="platform-warning-message" style="color: var(--ice-white); margin-bottom: 1.5rem; line-height: 1.5; font-size: 0.95rem;">Can not delete the platform, there is albums using it. Delete first all the albums, then the platform</p>
+        <button type="button" class="btn-primary" id="btn-close-warning-modal-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Embedded platforms data for client-side forms -->
+  <script id="music-platforms-data" type="application/json" is:inline define:vars={{ musicLinks }}>
+    {JSON.stringify(musicLinks)}
+  </script>
 
 </AdminLayout>
 

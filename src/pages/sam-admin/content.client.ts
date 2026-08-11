@@ -402,10 +402,42 @@ const albumsForm = document.getElementById("albums-form") as HTMLFormElement;
 const albumsContainer = document.getElementById("albums-container");
 const btnAddAlbumRow = document.getElementById("btn-add-album-row");
 
+// Embedded platform warning modal elements
+const platformWarningModal = document.getElementById("platform-warning-modal");
+const closeWarningModalBtn = document.getElementById("btn-close-warning-modal");
+const closeWarningModalOkBtn = document.getElementById("btn-close-warning-modal-ok");
+
+function showPlatformWarningModal() {
+  platformWarningModal?.classList.add("open");
+}
+
+function hidePlatformWarningModal() {
+  platformWarningModal?.classList.remove("open");
+}
+
+closeWarningModalBtn?.addEventListener("click", hidePlatformWarningModal);
+closeWarningModalOkBtn?.addEventListener("click", hidePlatformWarningModal);
+
+const platformsDataEl = document.getElementById("music-platforms-data");
+let availablePlatforms: any[] = [];
+try {
+  availablePlatforms = platformsDataEl ? JSON.parse(platformsDataEl.textContent || "[]") : [];
+} catch (e) {
+  console.error("Failed to parse music platforms data", e);
+}
+
 function addAlbumRow() {
   const key = Date.now() + Math.random().toString(36).substring(7);
   const row = document.createElement("div");
   row.className = "sortable-row";
+
+  const platformLinksHtml = availablePlatforms.map(platform => `
+    <div class="album-platform-link-row" data-platform-id="${platform.id}" style="display: flex; align-items: center; gap: 8px;">
+      <span style="min-width: 120px; font-size: 0.85rem; color: var(--text-muted);">${platform.name}</span>
+      <input type="url" class="album-platform-url" placeholder="https://... (leave blank to omit)" style="flex: 1; padding: 6px 12px; font-size: 0.85rem; background: var(--night-pitch); border: 1px solid var(--line); color: var(--ice-white); border-radius: 4px;" />
+    </div>
+  `).join("");
+
   row.innerHTML = `
     <div class="drag-handle">⋮⋮</div>
     <div class="form-group">
@@ -429,6 +461,13 @@ function addAlbumRow() {
       <label for="album-active-${key}">Active</label>
     </div>
     <button type="button" class="btn-remove-row remove-btn">Remove</button>
+
+    <div class="album-platform-links-section" style="grid-column: 1 / -1; margin-top: 12px; padding: 12px; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--line); border-radius: 4px; display: flex; flex-direction: column; gap: 8px; width: 100%;">
+      <h4 style="margin: 0; font-size: 0.9rem; color: var(--ice-white);">Platform Custom Links</h4>
+      <div class="album-links-list" style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+        ${platformLinksHtml}
+      </div>
+    </div>
   `;
 
   row.querySelector(".btn-remove-row")?.addEventListener("click", () => {
@@ -453,8 +492,17 @@ albumsForm?.addEventListener("submit", async (e) => {
     const image_media_id = Number((row.querySelector(".album-media-id") as HTMLInputElement).value);
     const is_active = (row.querySelector(".album-active") as HTMLInputElement).checked;
 
+    const links: any[] = [];
+    row.querySelectorAll(".album-platform-link-row").forEach((linkRow) => {
+      const platformId = Number(linkRow.getAttribute("data-platform-id"));
+      const url = (linkRow.querySelector(".album-platform-url") as HTMLInputElement).value.trim();
+      if (url) {
+        links.push({ platformId, url });
+      }
+    });
+
     if (title && image_media_id) {
-      albumsList.push({ title, image_media_id, is_active });
+      albumsList.push({ title, image_media_id, is_active, links });
     }
   });
 
@@ -777,8 +825,32 @@ function addMusicRow() {
 }
 
 btnAddMusicRow?.addEventListener("click", addMusicRow);
-document.querySelectorAll("#music-links-container .btn-remove-row").forEach((btn: any) => {
-  btn.addEventListener("click", () => btn.closest(".sortable-row").remove());
+// Check if platform is in use by any album cover custom links
+function checkPlatformInUse(platformId: string | null): boolean {
+  if (!platformId) return false;
+  const inputs = document.querySelectorAll(`.album-platform-link-row[data-platform-id="${platformId}"] .album-platform-url`);
+  for (const input of Array.from(inputs)) {
+    if ((input as HTMLInputElement).value.trim() !== "") {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Remove button click interceptor for music links container
+musicContainer?.addEventListener("click", (e) => {
+  const target = e.target as HTMLElement;
+  if (target.classList.contains("btn-remove-row")) {
+    const row = target.closest(".sortable-row");
+    if (row) {
+      const platformId = row.getAttribute("data-id");
+      if (checkPlatformInUse(platformId)) {
+        showPlatformWarningModal();
+        return;
+      }
+      row.remove();
+    }
+  }
 });
 
 musicForm?.addEventListener("submit", async (e) => {
@@ -786,14 +858,29 @@ musicForm?.addEventListener("submit", async (e) => {
   const rows = musicContainer?.querySelectorAll(".sortable-row");
   const musicList: any[] = [];
 
+  // Check if any deleted platforms are in use before submitting
+  const existingRows = Array.from(document.querySelectorAll("#music-links-container .sortable-row[data-id]"));
+  const incomingIds = new Set(Array.from(rows || []).map(r => r.getAttribute("data-id")).filter(Boolean));
+  for (const row of existingRows) {
+    const id = row.getAttribute("data-id");
+    if (id && !incomingIds.has(id)) {
+      if (checkPlatformInUse(id)) {
+        showPlatformWarningModal();
+        return;
+      }
+    }
+  }
+
   rows?.forEach((row) => {
+    const idAttr = row.getAttribute("data-id");
+    const id = idAttr ? Number(idAttr) : undefined;
     const name = (row.querySelector(".music-name") as HTMLInputElement).value;
     const url = (row.querySelector(".music-url") as HTMLInputElement).value;
     const logo_media_id = Number((row.querySelector(".music-media-id") as HTMLInputElement).value);
     const is_active = (row.querySelector(".music-active") as HTMLInputElement).checked;
 
     if (name && url && logo_media_id) {
-      musicList.push({ name, url, logo_media_id, is_active });
+      musicList.push({ id, name, url, logo_media_id, is_active });
     }
   });
 
@@ -803,7 +890,10 @@ musicForm?.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ musicLinks: musicList })
     });
-    if (!res.ok) throw new Error("Failed to save music platform links.");
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({})) as any;
+      throw new Error(data.error || "Failed to save music platform links.");
+    }
     alert("Music platform links updated successfully!");
     window.location.reload();
   } catch (err: any) {

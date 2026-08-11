@@ -56,7 +56,7 @@ export async function getLandingContent(env?: RuntimeEnv): Promise<LandingConten
 
   try {
     const now = new Date().toISOString();
-    const [news, toursResult, albums, videos, socials] = await Promise.all([
+    const [news, toursResult, albums, videos, socials, albumPlatformLinks] = await Promise.all([
       db.prepare(
         `select n.*, m.r2_key as background_key, m.alt_text as background_alt
          from news_blocks n
@@ -95,8 +95,35 @@ export async function getLandingContent(env?: RuntimeEnv): Promise<LandingConten
          join media_assets m on m.id = s.logo_media_id
          where s.is_active = 1
          order by s.sort_order asc, s.id asc`
+      ).all<Record<string, unknown>>(),
+      db.prepare(
+        `select l.*, p.name as platform_name, p.logo_media_id, m.r2_key as logo_key, m.alt_text as logo_alt
+         from album_platform_links l
+         join music_platform_links p on p.id = l.platform_id
+         left join media_assets m on m.id = p.logo_media_id
+         order by p.sort_order asc`
       ).all<Record<string, unknown>>()
     ]);
+
+    const linksByAlbumId: Record<number, any[]> = {};
+    if (albumPlatformLinks && albumPlatformLinks.results) {
+      for (const link of albumPlatformLinks.results) {
+        const albumId = Number(link.album_id);
+        if (!linksByAlbumId[albumId]) {
+          linksByAlbumId[albumId] = [];
+        }
+        linksByAlbumId[albumId].push({
+          platformId: Number(link.platform_id),
+          name: String(link.platform_name || ""),
+          url: String(link.url || ""),
+          logo: {
+            id: Number(link.logo_media_id || 0),
+            url: mediaUrl(env, String(link.logo_key || "")),
+            alt: String(link.logo_alt || link.platform_name || "")
+          }
+        });
+      }
+    }
 
     return {
       news: news
@@ -129,7 +156,8 @@ export async function getLandingContent(env?: RuntimeEnv): Promise<LandingConten
           id: Number(row.image_media_id || 0),
           url: mediaUrl(env, String(row.image_key || "")),
           alt: String(row.image_alt || row.title || "")
-        }
+        },
+        links: linksByAlbumId[Number(row.id)] || []
       })),
       videos: (videos.results || []).map((row) => mapVideo(row, env)),
       socialLinks: (socials.results || []).map((row) => mapPlatform(row, env))

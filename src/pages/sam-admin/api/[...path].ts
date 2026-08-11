@@ -348,29 +348,58 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
   // 6. Album Covers CRUD
   if (path === "albums") {
     if (method === "GET") {
-      const result = await db.prepare(
-        `select a.*, m.r2_key, m.alt_text
-         from album_covers a
-         left join media_assets m on m.id = a.image_media_id
-         order by a.sort_order asc`
-      ).all();
-      return json(result.results || []);
+      try {
+        const albumsResult = await db.prepare(
+          `select a.*, m.r2_key, m.alt_text
+           from album_covers a
+           left join media_assets m on m.id = a.image_media_id
+           order by a.sort_order asc`
+        ).all();
+        const linksResult = await db.prepare(
+          `select * from album_platform_links`
+        ).all();
+
+        const albums = (albumsResult.results || []) as any[];
+        const links = (linksResult.results || []) as any[];
+
+        const mapped = albums.map(album => ({
+          ...album,
+          links: links.filter(l => l.album_id === album.id)
+        }));
+        return json(mapped);
+      } catch (e: any) {
+        return json({ error: e.message }, { status: 500 });
+      }
     }
     if (method === "POST") {
       try {
         const body = await request.json() as { albums: any[] };
-        const batch = [db.prepare(`delete from album_covers`)];
         
-        body.albums.forEach((album, index) => {
-          batch.push(
-            db.prepare(
-              `insert into album_covers (title, image_media_id, sort_order, is_active)
-               values (?, ?, ?, ?)`
-            ).bind(album.title, album.image_media_id, index, album.is_active ? 1 : 0)
-          );
-        });
-        
-        await db.batch(batch);
+        // Delete all albums (cascades to links)
+        await db.prepare(`delete from album_covers`).run();
+
+        // Sequentially insert each album and its custom links
+        for (let index = 0; index < body.albums.length; index++) {
+          const album = body.albums[index];
+          const insertAlbum = await db.prepare(
+            `insert into album_covers (title, image_media_id, sort_order, is_active)
+             values (?, ?, ?, ?)`
+          ).bind(album.title, album.image_media_id, index, album.is_active ? 1 : 0).run();
+
+          const newAlbumId = insertAlbum.meta.last_row_id;
+          if (newAlbumId && album.links && Array.isArray(album.links)) {
+            const linkBatch = album.links.map((link: any) =>
+              db.prepare(
+                `insert into album_platform_links (album_id, platform_id, url)
+                 values (?, ?, ?)`
+              ).bind(newAlbumId, link.platformId || link.platform_id, link.url)
+            );
+            if (linkBatch.length > 0) {
+              await db.batch(linkBatch);
+            }
+          }
+        }
+
         await logActivity(env, admin.email, "update_albums", "album_covers", null, `Updated ${body.albums.length} album covers`);
         return json({ ok: true });
       } catch (e: any) {
@@ -469,18 +498,59 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
     if (method === "POST") {
       try {
         const body = await request.json() as { musicLinks: any[] };
-        const batch = [db.prepare(`delete from music_platform_links`)];
-        
+
+        // 1. Fetch existing platform IDs
+        const existingResult = await db.prepare(`select id from music_platform_links`).all();
+        const existingIds = (existingResult.results || []).map((row: any) => Number(row.id));
+
+        // 2. Identify incoming IDs
+        const incomingIds = new Set(body.musicLinks.map((link: any) => Number(link.id)).filter(id => !isNaN(id)));
+
+        // 3. Find deleted IDs
+        const deletedIds = existingIds.filter(id => !incomingIds.has(id));
+
+        if (deletedIds.length > 0) {
+          // 4. Check if any deleted platform is referenced in album_platform_links
+          const queryPlaceholders = deletedIds.map(() => "?").join(",");
+          const checkRefs = await db.prepare(
+            `select count(*) as count from album_platform_links where platform_id in (${queryPlaceholders})`
+          ).bind(...deletedIds).first<{ count: number }>();
+
+          if (checkRefs && checkRefs.count > 0) {
+            return json(
+              { error: "Can not delete the platform, there is albums using it. Delete first all the albums, then the platform" },
+              { status: 400 }
+            );
+          }
+        }
+
+        // Delete all music platforms first
+        await db.prepare(`delete from music_platform_links`).run();
+
+        // Batch insert the new platform list, keeping original IDs if they exist
+        const batch: any[] = [];
         body.musicLinks.forEach((link, index) => {
-          batch.push(
-            db.prepare(
-              `insert into music_platform_links (name, url, logo_media_id, sort_order, is_active)
-               values (?, ?, ?, ?, ?)`
-            ).bind(link.name, link.url, link.logo_media_id, index, link.is_active ? 1 : 0)
-          );
+          if (link.id) {
+            batch.push(
+              db.prepare(
+                `insert into music_platform_links (id, name, url, logo_media_id, sort_order, is_active)
+                 values (?, ?, ?, ?, ?, ?)`
+              ).bind(Number(link.id), link.name, link.url, link.logo_media_id, index, link.is_active ? 1 : 0)
+            );
+          } else {
+            batch.push(
+              db.prepare(
+                `insert into music_platform_links (name, url, logo_media_id, sort_order, is_active)
+                 values (?, ?, ?, ?, ?)`
+              ).bind(link.name, link.url, link.logo_media_id, index, link.is_active ? 1 : 0)
+            );
+          }
         });
-        
-        await db.batch(batch);
+
+        if (batch.length > 0) {
+          await db.batch(batch);
+        }
+
         await logActivity(env, admin.email, "update_music_links", "music_platform_links", null, `Updated ${body.musicLinks.length} music platform links`);
         return json({ ok: true });
       } catch (e: any) {
@@ -489,7 +559,6 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
     }
   }
 
-  // 9. Site Settings (Merch & Bonus Page)
   if (path === "settings") {
     if (method === "GET") {
       const settings = await db.prepare(`select * from site_settings where id = 1`).first();

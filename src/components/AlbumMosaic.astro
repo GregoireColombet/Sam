@@ -1,5 +1,5 @@
 ---
-import { labels, localePath, type Locale } from "@/lib/i18n";
+import { labels, type Locale } from "@/lib/i18n";
 import type { AlbumCover } from "@/lib/types";
 
 type Props = {
@@ -17,14 +17,130 @@ const t = labels[locale];
     {albums.length === 0 ? (
       <div class="empty-state">{t.albumComingSoon}</div>
     ) : (
-      <a class="mosaic" href={localePath(locale, "/music")} aria-label={t.music}>
+      <div class="mosaic">
         {albums.map((album) => (
-          <img src={album.image.url} alt={album.image.alt || album.title} loading="lazy" />
+          <button 
+            class="mosaic-item" 
+            data-title={album.title}
+            data-image={album.image.url}
+            data-links={JSON.stringify(album.links || [])}
+            aria-label={album.title}
+          >
+            <img src={album.image.url} alt={album.image.alt || album.title} loading="lazy" />
+          </button>
         ))}
-      </a>
+      </div>
     )}
   </div>
 </section>
+
+<!-- Overlay Modal for custom platform links -->
+<div id="album-overlay-modal" class="album-overlay" aria-hidden="true">
+  <div class="album-modal-backdrop"></div>
+  <div class="album-modal-wrapper">
+    <div class="album-modal-box">
+      <button class="album-modal-close-btn" aria-label="Close modal">&times;</button>
+      <div class="album-modal-content">
+        <div class="album-modal-left">
+          <img id="modal-album-img" src="" alt="Album Cover" />
+          <h3 id="modal-album-title-text"></h3>
+        </div>
+        <div class="album-modal-right">
+          <h4 class="modal-platform-header">{t.choosePlatform}</h4>
+          <div id="modal-platform-links-grid" class="platform-links-grid">
+            <!-- Dynamically populated buttons -->
+          </div>
+          <div id="modal-no-links-msg" class="no-links-message" style="display: none;">
+            {t.musicComingSoon}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const mosaicItems = document.querySelectorAll(".mosaic-item");
+  const modal = document.getElementById("album-overlay-modal");
+  const backdrop = modal?.querySelector(".album-modal-backdrop");
+  const closeBtn = modal?.querySelector(".album-modal-close-btn");
+  const modalImg = document.getElementById("modal-album-img") as HTMLImageElement;
+  const modalTitle = document.getElementById("modal-album-title-text");
+  const linksGrid = document.getElementById("modal-platform-links-grid");
+  const noLinksMsg = document.getElementById("modal-no-links-msg");
+
+  function openModal(title: string, image: string, links: any[]) {
+    if (!modal) return;
+    
+    if (modalImg) {
+      modalImg.src = image;
+      modalImg.alt = title;
+    }
+    if (modalTitle) {
+      modalTitle.textContent = title;
+    }
+
+    if (linksGrid) {
+      linksGrid.innerHTML = "";
+      if (links.length > 0) {
+        if (noLinksMsg) noLinksMsg.style.display = "none";
+        linksGrid.style.display = "grid";
+        
+        links.forEach((link: any) => {
+          const btn = document.createElement("a");
+          btn.className = "platform-btn";
+          btn.href = link.url;
+          btn.target = "_blank";
+          btn.rel = "noopener noreferrer";
+          
+          btn.innerHTML = `
+            ${link.logo?.url ? `<img src="${link.logo.url}" alt="${link.name}" class="platform-icon" />` : ""}
+            <span class="platform-name">${link.name}</span>
+          `;
+          linksGrid.appendChild(btn);
+        });
+      } else {
+        linksGrid.style.display = "none";
+        if (noLinksMsg) noLinksMsg.style.display = "block";
+      }
+    }
+
+    modal.setAttribute("aria-hidden", "false");
+    modal.classList.add("show");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.setAttribute("aria-hidden", "true");
+    modal.classList.remove("show");
+    document.body.style.overflow = "";
+  }
+
+  mosaicItems.forEach((item) => {
+    item.addEventListener("click", () => {
+      const title = item.getAttribute("data-title") || "";
+      const image = item.getAttribute("data-image") || "";
+      let links: any[] = [];
+      try {
+        links = JSON.parse(item.getAttribute("data-links") || "[]");
+      } catch (e) {
+        console.error(e);
+      }
+      openModal(title, image, links);
+    });
+  });
+
+  closeBtn?.addEventListener("click", closeModal);
+  backdrop?.addEventListener("click", closeModal);
+
+  // Close on Escape key press
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal?.classList.contains("show")) {
+      closeModal();
+    }
+  });
+</script>
 
 <style>
   .albums {
@@ -55,8 +171,21 @@ const t = labels[locale];
     gap: 16px;
   }
 
-  .mosaic img {
+  .mosaic-item {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
     width: 100%;
+    aspect-ratio: 1;
+    display: block;
+    outline: none;
+  }
+
+  .mosaic-item img {
+    width: 100%;
+    height: 100%;
     aspect-ratio: 1;
     object-fit: cover;
     filter: saturate(0.85);
@@ -66,7 +195,8 @@ const t = labels[locale];
       box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .mosaic img:hover {
+  .mosaic-item:hover img,
+  .mosaic-item:focus img {
     transform: scale(1.04) translateY(-2px);
     filter: saturate(1.2) contrast(1.1);
     box-shadow: 0 8px 24px rgba(250, 250, 250, 0.5), 0 0 12px rgba(250, 250, 250, 0.3);
@@ -78,6 +208,194 @@ const t = labels[locale];
     .mosaic {
       grid-template-columns: repeat(2, 1fr);
       gap: 10px;
+    }
+  }
+
+  /* Overlay Modal System */
+  .album-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .album-overlay.show {
+    display: flex;
+  }
+
+  .album-modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 12, 0.85);
+    backdrop-filter: blur(8px);
+  }
+
+  .album-modal-wrapper {
+    position: relative;
+    z-index: 10;
+    width: 90%;
+    max-width: 680px;
+    animation: zoomIn 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .album-modal-box {
+    background: linear-gradient(135deg, #1c1c24 0%, #121218 100%);
+    border: 1px solid rgba(130, 232, 231, 0.25);
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    position: relative;
+  }
+
+  .album-modal-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--ice-white);
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s, transform 0.2s;
+    outline: none;
+  }
+
+  .album-modal-close-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  .album-modal-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: center;
+  }
+
+  @media (max-width: 600px) {
+    .album-modal-content {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      text-align: center;
+    }
+  }
+
+  .album-modal-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .album-modal-left img {
+    width: 100%;
+    max-width: 240px;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .album-modal-left h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ice-white);
+    letter-spacing: 0.5px;
+  }
+
+  .album-modal-right {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .modal-platform-header {
+    margin: 0;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    border-bottom: 1px solid rgba(130, 232, 231, 0.2);
+    padding-bottom: 8px;
+  }
+
+  .platform-links-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  /* Premium scrollbar styling */
+  .platform-links-grid::-webkit-scrollbar {
+    width: 6px;
+  }
+  .platform-links-grid::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .platform-links-grid::-webkit-scrollbar-thumb {
+    background: rgba(130, 232, 231, 0.3);
+    border-radius: 4px;
+  }
+
+  .platform-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--ice-white);
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .platform-btn:hover {
+    background: rgba(130, 232, 231, 0.1);
+    border-color: rgba(130, 232, 231, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(130, 232, 231, 0.15);
+  }
+
+  .platform-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  }
+
+  .no-links-message {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 16px 0;
+  }
+
+  @keyframes zoomIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
     }
   }
 </style>

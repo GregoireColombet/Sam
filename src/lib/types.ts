@@ -29,10 +29,18 @@ export type TourDate = {
   ticketLinkCount: number;
 };
 
+export type AlbumPlatformLink = {
+  platformId: number;
+  name: string;
+  url: string;
+  logo: MediaAsset;
+};
+
 export type AlbumCover = {
   id: number;
   title: string;
   image: MediaAsset;
+  links?: AlbumPlatformLink[];
 };
 
 export type VideoLink = {
