@@ -366,8 +366,7 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
     left: 0;
     width: 100%;
     height: 4px;
-    background: rgba(255, 255, 255, 0.05);
-    border-top: 2px solid var(--line);
+    background: var(--dark);
     z-index: 100;
   }
 
@@ -375,7 +374,7 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
     height: 100%;
     width: 0%;
     background: var(--coral-red, #FF747D);
-    box-shadow: 0 3px 8px var(--coral-red, #FF747D);
+    box-shadow: 0 4px 16px var(--coral-red, #FF747D), 0 2px 6px var(--coral-red, #FF747D);
     transition: width 0.1s ease-out;
   }
 
