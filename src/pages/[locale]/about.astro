@@ -242,7 +242,7 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
       <!-- Future Section -->
       <section class="about-section direction-row">
         <div class="media-column">
-          <div class="neon-punk-container">
+          <div class="image-wrapper">
             <img src="/assets/about/about_venture.jpg" alt="Sam Lee Future Journey" class="future-image" />
           </div>
         </div>
@@ -421,7 +421,6 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
     width: 100%;
     height: auto;
     display: block;
-    filter: grayscale(100%);
     transition: transform 0.6s ease;
   }
 
@@ -440,45 +439,14 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
     transform: scale(1.02);
   }
 
-  .neon-punk-container {
-    position: relative;
-    width: 100%;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 2px solid var(--line);
-    box-shadow: 0 0 20px rgba(130, 232, 231, 0.2), 0 10px 30px rgba(0, 0, 0, 0.5);
-    background: #0d0d11;
-  }
-
   .future-image {
     width: 100%;
     height: auto;
     display: block;
-    filter: grayscale(100%) contrast(1.4) brightness(0.85);
     transition: transform 0.6s ease;
   }
 
-  .neon-punk-container::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(130, 232, 231, 0.8), rgba(255, 116, 125, 0.8));
-    mix-blend-mode: color;
-    pointer-events: none;
-  }
-
-  .neon-punk-container::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, var(--aqua-glow), var(--coral-red));
-    mix-blend-mode: overlay;
-    opacity: 0.4;
-    pointer-events: none;
-    z-index: 2;
-  }
-
-  .neon-punk-container:hover .future-image {
+  .image-wrapper:hover .future-image {
     transform: scale(1.02);
   }
 

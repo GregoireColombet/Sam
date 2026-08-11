@@ -167,8 +167,10 @@ const t = labels[locale];
 
   .mosaic {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 28px;
+    max-width: 1000px;
+    margin: 0 auto;
   }
 
   .mosaic-item {
