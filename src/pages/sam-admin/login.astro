@@ -59,6 +59,12 @@ if (Astro.request.method === "POST") {
       Astro.cookies.delete("sam_session", {
         path: "/"
       });
+      
+      const cfEmail = Astro.request.headers.get("cf-access-authenticated-user-email") || 
+                      Astro.request.headers.get("x-authenticated-user-email");
+      if (cfEmail) {
+        return Astro.redirect("/cdn-cgi/access/logout");
+      }
       return Astro.redirect("/sam-admin/login");
     } else if (action === "setup") {
       const confirmPassword = String(data.get("confirm_password") || "");
