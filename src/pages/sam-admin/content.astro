@@ -884,18 +884,10 @@ function getMediaUrl(id: number | null) {
   </div>
 
   <!-- Embedded data for client-side forms -->
-  <script id="music-platforms-data" type="application/json" is:inline>
-    {JSON.stringify(musicLinks)}
-  </script>
-  <script id="albums-data" type="application/json" is:inline>
-    {JSON.stringify(albums)}
-  </script>
-  <script id="videos-data" type="application/json" is:inline>
-    {JSON.stringify(videos)}
-  </script>
-  <script id="socials-data" type="application/json" is:inline>
-    {JSON.stringify(socials)}
-  </script>
+  <script id="music-platforms-data" type="application/json" is:inline set:html={JSON.stringify(musicLinks)}></script>
+  <script id="albums-data" type="application/json" is:inline set:html={JSON.stringify(albums)}></script>
+  <script id="videos-data" type="application/json" is:inline set:html={JSON.stringify(videos)}></script>
+  <script id="socials-data" type="application/json" is:inline set:html={JSON.stringify(socials)}></script>
 
 </AdminLayout>
 
