@@ -38,13 +38,40 @@ if (db) {
     };
     tours = toursResult.results || [];
     const allAlbumLinks = albumLinksResult.results || [];
-    albums = (albumsResult.results || []).map((album: any) => ({
-      ...album,
-      links: allAlbumLinks.filter((l: any) => l.album_id === album.id)
-    }));
-    videos = videosResult.results || [];
-    socials = socialsResult.results || [];
-    musicLinks = musicLinksResult.results || [];
+    const allMedia = mediaResult.results || [];
+    
+    albums = (albumsResult.results || []).map((album: any) => {
+      const media = allMedia.find((m: any) => m.id === album.image_media_id);
+      return {
+        ...album,
+        r2_key: media ? media.r2_key : undefined,
+        links: allAlbumLinks.filter((l: any) => l.album_id === album.id)
+      };
+    });
+    
+    videos = (videosResult.results || []).map((video: any) => {
+      const media = allMedia.find((m: any) => m.id === video.thumbnail_media_id);
+      return {
+        ...video,
+        r2_key: media ? media.r2_key : undefined
+      };
+    });
+    
+    socials = (socialsResult.results || []).map((soc: any) => {
+      const media = allMedia.find((m: any) => m.id === soc.logo_media_id);
+      return {
+        ...soc,
+        r2_key: media ? media.r2_key : undefined
+      };
+    });
+    
+    musicLinks = (musicLinksResult.results || []).map((link: any) => {
+      const media = allMedia.find((m: any) => m.id === link.logo_media_id);
+      return {
+        ...link,
+        r2_key: media ? media.r2_key : undefined
+      };
+    });
     settings = settingsRow || {
       merch_url_en: "", merch_url_zh_tw: "", merch_url_zh_cn: "", merch_is_active: 0,
       bonus_title_en: "", bonus_title_zh_tw: "", bonus_title_zh_cn: "",
@@ -295,7 +322,7 @@ function getMediaUrl(id: number | null) {
               <tr data-album-id={album.id}>
                 <td>
                   <div class="picker-preview select-sm" style="width: 50px; height: 50px; border: 1px solid var(--admin-line); background: var(--admin-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
-                    <img src={getMediaUrl(album.image_media_id)} alt={album.title} style="max-width: 100%; max-height: 100%; object-fit: cover;" />
+                    <img src={getMediaUrl(album.image_media_id)} alt={album.title} style="max-width: 100%; max-height: 100%; object-fit: contain;" />
                   </div>
                 </td>
                 <td><strong>{album.title}</strong></td>
@@ -304,7 +331,7 @@ function getMediaUrl(id: number | null) {
                     {album.links && album.links.length > 0 ? (
                       album.links.map((l: any) => {
                         const plat = musicLinks.find(p => p.id === l.platform_id || p.id === l.platformId);
-                        return <div><strong>{plat ? plat.name : "Platform"}:</strong> <span class="admin-muted">{l.url}</span></div>;
+                        return <div><strong>{plat ? plat.name : "Platform"}:</strong> <a href={l.url} target="_blank" class="admin-muted" style="text-decoration: underline; color: var(--text-muted);">Link</a></div>;
                       })
                     ) : (
                       <span class="admin-muted">No custom links</span>
@@ -357,7 +384,7 @@ function getMediaUrl(id: number | null) {
                 <td>
                   <div class="picker-preview select-sm" style="width: 50px; height: 50px; border: 1px solid var(--admin-line); background: var(--admin-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
                     {vid.thumbnail_media_id ? (
-                      <img src={getMediaUrl(vid.thumbnail_media_id)} alt={vid.title} style="max-width: 100%; max-height: 100%; object-fit: cover;" />
+                      <img src={getMediaUrl(vid.thumbnail_media_id)} alt={vid.title} style="max-width: 100%; max-height: 100%; object-fit: contain;" />
                     ) : (
                       <span class="no-img">No Image</span>
                     )}
@@ -443,7 +470,7 @@ function getMediaUrl(id: number | null) {
                   </div>
                 </td>
                 <td><strong>{soc.name}</strong></td>
-                <td><a href={soc.url} target="_blank" class="admin-muted" style="text-decoration: underline; color: var(--text-muted);">{soc.url}</a></td>
+                <td><a href={soc.url} target="_blank" class="admin-muted" style="text-decoration: underline; color: var(--text-muted);">Link</a></td>
                 <td>
                   <span class:list={["badge", soc.is_active === 1 ? "badge-active" : "badge-inactive"]}>
                     {soc.is_active === 1 ? "Active" : "Hidden"}
@@ -1342,7 +1369,7 @@ function getMediaUrl(id: number | null) {
   .modal-media-item img {
     width: 100%;
     aspect-ratio: 4 / 3;
-    object-fit: cover;
+    object-fit: contain;
     background: #fff;
   }
 
