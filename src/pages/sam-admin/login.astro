@@ -66,7 +66,7 @@ if (Astro.request.method === "POST") {
       const cfEmail = Astro.request.headers.get("cf-access-authenticated-user-email") || 
                       Astro.request.headers.get("x-authenticated-user-email");
       if (cfEmail) {
-        return Astro.redirect("/cdn-cgi/access/logout?returnTo=" + encodeURIComponent(new URL("/sam-admin/login", Astro.url.origin).toString()), 303);
+        return Astro.redirect("/cdn-cgi/access/logout?returnTo=" + encodeURIComponent(new URL("/sam-admin/login", Astro.request.url).toString()), 303);
       }
       return Astro.redirect("/sam-admin/login", 303);
     } else if (action === "setup") {
