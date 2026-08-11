@@ -383,10 +383,10 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
           const album = body.albums[index];
           const insertAlbum = await db.prepare(
             `insert into album_covers (title, image_media_id, sort_order, is_active)
-             values (?, ?, ?, ?)`
-          ).bind(album.title, album.image_media_id, index, album.is_active ? 1 : 0).run();
+             values (?, ?, ?, ?) RETURNING id`
+          ).bind(album.title, album.image_media_id, index, album.is_active ? 1 : 0).first<{ id: number }>();
 
-          const newAlbumId = insertAlbum.meta.last_row_id;
+          const newAlbumId = insertAlbum?.id;
           if (newAlbumId && album.links && Array.isArray(album.links)) {
             const linkBatch = album.links.map((link: any) =>
               db.prepare(

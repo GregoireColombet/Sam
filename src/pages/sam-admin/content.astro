@@ -226,174 +226,164 @@ function getMediaUrl(id: number | null) {
 
     <!-- ALBUMS TAB -->
     <div class="tab-pane" id="tab-albums">
-      <form id="music-links-form" class="admin-form card-form">
+      <div class="card-form">
         <div class="actions-bar">
           <h2>Music Streaming Platforms</h2>
-          <button type="button" class="btn-primary" id="btn-add-music-row">Add Music Platform</button>
+          <button type="button" class="btn-primary" id="btn-add-music">Add Music Platform</button>
         </div>
         <p class="admin-muted">Add streaming platforms (e.g. Spotify, Apple Music) displayed on the music page. Select logo PNGs/SVGs and input URLs.</p>
 
-        <div class="sortable-list" id="music-links-container">
-          {musicLinks.map((link, index) => (
-            <div class="sortable-row" data-index={index} data-id={link.id}>
-              <div class="drag-handle">⋮⋮</div>
-              <div class="form-group">
-                <label>Platform Name</label>
-                <input type="text" class="music-name" value={link.name} required placeholder="Spotify, Apple Music" />
-              </div>
-              <div class="form-group">
-                <label>Target URL</label>
-                <input type="url" class="music-url" value={link.url} required placeholder="https://..." />
-              </div>
-              <div class="form-group">
-                <label>Logo Icon</label>
-                <div class="media-picker-control" data-field={`music_logo_${index}`}>
-                  <input type="hidden" class="music-media-id" value={link.logo_media_id} />
-                  <div class="picker-preview select-sm">
-                    <img src={getMediaUrl(link.logo_media_id)} alt={link.name} />
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Logo</th>
+              <th>Platform Name</th>
+              <th>Target URL</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {musicLinks.map((link) => (
+              <tr data-music-id={link.id}>
+                <td>
+                  <div class="picker-preview select-sm" style="width: 40px; height: 40px; border: 1px solid var(--admin-line); background: var(--admin-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
+                    <img src={getMediaUrl(link.logo_media_id)} alt={link.name} style="max-width: 100%; max-height: 100%; object-fit: contain;" />
                   </div>
-                  <div class="picker-actions">
-                    <button type="button" class="btn-select-media btn-xs">Select</button>
-                  </div>
-                </div>
-              </div>
-              <div class="form-group checkbox-cell">
-                <input type="checkbox" class="music-active" checked={link.is_active === 1} id={`music-active-${index}`} />
-                <label for={`music-active-${index}`}>Active</label>
-              </div>
-              <button type="button" class="btn-remove-row remove-btn">Remove</button>
-            </div>
-          ))}
-          {musicLinks.length === 0 && <div class="empty-list-msg">No music platform links configured. Click "Add Music Platform".</div>}
-        </div>
+                </td>
+                <td><strong>{link.name}</strong></td>
+                <td><a href={link.url} target="_blank" class="admin-muted" style="text-decoration: underline; color: var(--text-muted);">{link.url}</a></td>
+                <td>
+                  <span class:list={["badge", link.is_active === 1 ? "badge-active" : "badge-inactive"]}>
+                    {link.is_active === 1 ? "Active" : "Hidden"}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-edit-music" data-music={JSON.stringify(link)}>Edit</button>
+                  <button class="btn-delete-music delete-btn" data-id={link.id}>Delete</button>
+                </td>
+              </tr>
+            ))}
+            {musicLinks.length === 0 && (
+              <tr>
+                <td colspan="5" class="admin-muted" style="text-align: center; padding: 24px;">No music platform links configured.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
-        <button type="submit" class="btn-submit">Save Music Platforms</button>
-      </form>
-
-      <form id="albums-form" class="admin-form card-form" style="margin-top: 2rem;">
+      <div class="card-form" style="margin-top: 2rem;">
         <div class="actions-bar">
           <h2>Album Covers (Mosaic Grid)</h2>
-          <button type="button" class="btn-primary" id="btn-add-album-row">Add Cover</button>
+          <button type="button" class="btn-primary" id="btn-add-album">Add Cover</button>
         </div>
         <p class="admin-muted">Add album covers here. Order is set by sorting position. Albums link to the public Music page.</p>
-        
-        <div class="sortable-list" id="albums-container">
-          {albums.map((album, index) => (
-            <div class="sortable-row" data-index={index}>
-              <div class="drag-handle">⋮⋮</div>
-              <div class="form-group">
-                <label>Album Title</label>
-                <input type="text" class="album-title" value={album.title} required />
-              </div>
-              <div class="form-group">
-                <label>Cover Image</label>
-                <div class="media-picker-control" data-field={`album_img_${index}`}>
-                  <input type="hidden" class="album-media-id" value={album.image_media_id} />
-                  <div class="picker-preview select-sm">
-                    <img src={getMediaUrl(album.image_media_id)} alt={album.title} />
+
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Cover</th>
+              <th>Album Title</th>
+              <th>Platform Links</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {albums.map((album) => (
+              <tr data-album-id={album.id}>
+                <td>
+                  <div class="picker-preview select-sm" style="width: 50px; height: 50px; border: 1px solid var(--admin-line); background: var(--admin-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
+                    <img src={getMediaUrl(album.image_media_id)} alt={album.title} style="max-width: 100%; max-height: 100%; object-fit: cover;" />
                   </div>
-                  <div class="picker-actions">
-                    <button type="button" class="btn-select-media btn-xs">Select</button>
+                </td>
+                <td><strong>{album.title}</strong></td>
+                <td>
+                  <div style="font-size: 0.85rem; color: var(--admin-text-muted); display: flex; flex-direction: column; gap: 4px;">
+                    {album.links && album.links.length > 0 ? (
+                      album.links.map((l: any) => {
+                        const plat = musicLinks.find(p => p.id === l.platform_id || p.id === l.platformId);
+                        return <div><strong>{plat ? plat.name : "Platform"}:</strong> <span class="admin-muted">{l.url}</span></div>;
+                      })
+                    ) : (
+                      <span class="admin-muted">No custom links</span>
+                    )}
                   </div>
-                </div>
-              </div>
-              <div class="form-group checkbox-cell">
-                <input type="checkbox" class="album-active" checked={album.is_active === 1} id={`album-active-${index}`} />
-                <label for={`album-active-${index}`}>Active</label>
-              </div>
-              <button type="button" class="btn-remove-row remove-btn">Remove</button>
-              
-              <div class="album-platform-links-section" style="grid-column: 1 / -1; margin-top: 12px; padding: 12px; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--line); border-radius: 4px; display: flex; flex-direction: column; gap: 8px; width: 100%;">
-                <h4 style="margin: 0; font-size: 0.9rem; color: var(--ice-white);">Platform Custom Links</h4>
-                <div class="album-links-list" style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
-                  {musicLinks.map((platform) => {
-                    const existingLink = album.links?.find((l: any) => l.platform_id === platform.id || l.platformId === platform.id);
-                    return (
-                      <div class="album-platform-link-row" data-platform-id={platform.id} style="display: flex; align-items: center; gap: 8px;">
-                        <span style="min-width: 120px; font-size: 0.85rem; color: var(--text-muted);">{platform.name}</span>
-                        <input type="url" class="album-platform-url" value={existingLink ? existingLink.url : ""} placeholder="https://... (leave blank to omit)" style="flex: 1; padding: 6px 12px; font-size: 0.85rem; background: var(--night-pitch); border: 1px solid var(--line); color: var(--ice-white); border-radius: 4px;" />
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          ))}
-          {albums.length === 0 && <div class="empty-list-msg">No album covers listed. Click "Add Cover" to populate.</div>}
-        </div>
-        
-        <button type="submit" class="btn-submit">Save Albums Layout</button>
-      </form>
+                </td>
+                <td>
+                  <span class:list={["badge", album.is_active === 1 ? "badge-active" : "badge-inactive"]}>
+                    {album.is_active === 1 ? "Active" : "Hidden"}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-edit-album" data-album={JSON.stringify(album)}>Edit</button>
+                  <button class="btn-delete-album delete-btn" data-id={album.id}>Delete</button>
+                </td>
+              </tr>
+            ))}
+            {albums.length === 0 && (
+              <tr>
+                <td colspan="5" class="admin-muted" style="text-align: center; padding: 24px;">No album covers configured.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- VIDEOS TAB (MOMENT) -->
     <div class="tab-pane" id="tab-videos">
-      <form id="videos-form" class="admin-form card-form">
+      <div class="card-form">
         <div class="actions-bar">
           <h2>Carousel Playable Moments</h2>
-          <button type="button" class="btn-primary" id="btn-add-video-row">Add Moment</button>
+          <button type="button" class="btn-primary" id="btn-add-video">Add Moment</button>
         </div>
         <p class="admin-muted">Set up playable moments. Select a video from your uploaded video assets and choose an image for its thumbnail cover.</p>
 
-        <div class="sortable-list" id="videos-container">
-          {videos.map((vid, index) => (
-            <div class="sortable-row video-row" data-index={index}>
-              <div class="drag-handle">⋮⋮</div>
-              <div class="video-grid-inputs">
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label>Video Title</label>
-                    <input type="text" class="video-title" value={vid.title} required />
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Thumbnail</th>
+              <th>Video Title</th>
+              <th>Video File</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {videos.map((vid) => (
+              <tr data-video-id={vid.id}>
+                <td>
+                  <div class="picker-preview select-sm" style="width: 50px; height: 50px; border: 1px solid var(--admin-line); background: var(--admin-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
+                    {vid.thumbnail_media_id ? (
+                      <img src={getMediaUrl(vid.thumbnail_media_id)} alt={vid.title} style="max-width: 100%; max-height: 100%; object-fit: cover;" />
+                    ) : (
+                      <span class="no-img">No Image</span>
+                    )}
                   </div>
-                  <div class="form-group">
-                    <label>Thumbnail Cover</label>
-                    <div class="media-picker-control" data-media-type="image" data-field={`video_thumb_${index}`}>
-                      <input type="hidden" class="video-thumbnail-id" value={vid.thumbnail_media_id || ""} />
-                      <div class="picker-preview select-sm">
-                        {vid.thumbnail_media_id ? (
-                          <img src={getMediaUrl(vid.thumbnail_media_id)} alt={vid.title} />
-                        ) : (
-                          <span class="no-img">No Image</span>
-                        )}
-                      </div>
-                      <div class="picker-actions">
-                        <button type="button" class="btn-select-media btn-xs">Select</button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="form-group checkbox-cell">
-                    <input type="checkbox" class="video-active" checked={vid.is_active === 1} id={`video-active-${index}`} />
-                    <label for={`video-active-${index}`}>Active</label>
-                  </div>
-                </div>
-
-                <div class="form-grid pt-2">
-                  <div class="form-group">
-                    <label>Choose Video File (Cloudflare)</label>
-                    <div class="media-picker-control" data-media-type="video" data-field={`video_asset_${index}`}>
-                      <input type="hidden" class="video-asset-url" value={vid.url_en || ""} required />
-                      <div class="picker-preview select-sm" style="width: 150px; height: 45px; display: flex; align-items: center; justify-content: center; background: var(--admin-bg);">
-                        {vid.url_en ? (
-                          <span class="video-chosen" style="font-size: 0.75rem; word-break: break-all; padding: 4px; text-align: center;" title={vid.url_en}>{vid.url_en.split("/").pop()}</span>
-                        ) : (
-                          <span class="no-img">No Video Selected</span>
-                        )}
-                      </div>
-                      <div class="picker-actions">
-                        <button type="button" class="btn-select-media btn-xs">Select Video</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <button type="button" class="btn-remove-row remove-btn">Remove</button>
-            </div>
-          ))}
-          {videos.length === 0 && <div class="empty-list-msg">No moments configured. Click "Add Moment" to populate.</div>}
-        </div>
-
-        <button type="submit" class="btn-submit">Save Video Carousel</button>
-      </form>
+                </td>
+                <td><strong>{vid.title}</strong></td>
+                <td><span class="admin-muted" style="font-size: 0.85rem; word-break: break-all;">{vid.url_en ? vid.url_en.split("/").pop() : "No video file"}</span></td>
+                <td>
+                  <span class:list={["badge", vid.is_active === 1 ? "badge-active" : "badge-inactive"]}>
+                    {vid.is_active === 1 ? "Active" : "Hidden"}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-edit-video" data-video={JSON.stringify(vid)}>Edit</button>
+                  <button class="btn-delete-video delete-btn" data-id={vid.id}>Delete</button>
+                </td>
+              </tr>
+            ))}
+            {videos.length === 0 && (
+              <tr>
+                <td colspan="5" class="admin-muted" style="text-align: center; padding: 24px;">No moments configured.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- SOCIALS & MERCH TAB -->
@@ -427,49 +417,52 @@ function getMediaUrl(id: number | null) {
       </form>
 
       <!-- Socials Form -->
-      <form id="socials-form" class="admin-form card-form">
+      <div class="card-form">
         <div class="actions-bar">
           <h2>Footer Social Platforms</h2>
-          <button type="button" class="btn-primary" id="btn-add-social-row">Add Platform</button>
+          <button type="button" class="btn-primary" id="btn-add-social">Add Platform</button>
         </div>
         <p class="admin-muted">Add social links displayed in the footer. Upload clean, colored or monochrome logo PNG/SVGs to R2 and reference them below.</p>
 
-        <div class="sortable-list" id="socials-container">
-          {socials.map((soc, index) => (
-            <div class="sortable-row" data-index={index}>
-              <div class="drag-handle">⋮⋮</div>
-              <div class="form-group">
-                <label>Platform Name</label>
-                <input type="text" class="social-name" value={soc.name} required placeholder="Spotify, YouTube, Instagram" />
-              </div>
-              <div class="form-group">
-                <label>Target URL</label>
-                <input type="url" class="social-url" value={soc.url} required placeholder="https://..." />
-              </div>
-              <div class="form-group">
-                <label>Custom Logo (R2)</label>
-                <div class="media-picker-control" data-field={`social_logo_${index}`}>
-                  <input type="hidden" class="social-media-id" value={soc.logo_media_id} />
-                  <div class="picker-preview select-sm">
-                    <img src={getMediaUrl(soc.logo_media_id)} alt={soc.name} />
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Logo</th>
+              <th>Platform Name</th>
+              <th>Target URL</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {socials.map((soc) => (
+              <tr data-social-id={soc.id}>
+                <td>
+                  <div class="picker-preview select-sm" style="width: 40px; height: 40px; border: 1px solid var(--admin-line); background: var(--admin-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
+                    <img src={getMediaUrl(soc.logo_media_id)} alt={soc.name} style="max-width: 100%; max-height: 100%; object-fit: contain;" />
                   </div>
-                  <div class="picker-actions">
-                    <button type="button" class="btn-select-media btn-xs">Select</button>
-                  </div>
-                </div>
-              </div>
-              <div class="form-group checkbox-cell">
-                <input type="checkbox" class="social-active" checked={soc.is_active === 1} id={`social-active-${index}`} />
-                <label for={`social-active-${index}`}>Active</label>
-              </div>
-              <button type="button" class="btn-remove-row remove-btn">Remove</button>
-            </div>
-          ))}
-          {socials.length === 0 && <div class="empty-list-msg">No social links configured. Click "Add Platform".</div>}
-        </div>
-
-        <button type="submit" class="btn-submit">Save Social Links</button>
-      </form>
+                </td>
+                <td><strong>{soc.name}</strong></td>
+                <td><a href={soc.url} target="_blank" class="admin-muted" style="text-decoration: underline; color: var(--text-muted);">{soc.url}</a></td>
+                <td>
+                  <span class:list={["badge", soc.is_active === 1 ? "badge-active" : "badge-inactive"]}>
+                    {soc.is_active === 1 ? "Active" : "Hidden"}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-edit-social" data-social={JSON.stringify(soc)}>Edit</button>
+                  <button class="btn-delete-social delete-btn" data-id={soc.id}>Delete</button>
+                </td>
+              </tr>
+            ))}
+            {socials.length === 0 && (
+              <tr>
+                <td colspan="5" class="admin-muted" style="text-align: center; padding: 24px;">No social platforms configured.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- BONUS TAB -->
@@ -631,7 +624,221 @@ function getMediaUrl(id: number | null) {
             <label for="tour-active">Active (Visible on landing page)</label>
           </div>
 
-          <button type="submit" class="btn-submit" id="btn-save-tour">Save Tour Date</button>
+          <div class="modal-footer-buttons" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <button type="button" class="btn-secondary" id="btn-cancel-tour">Cancel</button>
+            <button type="submit" class="btn-submit" id="btn-save-tour" style="margin: 0;">Save Tour Date</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MUSIC EDITOR MODAL (HIDDEN BY DEFAULT) -->
+  <div class="admin-modal" id="music-editor-modal">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h3 id="music-modal-title">Add Music Platform</h3>
+        <button type="button" class="btn-close-modal" id="btn-close-music-modal">&times;</button>
+      </header>
+      <div class="modal-body">
+        <form id="music-editor-form" class="admin-form">
+          <input type="hidden" name="id" id="music-id" />
+          
+          <div class="form-group">
+            <label for="music-name">Platform Name</label>
+            <input type="text" id="music-name" name="name" placeholder="e.g. Spotify, Apple Music" required />
+          </div>
+
+          <div class="form-group">
+            <label for="music-url">Target URL</label>
+            <input type="url" id="music-url" name="url" placeholder="https://..." required />
+          </div>
+
+          <div class="form-group">
+            <label>Logo Icon</label>
+            <div class="media-picker-control" data-field="music-logo-picker" id="music-logo-control">
+              <input type="hidden" name="logo_media_id" id="music-logo-id" required />
+              <div class="picker-preview select-sm" id="music-logo-preview">
+                <span class="no-img">No Image</span>
+              </div>
+              <div class="picker-actions">
+                <button type="button" class="btn-select-media btn-xs">Select</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group row-group">
+            <input type="checkbox" id="music-active" name="is_active" checked />
+            <label for="music-active">Active (Visible on music page)</label>
+          </div>
+
+          <div class="modal-footer-buttons" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <button type="button" class="btn-secondary" id="btn-cancel-music">Cancel</button>
+            <button type="submit" class="btn-submit" id="btn-save-music" style="margin: 0;">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALBUM EDITOR MODAL (HIDDEN BY DEFAULT) -->
+  <div class="admin-modal" id="album-editor-modal">
+    <div class="modal-content modal-lg">
+      <header class="modal-header">
+        <h3 id="album-modal-title">Add Album Cover</h3>
+        <button type="button" class="btn-close-modal" id="btn-close-album-modal">&times;</button>
+      </header>
+      <div class="modal-body">
+        <form id="album-editor-form" class="admin-form">
+          <input type="hidden" name="id" id="album-id" />
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="album-title">Album Title</label>
+              <input type="text" id="album-title" name="title" required />
+            </div>
+
+            <div class="form-group">
+              <label>Cover Image</label>
+              <div class="media-picker-control" data-field="album-cover-picker" id="album-cover-control">
+                <input type="hidden" name="image_media_id" id="album-image-id" required />
+                <div class="picker-preview select-sm" id="album-image-preview">
+                  <span class="no-img">No Image</span>
+                </div>
+                <div class="picker-actions">
+                  <button type="button" class="btn-select-media btn-xs">Select</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group row-group">
+            <input type="checkbox" id="album-active" name="is_active" checked />
+            <label for="album-active">Active (Visible on landing page)</label>
+          </div>
+
+          <div class="album-platform-links-section" style="margin-top: 12px; padding: 12px; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--line); border-radius: 4px; display: flex; flex-direction: column; gap: 8px; width: 100%;">
+            <h4 style="margin: 0; font-size: 0.9rem; color: var(--ice-white);">Platform Custom Links</h4>
+            <div class="album-links-list" id="modal-album-links-list" style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+              {musicLinks.map((platform) => (
+                <div class="album-platform-link-row" data-platform-id={platform.id} style="display: flex; align-items: center; gap: 8px;">
+                  <span style="min-width: 120px; font-size: 0.85rem; color: var(--text-muted);">{platform.name}</span>
+                  <input type="url" class="album-platform-url" placeholder="https://... (leave blank to omit)" style="flex: 1; padding: 6px 12px; font-size: 0.85rem; background: var(--night-pitch); border: 1px solid var(--line); color: var(--ice-white); border-radius: 4px;" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div class="modal-footer-buttons" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <button type="button" class="btn-secondary" id="btn-cancel-album">Cancel</button>
+            <button type="submit" class="btn-submit" id="btn-save-album" style="margin: 0;">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIDEO EDITOR MODAL (HIDDEN BY DEFAULT) -->
+  <div class="admin-modal" id="video-editor-modal">
+    <div class="modal-content modal-lg">
+      <header class="modal-header">
+        <h3 id="video-modal-title">Add Moment</h3>
+        <button type="button" class="btn-close-modal" id="btn-close-video-modal">&times;</button>
+      </header>
+      <div class="modal-body">
+        <form id="video-editor-form" class="admin-form">
+          <input type="hidden" name="id" id="video-id" />
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="video-title">Video Title</label>
+              <input type="text" id="video-title" name="title" required />
+            </div>
+
+            <div class="form-group">
+              <label>Thumbnail Cover</label>
+              <div class="media-picker-control" data-media-type="image" data-field="video-thumb-picker" id="video-thumb-control">
+                <input type="hidden" name="thumbnail_media_id" id="video-thumbnail-id" />
+                <div class="picker-preview select-sm" id="video-thumbnail-preview">
+                  <span class="no-img">No Image</span>
+                </div>
+                <div class="picker-actions">
+                  <button type="button" class="btn-select-media btn-xs">Select</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Choose Video File (Cloudflare)</label>
+            <div class="media-picker-control" data-media-type="video" data-field="video-asset-picker" id="video-asset-control">
+              <input type="hidden" name="url_en" id="video-asset-url" required />
+              <div class="picker-preview select-sm" id="video-asset-preview" style="width: 100%; height: 45px; display: flex; align-items: center; justify-content: center; background: var(--admin-bg);">
+                <span class="no-img">No Video Selected</span>
+              </div>
+              <div class="picker-actions">
+                <button type="button" class="btn-select-media btn-xs">Select Video</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group row-group">
+            <input type="checkbox" id="video-active" name="is_active" checked />
+            <label for="video-active">Active (Visible on landing page)</label>
+          </div>
+
+          <div class="modal-footer-buttons" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <button type="button" class="btn-secondary" id="btn-cancel-video">Cancel</button>
+            <button type="submit" class="btn-submit" id="btn-save-video" style="margin: 0;">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOCIAL EDITOR MODAL (HIDDEN BY DEFAULT) -->
+  <div class="admin-modal" id="social-editor-modal">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h3 id="social-modal-title">Add Footer Social Platform</h3>
+        <button type="button" class="btn-close-modal" id="btn-close-social-modal">&times;</button>
+      </header>
+      <div class="modal-body">
+        <form id="social-editor-form" class="admin-form">
+          <input type="hidden" name="id" id="social-id" />
+          
+          <div class="form-group">
+            <label for="social-name">Platform Name</label>
+            <input type="text" id="social-name" name="name" placeholder="e.g. YouTube, Instagram" required />
+          </div>
+
+          <div class="form-group">
+            <label for="social-url">Target URL</label>
+            <input type="url" id="social-url" name="url" placeholder="https://..." required />
+          </div>
+
+          <div class="form-group">
+            <label>Custom Logo (R2)</label>
+            <div class="media-picker-control" data-field="social-logo-picker" id="social-logo-control">
+              <input type="hidden" name="logo_media_id" id="social-logo-id" required />
+              <div class="picker-preview select-sm" id="social-logo-preview">
+                <span class="no-img">No Image</span>
+              </div>
+              <div class="picker-actions">
+                <button type="button" class="btn-select-media btn-xs">Select</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group row-group">
+            <input type="checkbox" id="social-active" name="is_active" checked />
+            <label for="social-active">Active (Visible in footer)</label>
+          </div>
+
+          <div class="modal-footer-buttons" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <button type="button" class="btn-secondary" id="btn-cancel-social">Cancel</button>
+            <button type="submit" class="btn-submit" id="btn-save-social" style="margin: 0;">Save</button>
+          </div>
         </form>
       </div>
     </div>
@@ -676,9 +883,18 @@ function getMediaUrl(id: number | null) {
     </div>
   </div>
 
-  <!-- Embedded platforms data for client-side forms -->
-  <script id="music-platforms-data" type="application/json" is:inline define:vars={{ musicLinks }}>
+  <!-- Embedded data for client-side forms -->
+  <script id="music-platforms-data" type="application/json" is:inline>
     {JSON.stringify(musicLinks)}
+  </script>
+  <script id="albums-data" type="application/json" is:inline>
+    {JSON.stringify(albums)}
+  </script>
+  <script id="videos-data" type="application/json" is:inline>
+    {JSON.stringify(videos)}
+  </script>
+  <script id="socials-data" type="application/json" is:inline>
+    {JSON.stringify(socials)}
   </script>
 
 </AdminLayout>

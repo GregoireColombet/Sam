@@ -1,3 +1,6 @@
+if (!(window as any).__contentClientInitialized) {
+  (window as any).__contentClientInitialized = true;
+
 // Elements
 const tabButtons = document.querySelectorAll(".tab-btn");
 const tabPanes = document.querySelectorAll(".tab-pane");
@@ -396,11 +399,58 @@ ticketForm?.addEventListener("submit", async (e) => {
 });
 
 // ==========================================
-// ALBUM COVERS LIST
+// MODAL CONTROLLERS & DATA PARSING
 // ==========================================
-const albumsForm = document.getElementById("albums-form") as HTMLFormElement;
-const albumsContainer = document.getElementById("albums-container");
-const btnAddAlbumRow = document.getElementById("btn-add-album-row");
+
+// Embedded data parsing
+const platformsDataEl = document.getElementById("music-platforms-data");
+let availablePlatforms: any[] = [];
+try {
+  availablePlatforms = platformsDataEl ? JSON.parse(platformsDataEl.textContent || "[]") : [];
+} catch (e) {
+  console.error("Failed to parse music platforms data", e);
+}
+
+const albumsDataEl = document.getElementById("albums-data");
+let availableAlbums: any[] = [];
+try {
+  availableAlbums = albumsDataEl ? JSON.parse(albumsDataEl.textContent || "[]") : [];
+} catch (e) {
+  console.error("Failed to parse albums data", e);
+}
+
+const videosDataEl = document.getElementById("videos-data");
+let availableVideos: any[] = [];
+try {
+  availableVideos = videosDataEl ? JSON.parse(videosDataEl.textContent || "[]") : [];
+} catch (e) {
+  console.error("Failed to parse videos data", e);
+}
+
+const socialsDataEl = document.getElementById("socials-data");
+let availableSocials: any[] = [];
+try {
+  availableSocials = socialsDataEl ? JSON.parse(socialsDataEl.textContent || "[]") : [];
+} catch (e) {
+  console.error("Failed to parse socials data", e);
+}
+
+// Modal closing helper
+function setupModalClose(modalId: string, closeBtnId: string, cancelBtnId: string) {
+  const modal = document.getElementById(modalId);
+  const closeBtn = document.getElementById(closeBtnId);
+  const cancelBtn = document.getElementById(cancelBtnId);
+
+  const closeFn = () => modal?.classList.remove("open");
+  closeBtn?.addEventListener("click", closeFn);
+  cancelBtn?.addEventListener("click", closeFn);
+}
+
+setupModalClose("music-editor-modal", "btn-close-music-modal", "btn-cancel-music");
+setupModalClose("album-editor-modal", "btn-close-album-modal", "btn-cancel-album");
+setupModalClose("video-editor-modal", "btn-close-video-modal", "btn-cancel-video");
+setupModalClose("social-editor-modal", "btn-close-social-modal", "btn-cancel-social");
+setupModalClose("tour-editor-modal", "btn-close-tour-modal", "btn-cancel-tour");
 
 // Embedded platform warning modal elements
 const platformWarningModal = document.getElementById("platform-warning-modal");
@@ -410,226 +460,474 @@ const closeWarningModalOkBtn = document.getElementById("btn-close-warning-modal-
 function showPlatformWarningModal() {
   platformWarningModal?.classList.add("open");
 }
-
 function hidePlatformWarningModal() {
   platformWarningModal?.classList.remove("open");
 }
-
 closeWarningModalBtn?.addEventListener("click", hidePlatformWarningModal);
 closeWarningModalOkBtn?.addEventListener("click", hidePlatformWarningModal);
 
-const platformsDataEl = document.getElementById("music-platforms-data");
-let availablePlatforms: any[] = [];
-try {
-  availablePlatforms = platformsDataEl ? JSON.parse(platformsDataEl.textContent || "[]") : [];
-} catch (e) {
-  console.error("Failed to parse music platforms data", e);
+function checkPlatformInUse(platformId: string | null): boolean {
+  if (!platformId) return false;
+  const inputs = document.querySelectorAll(`.album-platform-link-row[data-platform-id="${platformId}"] .album-platform-url`);
+  for (const input of Array.from(inputs)) {
+    if ((input as HTMLInputElement).value.trim() !== "") {
+      return true;
+    }
+  }
+  return false;
 }
 
-function addAlbumRow() {
-  const key = Date.now() + Math.random().toString(36).substring(7);
-  const row = document.createElement("div");
-  row.className = "sortable-row";
+// ==========================================
+// 1. MUSIC PLATFORMS CONTROLLER
+// ==========================================
+function openMusicEditor(music: any = null) {
+  const titleEl = document.getElementById("music-modal-title");
+  const form = document.getElementById("music-editor-form") as HTMLFormElement;
+  if (music) {
+    if (titleEl) titleEl.textContent = "Edit Music Platform";
+    (document.getElementById("music-id") as HTMLInputElement).value = music.id;
+    (document.getElementById("music-name") as HTMLInputElement).value = music.name;
+    (document.getElementById("music-url") as HTMLInputElement).value = music.url;
+    (document.getElementById("music-logo-id") as HTMLInputElement).value = music.logo_media_id || "";
+    
+    const preview = document.getElementById("music-logo-preview");
+    if (preview) {
+      if (music.logo_media_id) {
+        preview.innerHTML = `<img src="/media/${music.r2_key}" alt="${music.name}" />`;
+      } else {
+        preview.innerHTML = `<span class="no-img">No Image</span>`;
+      }
+    }
+    (document.getElementById("music-active") as HTMLInputElement).checked = music.is_active === 1;
+  } else {
+    if (titleEl) titleEl.textContent = "Add Music Platform";
+    form.reset();
+    (document.getElementById("music-id") as HTMLInputElement).value = "";
+    (document.getElementById("music-logo-id") as HTMLInputElement).value = "";
+    const preview = document.getElementById("music-logo-preview");
+    if (preview) preview.innerHTML = `<span class="no-img">No Image</span>`;
+    (document.getElementById("music-active") as HTMLInputElement).checked = true;
+  }
+  document.getElementById("music-editor-modal")?.classList.add("open");
+}
 
-  const platformLinksHtml = availablePlatforms.map(platform => `
-    <div class="album-platform-link-row" data-platform-id="${platform.id}" style="display: flex; align-items: center; gap: 8px;">
-      <span style="min-width: 120px; font-size: 0.85rem; color: var(--text-muted);">${platform.name}</span>
-      <input type="url" class="album-platform-url" placeholder="https://... (leave blank to omit)" style="flex: 1; padding: 6px 12px; font-size: 0.85rem; background: var(--night-pitch); border: 1px solid var(--line); color: var(--ice-white); border-radius: 4px;" />
-    </div>
-  `).join("");
-
-  row.innerHTML = `
-    <div class="drag-handle">⋮⋮</div>
-    <div class="form-group">
-      <label>Album Title</label>
-      <input type="text" class="album-title" required />
-    </div>
-    <div class="form-group">
-      <label>Cover Image</label>
-      <div class="media-picker-control" data-field="album_img_${key}">
-        <input type="hidden" class="album-media-id" required />
-        <div class="picker-preview select-sm">
-          <span class="no-img">No Image</span>
-        </div>
-        <div class="picker-actions">
-          <button type="button" class="btn-select-media btn-xs">Select</button>
-        </div>
-      </div>
-    </div>
-    <div class="form-group checkbox-cell">
-      <input type="checkbox" class="album-active" checked id="album-active-${key}" />
-      <label for="album-active-${key}">Active</label>
-    </div>
-    <button type="button" class="btn-remove-row remove-btn">Remove</button>
-
-    <div class="album-platform-links-section" style="grid-column: 1 / -1; margin-top: 12px; padding: 12px; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--line); border-radius: 4px; display: flex; flex-direction: column; gap: 8px; width: 100%;">
-      <h4 style="margin: 0; font-size: 0.9rem; color: var(--ice-white);">Platform Custom Links</h4>
-      <div class="album-links-list" style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
-        ${platformLinksHtml}
-      </div>
-    </div>
-  `;
-
-  row.querySelector(".btn-remove-row")?.addEventListener("click", () => {
-    row.remove();
+document.getElementById("btn-add-music")?.addEventListener("click", () => openMusicEditor());
+document.querySelectorAll(".btn-edit-music").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const data = JSON.parse(btn.getAttribute("data-music") || "{}");
+    openMusicEditor(data);
   });
-
-  albumsContainer?.appendChild(row);
-}
-
-btnAddAlbumRow?.addEventListener("click", addAlbumRow);
-document.querySelectorAll("#albums-container .btn-remove-row").forEach((btn: any) => {
-  btn.addEventListener("click", () => btn.closest(".sortable-row").remove());
 });
 
-albumsForm?.addEventListener("submit", async (e) => {
+const musicFormEl = document.getElementById("music-editor-form") as HTMLFormElement;
+musicFormEl?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const rows = albumsContainer?.querySelectorAll(".sortable-row");
-  const albumsList: any[] = [];
+  const data = new FormData(musicFormEl);
+  const id = data.get("id") ? Number(data.get("id")) : undefined;
+  const name = String(data.get("name"));
+  const url = String(data.get("url"));
+  const logo_media_id = Number(data.get("logo_media_id"));
+  const is_active = data.get("is_active") === "on";
 
-  rows?.forEach((row) => {
-    const title = (row.querySelector(".album-title") as HTMLInputElement).value;
-    const image_media_id = Number((row.querySelector(".album-media-id") as HTMLInputElement).value);
-    const is_active = (row.querySelector(".album-active") as HTMLInputElement).checked;
+  if (!logo_media_id) {
+    alert("Please select a logo icon.");
+    return;
+  }
 
-    const links: any[] = [];
-    row.querySelectorAll(".album-platform-link-row").forEach((linkRow) => {
-      const platformId = Number(linkRow.getAttribute("data-platform-id"));
-      const url = (linkRow.querySelector(".album-platform-url") as HTMLInputElement).value.trim();
-      if (url) {
-        links.push({ platformId, url });
-      }
+  const newItem = { id, name, url, logo_media_id, is_active };
+
+  let updatedList = [...availablePlatforms];
+  if (id) {
+    updatedList = updatedList.map(item => item.id === id ? { ...item, ...newItem } : item);
+  } else {
+    updatedList.push(newItem);
+  }
+
+  try {
+    const res = await fetch("/sam-admin/api/music", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ musicLinks: updatedList })
     });
+    if (!res.ok) {
+      const errData = (await res.json().catch(() => ({}))) as any;
+      throw new Error(errData.error || "Failed to save music platform.");
+    }
+    alert("Music platform saved successfully!");
+    window.location.reload();
+  } catch (err: any) {
+    alert("Error: " + err.message);
+  }
+});
 
-    if (title && image_media_id) {
-      albumsList.push({ title, image_media_id, is_active, links });
+document.querySelectorAll(".btn-delete-music").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const id = Number(btn.getAttribute("data-id"));
+    if (checkPlatformInUse(String(id))) {
+      showPlatformWarningModal();
+      return;
+    }
+    if (!confirm("Are you sure you want to delete this music platform?")) return;
+    const updatedList = availablePlatforms.filter(item => item.id !== id);
+    try {
+      const res = await fetch("/sam-admin/api/music", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ musicLinks: updatedList })
+      });
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as any;
+        throw new Error(errData.error || "Failed to delete music platform.");
+      }
+      alert("Music platform deleted!");
+      window.location.reload();
+    } catch (err: any) {
+      alert("Error: " + err.message);
     }
   });
+});
+
+// ==========================================
+// 2. ALBUM COVERS CONTROLLER
+// ==========================================
+function openAlbumEditor(album: any = null) {
+  const titleEl = document.getElementById("album-modal-title");
+  const form = document.getElementById("album-editor-form") as HTMLFormElement;
+  if (album) {
+    if (titleEl) titleEl.textContent = "Edit Album Cover";
+    (document.getElementById("album-id") as HTMLInputElement).value = album.id;
+    (document.getElementById("album-title") as HTMLInputElement).value = album.title;
+    (document.getElementById("album-image-id") as HTMLInputElement).value = album.image_media_id || "";
+    
+    const preview = document.getElementById("album-image-preview");
+    if (preview) {
+      if (album.image_media_id) {
+        preview.innerHTML = `<img src="/media/${album.r2_key}" alt="${album.title}" />`;
+      } else {
+        preview.innerHTML = `<span class="no-img">No Image</span>`;
+      }
+    }
+    (document.getElementById("album-active") as HTMLInputElement).checked = album.is_active === 1;
+
+    // Prefill custom platform links
+    const modalLinksList = document.getElementById("modal-album-links-list");
+    modalLinksList?.querySelectorAll(".album-platform-link-row").forEach(row => {
+      const platformId = Number(row.getAttribute("data-platform-id"));
+      const input = row.querySelector(".album-platform-url") as HTMLInputElement;
+      const existingLink = album.links?.find((l: any) => l.platform_id === platformId || l.platformId === platformId);
+      input.value = existingLink ? existingLink.url : "";
+    });
+  } else {
+    if (titleEl) titleEl.textContent = "Add Album Cover";
+    form.reset();
+    (document.getElementById("album-id") as HTMLInputElement).value = "";
+    (document.getElementById("album-image-id") as HTMLInputElement).value = "";
+    const preview = document.getElementById("album-image-preview");
+    if (preview) preview.innerHTML = `<span class="no-img">No Image</span>`;
+    (document.getElementById("album-active") as HTMLInputElement).checked = true;
+
+    // Reset custom platform links
+    const modalLinksList = document.getElementById("modal-album-links-list");
+    modalLinksList?.querySelectorAll(".album-platform-url").forEach(input => {
+      (input as HTMLInputElement).value = "";
+    });
+  }
+  document.getElementById("album-editor-modal")?.classList.add("open");
+}
+
+document.getElementById("btn-add-album")?.addEventListener("click", () => openAlbumEditor());
+document.querySelectorAll(".btn-edit-album").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const data = JSON.parse(btn.getAttribute("data-album") || "{}");
+    openAlbumEditor(data);
+  });
+});
+
+const albumFormEl = document.getElementById("album-editor-form") as HTMLFormElement;
+albumFormEl?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const data = new FormData(albumFormEl);
+  const id = data.get("id") ? Number(data.get("id")) : undefined;
+  const title = String(data.get("title"));
+  const image_media_id = Number(data.get("image_media_id"));
+  const is_active = data.get("is_active") === "on";
+
+  if (!image_media_id) {
+    alert("Please select a cover image.");
+    return;
+  }
+
+  // Grab platform links from modal-album-links-list
+  const links: any[] = [];
+  const modalLinksList = document.getElementById("modal-album-links-list");
+  modalLinksList?.querySelectorAll(".album-platform-link-row").forEach(row => {
+    const platformId = Number(row.getAttribute("data-platform-id"));
+    const url = (row.querySelector(".album-platform-url") as HTMLInputElement).value.trim();
+    if (url) {
+      links.push({ platformId, url });
+    }
+  });
+
+  const newItem = { id, title, image_media_id, is_active, links };
+
+  let updatedList = [...availableAlbums];
+  if (id) {
+    updatedList = updatedList.map(item => item.id === id ? { ...item, ...newItem } : item);
+  } else {
+    updatedList.push(newItem);
+  }
 
   try {
     const res = await fetch("/sam-admin/api/albums", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ albums: albumsList })
+      body: JSON.stringify({ albums: updatedList })
     });
-    if (!res.ok) throw new Error("Failed to save albums.");
-    alert("Album cover list saved successfully!");
+    if (!res.ok) throw new Error("Failed to save album cover.");
+    alert("Album cover saved successfully!");
     window.location.reload();
   } catch (err: any) {
     alert("Error: " + err.message);
   }
 });
 
-// ==========================================
-// VIDEO PLAYLIST
-// ==========================================
-const videosForm = document.getElementById("videos-form") as HTMLFormElement;
-const videosContainer = document.getElementById("videos-container");
-const btnAddVideoRow = document.getElementById("btn-add-video-row");
-
-function addVideoRow() {
-  const key = Date.now() + Math.random().toString(36).substring(7);
-  const row = document.createElement("div");
-  row.className = "sortable-row video-row";
-  row.innerHTML = `
-    <div class="drag-handle">⋮⋮</div>
-    <div class="video-grid-inputs">
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Video Title</label>
-          <input type="text" class="video-title" required />
-        </div>
-        <div class="form-group">
-          <label>Thumbnail Cover</label>
-          <div class="media-picker-control" data-media-type="image" data-field="video_thumb_${key}">
-            <input type="hidden" class="video-thumbnail-id" />
-            <div class="picker-preview select-sm">
-              <span class="no-img">No Image</span>
-            </div>
-            <div class="picker-actions">
-              <button type="button" class="btn-select-media btn-xs">Select</button>
-            </div>
-          </div>
-        </div>
-        <div class="form-group checkbox-cell">
-          <input type="checkbox" class="video-active" checked id="video-active-${key}" />
-          <label for="video-active-${key}">Active</label>
-        </div>
-      </div>
-
-      <div class="form-grid pt-2">
-        <div class="form-group">
-          <label>Choose Video File (Cloudflare)</label>
-          <div class="media-picker-control" data-media-type="video" data-field="video_asset_${key}">
-            <input type="hidden" class="video-asset-url" required />
-            <div class="picker-preview select-sm" style="width: 150px; height: 45px; display: flex; align-items: center; justify-content: center; background: var(--admin-bg);">
-              <span class="no-img">No Video Selected</span>
-            </div>
-            <div class="picker-actions">
-              <button type="button" class="btn-select-media btn-xs">Select Video</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <button type="button" class="btn-remove-row remove-btn">Remove</button>
-  `;
-
-  row.querySelector(".btn-remove-row")?.addEventListener("click", () => {
-    row.remove();
-  });
-
-  videosContainer?.appendChild(row);
-}
-
-btnAddVideoRow?.addEventListener("click", addVideoRow);
-document.querySelectorAll("#videos-container .btn-remove-row").forEach((btn: any) => {
-  btn.addEventListener("click", () => btn.closest(".sortable-row").remove());
-});
-
-videosForm?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const rows = videosContainer?.querySelectorAll(".video-row");
-  const videosList: any[] = [];
-
-  rows?.forEach((row) => {
-    const title = (row.querySelector(".video-title") as HTMLInputElement).value;
-    const thumbnail_media_id = row.querySelector(".video-thumbnail-id")?.getAttribute("value") 
-      ? Number((row.querySelector(".video-thumbnail-id") as HTMLInputElement).value) 
-      : null;
-    const is_active = (row.querySelector(".video-active") as HTMLInputElement).checked;
-    
-    const urlEn = (row.querySelector(".video-asset-url") as HTMLInputElement).value;
-    const urlZhTw = urlEn;
-    const urlZhCn = urlEn;
-
-    const providerEn = "cloudflare";
-    const providerZhTw = "cloudflare";
-    const providerZhCn = "cloudflare";
-
-    if (title && urlEn) {
-      videosList.push({
-        title,
-        thumbnail_media_id,
-        is_active,
-        urlEn, urlZhTw, urlZhCn,
-        providerEn, providerZhTw, providerZhCn
+document.querySelectorAll(".btn-delete-album").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const id = Number(btn.getAttribute("data-id"));
+    if (!confirm("Are you sure you want to delete this album cover?")) return;
+    const updatedList = availableAlbums.filter(item => item.id !== id);
+    try {
+      const res = await fetch("/sam-admin/api/albums", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ albums: updatedList })
       });
+      if (!res.ok) throw new Error("Failed to delete album cover.");
+      alert("Album cover deleted!");
+      window.location.reload();
+    } catch (err: any) {
+      alert("Error: " + err.message);
     }
   });
+});
+
+// ==========================================
+// 3. VIDEO CAROUSEL (MOMENTS) CONTROLLER
+// ==========================================
+function openVideoEditor(video: any = null) {
+  const titleEl = document.getElementById("video-modal-title");
+  const form = document.getElementById("video-editor-form") as HTMLFormElement;
+  if (video) {
+    if (titleEl) titleEl.textContent = "Edit Moment";
+    (document.getElementById("video-id") as HTMLInputElement).value = video.id;
+    (document.getElementById("video-title") as HTMLInputElement).value = video.title;
+    (document.getElementById("video-thumbnail-id") as HTMLInputElement).value = video.thumbnail_media_id || "";
+    
+    const thumbPreview = document.getElementById("video-thumbnail-preview");
+    if (thumbPreview) {
+      if (video.thumbnail_media_id) {
+        thumbPreview.innerHTML = `<img src="/media/${video.r2_key}" alt="${video.title}" />`;
+      } else {
+        thumbPreview.innerHTML = `<span class="no-img">No Image</span>`;
+      }
+    }
+    
+    (document.getElementById("video-asset-url") as HTMLInputElement).value = video.url_en;
+    const assetPreview = document.getElementById("video-asset-preview");
+    if (assetPreview) {
+      if (video.url_en) {
+        assetPreview.innerHTML = `<span class="video-chosen" style="font-size: 0.75rem; word-break: break-all; padding: 4px; text-align: center;">${video.url_en.split("/").pop()}</span>`;
+      } else {
+        assetPreview.innerHTML = `<span class="no-img">No Video Selected</span>`;
+      }
+    }
+    (document.getElementById("video-active") as HTMLInputElement).checked = video.is_active === 1;
+  } else {
+    if (titleEl) titleEl.textContent = "Add Moment";
+    form.reset();
+    (document.getElementById("video-id") as HTMLInputElement).value = "";
+    (document.getElementById("video-thumbnail-id") as HTMLInputElement).value = "";
+    const thumbPreview = document.getElementById("video-thumbnail-preview");
+    if (thumbPreview) thumbPreview.innerHTML = `<span class="no-img">No Image</span>`;
+    (document.getElementById("video-asset-url") as HTMLInputElement).value = "";
+    const assetPreview = document.getElementById("video-asset-preview");
+    if (assetPreview) assetPreview.innerHTML = `<span class="no-img">No Video Selected</span>`;
+    (document.getElementById("video-active") as HTMLInputElement).checked = true;
+  }
+  document.getElementById("video-editor-modal")?.classList.add("open");
+}
+
+document.getElementById("btn-add-video")?.addEventListener("click", () => openVideoEditor());
+document.querySelectorAll(".btn-edit-video").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const data = JSON.parse(btn.getAttribute("data-video") || "{}");
+    openVideoEditor(data);
+  });
+});
+
+const videoFormEl = document.getElementById("video-editor-form") as HTMLFormElement;
+videoFormEl?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const data = new FormData(videoFormEl);
+  const id = data.get("id") ? Number(data.get("id")) : undefined;
+  const title = String(data.get("title"));
+  const thumbnail_media_id = data.get("thumbnail_media_id") ? Number(data.get("thumbnail_media_id")) : null;
+  const urlEn = String(data.get("url_en"));
+  const is_active = data.get("is_active") === "on";
+
+  if (!urlEn) {
+    alert("Please select a video file.");
+    return;
+  }
+
+  const newItem = {
+    id,
+    title,
+    thumbnail_media_id,
+    urlEn, urlZhTw: urlEn, urlZhCn: urlEn,
+    providerEn: "cloudflare", providerZhTw: "cloudflare", providerZhCn: "cloudflare",
+    is_active
+  };
+
+  let updatedList = [...availableVideos];
+  if (id) {
+    updatedList = updatedList.map(item => item.id === id ? { ...item, ...newItem } : item);
+  } else {
+    updatedList.push(newItem);
+  }
 
   try {
     const res = await fetch("/sam-admin/api/videos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ videos: videosList })
+      body: JSON.stringify({ videos: updatedList })
     });
-    if (!res.ok) throw new Error("Failed to save video list.");
-    alert("Video carousel saved successfully!");
+    if (!res.ok) throw new Error("Failed to save moment.");
+    alert("Moment saved successfully!");
     window.location.reload();
   } catch (err: any) {
     alert("Error: " + err.message);
   }
+});
+
+document.querySelectorAll(".btn-delete-video").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const id = Number(btn.getAttribute("data-id"));
+    if (!confirm("Are you sure you want to delete this moment?")) return;
+    const updatedList = availableVideos.filter(item => item.id !== id);
+    try {
+      const res = await fetch("/sam-admin/api/videos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videos: updatedList })
+      });
+      if (!res.ok) throw new Error("Failed to delete moment.");
+      alert("Moment deleted!");
+      window.location.reload();
+    } catch (err: any) {
+      alert("Error: " + err.message);
+    }
+  });
+});
+
+// ==========================================
+// 4. SOCIAL PLATFORMS CONTROLLER
+// ==========================================
+function openSocialEditor(social: any = null) {
+  const titleEl = document.getElementById("social-modal-title");
+  const form = document.getElementById("social-editor-form") as HTMLFormElement;
+  if (social) {
+    if (titleEl) titleEl.textContent = "Edit Footer Social Platform";
+    (document.getElementById("social-id") as HTMLInputElement).value = social.id;
+    (document.getElementById("social-name") as HTMLInputElement).value = social.name;
+    (document.getElementById("social-url") as HTMLInputElement).value = social.url;
+    (document.getElementById("social-logo-id") as HTMLInputElement).value = social.logo_media_id || "";
+    
+    const preview = document.getElementById("social-logo-preview");
+    if (preview) {
+      if (social.logo_media_id) {
+        preview.innerHTML = `<img src="/media/${social.r2_key}" alt="${social.name}" />`;
+      } else {
+        preview.innerHTML = `<span class="no-img">No Image</span>`;
+      }
+    }
+    (document.getElementById("social-active") as HTMLInputElement).checked = social.is_active === 1;
+  } else {
+    if (titleEl) titleEl.textContent = "Add Footer Social Platform";
+    form.reset();
+    (document.getElementById("social-id") as HTMLInputElement).value = "";
+    (document.getElementById("social-logo-id") as HTMLInputElement).value = "";
+    const preview = document.getElementById("social-logo-preview");
+    if (preview) preview.innerHTML = `<span class="no-img">No Image</span>`;
+    (document.getElementById("social-active") as HTMLInputElement).checked = true;
+  }
+  document.getElementById("social-editor-modal")?.classList.add("open");
+}
+
+document.getElementById("btn-add-social")?.addEventListener("click", () => openSocialEditor());
+document.querySelectorAll(".btn-edit-social").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const data = JSON.parse(btn.getAttribute("data-social") || "{}");
+    openSocialEditor(data);
+  });
+});
+
+const socialFormEl = document.getElementById("social-editor-form") as HTMLFormElement;
+socialFormEl?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const data = new FormData(socialFormEl);
+  const id = data.get("id") ? Number(data.get("id")) : undefined;
+  const name = String(data.get("name"));
+  const url = String(data.get("url"));
+  const logo_media_id = Number(data.get("logo_media_id"));
+  const is_active = data.get("is_active") === "on";
+
+  if (!logo_media_id) {
+    alert("Please select a logo icon.");
+    return;
+  }
+
+  const newItem = { id, name, url, logo_media_id, is_active };
+
+  let updatedList = [...availableSocials];
+  if (id) {
+    updatedList = updatedList.map(item => item.id === id ? { ...item, ...newItem } : item);
+  } else {
+    updatedList.push(newItem);
+  }
+
+  try {
+    const res = await fetch("/sam-admin/api/socials", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ socials: updatedList })
+    });
+    if (!res.ok) throw new Error("Failed to save social link.");
+    alert("Social link saved successfully!");
+    window.location.reload();
+  } catch (err: any) {
+    alert("Error: " + err.message);
+  }
+});
+
+document.querySelectorAll(".btn-delete-social").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const id = Number(btn.getAttribute("data-id"));
+    if (!confirm("Are you sure you want to delete this social platform?")) return;
+    const updatedList = availableSocials.filter(item => item.id !== id);
+    try {
+      const res = await fetch("/sam-admin/api/socials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ socials: updatedList })
+      });
+      if (!res.ok) throw new Error("Failed to delete social link.");
+      alert("Social platform deleted!");
+      window.location.reload();
+    } catch (err: any) {
+      alert("Error: " + err.message);
+    }
+  });
 });
 
 // ==========================================
@@ -694,209 +992,4 @@ bonusForm?.addEventListener("submit", async (e) => {
     alert("Error: " + err.message);
   }
 });
-
-// ==========================================
-// SOCIAL PLATFORMS LIST
-// ==========================================
-const socialsForm = document.getElementById("socials-form") as HTMLFormElement;
-const socialsContainer = document.getElementById("socials-container");
-const btnAddSocialRow = document.getElementById("btn-add-social-row");
-
-function addSocialRow() {
-  const key = Date.now() + Math.random().toString(36).substring(7);
-  const row = document.createElement("div");
-  row.className = "sortable-row";
-  row.innerHTML = `
-    <div class="drag-handle">⋮⋮</div>
-    <div class="form-group">
-      <label>Platform Name</label>
-      <input type="text" class="social-name" required placeholder="e.g. Instagram" />
-    </div>
-    <div class="form-group" style="flex: 2;">
-      <label>Target URL</label>
-      <input type="url" class="social-url" required placeholder="https://..." />
-    </div>
-    <div class="form-group">
-      <label>Logo Icon</label>
-      <div class="media-picker-control" data-field="social_logo_${key}">
-        <input type="hidden" class="social-media-id" required />
-        <div class="picker-preview select-sm">
-          <span class="no-img">No Image</span>
-        </div>
-        <div class="picker-actions">
-          <button type="button" class="btn-select-media btn-xs">Select</button>
-        </div>
-      </div>
-    </div>
-    <div class="form-group checkbox-cell">
-      <input type="checkbox" class="social-active" checked id="social-active-${key}" />
-      <label for="social-active-${key}">Active</label>
-    </div>
-    <button type="button" class="btn-remove-row remove-btn">Remove</button>
-  `;
-
-  row.querySelector(".btn-remove-row")?.addEventListener("click", () => {
-    row.remove();
-  });
-
-  socialsContainer?.appendChild(row);
 }
-
-btnAddSocialRow?.addEventListener("click", addSocialRow);
-document.querySelectorAll("#socials-container .btn-remove-row").forEach((btn: any) => {
-  btn.addEventListener("click", () => btn.closest(".sortable-row").remove());
-});
-
-socialsForm?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const rows = socialsContainer?.querySelectorAll(".sortable-row");
-  const socialsList: any[] = [];
-
-  rows?.forEach((row) => {
-    const name = (row.querySelector(".social-name") as HTMLInputElement).value;
-    const url = (row.querySelector(".social-url") as HTMLInputElement).value;
-    const logo_media_id = Number((row.querySelector(".social-media-id") as HTMLInputElement).value);
-    const is_active = (row.querySelector(".social-active") as HTMLInputElement).checked;
-
-    if (name && url && logo_media_id) {
-      socialsList.push({ name, url, logo_media_id, is_active });
-    }
-  });
-
-  try {
-    const res = await fetch("/sam-admin/api/socials", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ socials: socialsList })
-    });
-    if (!res.ok) throw new Error("Failed to save socials.");
-    alert("Social links updated successfully!");
-    window.location.reload();
-  } catch (err: any) {
-    alert("Error: " + err.message);
-  }
-});
-
-// ==========================================
-// MUSIC PLATFORMS LIST
-// ==========================================
-const musicForm = document.getElementById("music-links-form") as HTMLFormElement;
-const musicContainer = document.getElementById("music-links-container");
-const btnAddMusicRow = document.getElementById("btn-add-music-row");
-
-function addMusicRow() {
-  const key = Date.now() + Math.random().toString(36).substring(7);
-  const row = document.createElement("div");
-  row.className = "sortable-row";
-  row.innerHTML = `
-    <div class="drag-handle">⋮⋮</div>
-    <div class="form-group">
-      <label>Platform Name</label>
-      <input type="text" class="music-name" required placeholder="e.g. Spotify" />
-    </div>
-    <div class="form-group" style="flex: 2;">
-      <label>Target URL</label>
-      <input type="url" class="music-url" required placeholder="https://..." />
-    </div>
-    <div class="form-group">
-      <label>Logo Icon</label>
-      <div class="media-picker-control" data-field="music_logo_${key}">
-        <input type="hidden" class="music-media-id" required />
-        <div class="picker-preview select-sm">
-          <span class="no-img">No Image</span>
-        </div>
-        <div class="picker-actions">
-          <button type="button" class="btn-select-media btn-xs">Select</button>
-        </div>
-      </div>
-    </div>
-    <div class="form-group checkbox-cell">
-      <input type="checkbox" class="music-active" checked id="music-active-${key}" />
-      <label for="music-active-${key}">Active</label>
-    </div>
-    <button type="button" class="btn-remove-row remove-btn">Remove</button>
-  `;
-
-  row.querySelector(".btn-remove-row")?.addEventListener("click", () => {
-    row.remove();
-  });
-
-  musicContainer?.appendChild(row);
-}
-
-btnAddMusicRow?.addEventListener("click", addMusicRow);
-// Check if platform is in use by any album cover custom links
-function checkPlatformInUse(platformId: string | null): boolean {
-  if (!platformId) return false;
-  const inputs = document.querySelectorAll(`.album-platform-link-row[data-platform-id="${platformId}"] .album-platform-url`);
-  for (const input of Array.from(inputs)) {
-    if ((input as HTMLInputElement).value.trim() !== "") {
-      return true;
-    }
-  }
-  return false;
-}
-
-// Remove button click interceptor for music links container
-musicContainer?.addEventListener("click", (e) => {
-  const target = e.target as HTMLElement;
-  if (target.classList.contains("btn-remove-row")) {
-    const row = target.closest(".sortable-row");
-    if (row) {
-      const platformId = row.getAttribute("data-id");
-      if (checkPlatformInUse(platformId)) {
-        showPlatformWarningModal();
-        return;
-      }
-      row.remove();
-    }
-  }
-});
-
-musicForm?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const rows = musicContainer?.querySelectorAll(".sortable-row");
-  const musicList: any[] = [];
-
-  // Check if any deleted platforms are in use before submitting
-  const existingRows = Array.from(document.querySelectorAll("#music-links-container .sortable-row[data-id]"));
-  const incomingIds = new Set(Array.from(rows || []).map(r => r.getAttribute("data-id")).filter(Boolean));
-  for (const row of existingRows) {
-    const id = row.getAttribute("data-id");
-    if (id && !incomingIds.has(id)) {
-      if (checkPlatformInUse(id)) {
-        showPlatformWarningModal();
-        return;
-      }
-    }
-  }
-
-  rows?.forEach((row) => {
-    const idAttr = row.getAttribute("data-id");
-    const id = idAttr ? Number(idAttr) : undefined;
-    const name = (row.querySelector(".music-name") as HTMLInputElement).value;
-    const url = (row.querySelector(".music-url") as HTMLInputElement).value;
-    const logo_media_id = Number((row.querySelector(".music-media-id") as HTMLInputElement).value);
-    const is_active = (row.querySelector(".music-active") as HTMLInputElement).checked;
-
-    if (name && url && logo_media_id) {
-      musicList.push({ id, name, url, logo_media_id, is_active });
-    }
-  });
-
-  try {
-    const res = await fetch("/sam-admin/api/music", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ musicLinks: musicList })
-    });
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({})) as any;
-      throw new Error(data.error || "Failed to save music platform links.");
-    }
-    alert("Music platform links updated successfully!");
-    window.location.reload();
-  } catch (err: any) {
-    alert("Error: " + err.message);
-  }
-});
