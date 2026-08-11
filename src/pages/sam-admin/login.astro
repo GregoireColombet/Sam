@@ -1,15 +1,18 @@
 ---
-import { getAdminContext, hashPassword, verifyPassword, logActivity } from "@/lib/admin";
+import { getAdminContext, hashPassword, verifyPassword, logActivity, getSessionToken } from "@/lib/admin";
 
 export const prerender = false;
 
 const env = Astro.locals.runtime?.env;
 const db = env?.DB;
 
-// If already logged in, redirect to admin index
-const admin = await getAdminContext(env, Astro.request);
-if (admin) {
-  return Astro.redirect("/sam-admin/");
+// If already logged in via a local session cookie, redirect to admin index
+const token = getSessionToken(Astro.request);
+if (token) {
+  const admin = await getAdminContext(env, Astro.request);
+  if (admin) {
+    return Astro.redirect("/sam-admin/");
+  }
 }
 
 let error = "";
