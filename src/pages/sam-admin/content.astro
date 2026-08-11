@@ -226,7 +226,51 @@ function getMediaUrl(id: number | null) {
 
     <!-- ALBUMS TAB -->
     <div class="tab-pane" id="tab-albums">
-      <form id="albums-form" class="admin-form card-form">
+      <form id="music-links-form" class="admin-form card-form">
+        <div class="actions-bar">
+          <h2>Music Streaming Platforms</h2>
+          <button type="button" class="btn-primary" id="btn-add-music-row">Add Music Platform</button>
+        </div>
+        <p class="admin-muted">Add streaming platforms (e.g. Spotify, Apple Music) displayed on the music page. Select logo PNGs/SVGs and input URLs.</p>
+
+        <div class="sortable-list" id="music-links-container">
+          {musicLinks.map((link, index) => (
+            <div class="sortable-row" data-index={index} data-id={link.id}>
+              <div class="drag-handle">⋮⋮</div>
+              <div class="form-group">
+                <label>Platform Name</label>
+                <input type="text" class="music-name" value={link.name} required placeholder="Spotify, Apple Music" />
+              </div>
+              <div class="form-group">
+                <label>Target URL</label>
+                <input type="url" class="music-url" value={link.url} required placeholder="https://..." />
+              </div>
+              <div class="form-group">
+                <label>Logo Icon</label>
+                <div class="media-picker-control" data-field={`music_logo_${index}`}>
+                  <input type="hidden" class="music-media-id" value={link.logo_media_id} />
+                  <div class="picker-preview select-sm">
+                    <img src={getMediaUrl(link.logo_media_id)} alt={link.name} />
+                  </div>
+                  <div class="picker-actions">
+                    <button type="button" class="btn-select-media btn-xs">Select</button>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group checkbox-cell">
+                <input type="checkbox" class="music-active" checked={link.is_active === 1} id={`music-active-${index}`} />
+                <label for={`music-active-${index}`}>Active</label>
+              </div>
+              <button type="button" class="btn-remove-row remove-btn">Remove</button>
+            </div>
+          ))}
+          {musicLinks.length === 0 && <div class="empty-list-msg">No music platform links configured. Click "Add Music Platform".</div>}
+        </div>
+
+        <button type="submit" class="btn-submit">Save Music Platforms</button>
+      </form>
+
+      <form id="albums-form" class="admin-form card-form" style="margin-top: 2rem;">
         <div class="actions-bar">
           <h2>Album Covers (Mosaic Grid)</h2>
           <button type="button" class="btn-primary" id="btn-add-album-row">Add Cover</button>
@@ -279,50 +323,6 @@ function getMediaUrl(id: number | null) {
         </div>
         
         <button type="submit" class="btn-submit">Save Albums Layout</button>
-      </form>
-
-      <form id="music-links-form" class="admin-form card-form" style="margin-top: 2rem;">
-        <div class="actions-bar">
-          <h2>Music Streaming Platforms</h2>
-          <button type="button" class="btn-primary" id="btn-add-music-row">Add Music Platform</button>
-        </div>
-        <p class="admin-muted">Add streaming platforms (e.g. Spotify, Apple Music) displayed on the music page. Select logo PNGs/SVGs and input URLs.</p>
-
-        <div class="sortable-list" id="music-links-container">
-          {musicLinks.map((link, index) => (
-            <div class="sortable-row" data-index={index} data-id={link.id}>
-              <div class="drag-handle">⋮⋮</div>
-              <div class="form-group">
-                <label>Platform Name</label>
-                <input type="text" class="music-name" value={link.name} required placeholder="Spotify, Apple Music" />
-              </div>
-              <div class="form-group">
-                <label>Target URL</label>
-                <input type="url" class="music-url" value={link.url} required placeholder="https://..." />
-              </div>
-              <div class="form-group">
-                <label>Logo Icon</label>
-                <div class="media-picker-control" data-field={`music_logo_${index}`}>
-                  <input type="hidden" class="music-media-id" value={link.logo_media_id} />
-                  <div class="picker-preview select-sm">
-                    <img src={getMediaUrl(link.logo_media_id)} alt={link.name} />
-                  </div>
-                  <div class="picker-actions">
-                    <button type="button" class="btn-select-media btn-xs">Select</button>
-                  </div>
-                </div>
-              </div>
-              <div class="form-group checkbox-cell">
-                <input type="checkbox" class="music-active" checked={link.is_active === 1} id={`music-active-${index}`} />
-                <label for={`music-active-${index}`}>Active</label>
-              </div>
-              <button type="button" class="btn-remove-row remove-btn">Remove</button>
-            </div>
-          ))}
-          {musicLinks.length === 0 && <div class="empty-list-msg">No music platform links configured. Click "Add Music Platform".</div>}
-        </div>
-
-        <button type="submit" class="btn-submit">Save Music Platforms</button>
       </form>
     </div>
 
