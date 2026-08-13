@@ -145,6 +145,25 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
 
       if (!asset) return json({ error: "Media asset not found" }, { status: 404 });
 
+      // Check non-nullable references to give a precise user-facing error message
+      const references: string[] = [];
+      
+      const albumCheck = await db.prepare(`select count(*) as count from album_covers where image_media_id = ?`).bind(body.id).first<{ count: number }>();
+      if (albumCheck && albumCheck.count > 0) references.push("Album Cover");
+
+      const tourCheck = await db.prepare(`select count(*) as count from tour_ticket_links where logo_media_id = ?`).bind(body.id).first<{ count: number }>();
+      if (tourCheck && tourCheck.count > 0) references.push("Tour Ticket Link logo");
+
+      const musicCheck = await db.prepare(`select count(*) as count from music_platform_links where logo_media_id = ?`).bind(body.id).first<{ count: number }>();
+      if (musicCheck && musicCheck.count > 0) references.push("Music Platform logo");
+
+      const socialCheck = await db.prepare(`select count(*) as count from social_links where logo_media_id = ?`).bind(body.id).first<{ count: number }>();
+      if (socialCheck && socialCheck.count > 0) references.push("Social Link logo");
+
+      if (references.length > 0) {
+        return json({ error: `Cannot delete media. It is currently used by: ${references.join(", ")}.` }, { status: 409 });
+      }
+
       // Nullify references in news, settings, and video links, then try deleting from D1
       await db.batch([
         db.prepare(`update news_blocks set background_media_id = null where background_media_id = ?`).bind(body.id),
@@ -167,7 +186,7 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
       await logActivity(env, admin.email, "delete_media", "media_asset", body.id, asset.file_name);
       return json({ ok: true });
     } catch (e: any) {
-      return json({ error: "Cannot delete media. It might be referenced by other content." }, { status: 409 });
+      return json({ error: `Cannot delete media. ${e.message}` }, { status: 409 });
     }
   }
 
