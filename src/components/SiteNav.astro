@@ -154,8 +154,10 @@ const merchExternal = Boolean(merchUrl);
   }
 
   .brand-logo {
-    height: 28px;
+    height: auto;
+    max-height: 28px;
     width: auto;
+    max-width: 100%;
     display: block;
     filter: invert(1) brightness(1.2);
     transition: filter 180ms ease;
@@ -256,6 +258,10 @@ const merchExternal = Boolean(merchUrl);
   @media (max-width: 760px) {
     .site-nav {
       grid-template-columns: 1fr auto;
+    }
+
+    .brand-logo {
+      max-height: 20px;
     }
 
     .desktop-nav {
