@@ -1157,15 +1157,21 @@ function getMediaUrl(id: number | null) {
     height: 45px;
   }
 
-  #ticket-links-modal .picker-preview {
-    background: #101010;
+  :global(#ticket-links-modal) .picker-preview {
+    background: #101010 !important;
+    border: 1px solid var(--admin-line) !important;
+    width: 60px;
+    height: 45px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
   }
 
-  #ticket-links-modal .picker-preview img {
-    width: 40px;
-    height: 25px;
-    object-fit: contain;
-    background: transparent;
+  :global(#ticket-links-modal) .picker-preview img {
+    width: 40px !important;
+    height: 25px !important;
+    object-fit: contain !important;
+    background: transparent !important;
   }
 
   .no-img {
