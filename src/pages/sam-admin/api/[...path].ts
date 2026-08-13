@@ -145,8 +145,11 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
 
       if (!asset) return json({ error: "Media asset not found" }, { status: 404 });
 
-      // Try deleting from D1 first (blocks if referenced due to foreign key check)
+      // Nullify references in news, settings, and video links, then try deleting from D1
       await db.batch([
+        db.prepare(`update news_blocks set background_media_id = null where background_media_id = ?`).bind(body.id),
+        db.prepare(`update site_settings set bonus_media_id = null where bonus_media_id = ?`).bind(body.id),
+        db.prepare(`update video_links set thumbnail_media_id = null where thumbnail_media_id = ?`).bind(body.id),
         db.prepare(`PRAGMA foreign_keys = ON;`),
         db.prepare(`delete from media_assets where id = ?`).bind(body.id)
       ]);
