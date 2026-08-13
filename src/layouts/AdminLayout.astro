@@ -48,10 +48,89 @@ if (!admin) {
     <main>
       <slot />
     </main>
+
+    <script>
+      let activeFetchCount = 0;
+      const originalFetch = window.fetch;
+      
+      window.fetch = async function (...args) {
+        activeFetchCount++;
+        document.body.classList.add("admin-body-loading");
+
+        const activeElement = document.activeElement as HTMLElement | null;
+        const isActionButton = activeElement && (
+          activeElement.tagName === 'BUTTON' || 
+          (activeElement.tagName === 'INPUT' && (activeElement as HTMLInputElement).type === 'submit')
+        );
+
+        if (isActionButton && activeElement && !activeElement.hasAttribute('data-no-disable')) {
+          activeElement.setAttribute('disabled', 'true');
+          activeElement.classList.add('btn-loading');
+          
+          if (!activeElement.hasAttribute('data-original-content')) {
+            activeElement.setAttribute('data-original-content', activeElement.innerHTML);
+          }
+          
+          // Prepend a spinner to the button content
+          activeElement.innerHTML = `<span class="spinner"></span> ` + activeElement.innerHTML;
+        }
+
+        try {
+          return await originalFetch(...args);
+        } finally {
+          activeFetchCount--;
+          if (activeFetchCount <= 0) {
+            document.body.classList.remove("admin-body-loading");
+          }
+          if (isActionButton && activeElement) {
+            activeElement.removeAttribute('disabled');
+            activeElement.classList.remove('btn-loading');
+            const originalContent = activeElement.getAttribute('data-original-content');
+            if (originalContent) {
+              activeElement.innerHTML = originalContent;
+            }
+          }
+        }
+      };
+    </script>
   </body>
 </html>
 
 <style is:global>
+  /* Global loading styles and cursor */
+  .admin-body-loading,
+  .admin-body-loading * {
+    cursor: wait !important;
+  }
+
+  button[disabled],
+  input[type="submit"][disabled] {
+    opacity: 0.6 !important;
+    cursor: wait !important;
+    pointer-events: none !important;
+  }
+
+  .btn-loading {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: currentColor;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
   :root {
     color-scheme: light;
     --admin-bg: #f5f4f1;
