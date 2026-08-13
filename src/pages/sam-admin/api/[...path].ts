@@ -431,12 +431,15 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
                values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
             ).bind(
               video.title,
-              video.providerEn, video.urlEn,
-              video.providerZhTw, video.urlZhTw,
-              video.providerZhCn, video.urlZhCn,
+              video.providerEn || video.provider_en || "cloudflare",
+              video.urlEn || video.url_en,
+              video.providerZhTw || video.provider_zh_tw || "cloudflare",
+              video.urlZhTw || video.url_zh_tw,
+              video.providerZhCn || video.provider_zh_cn || "cloudflare",
+              video.urlZhCn || video.url_zh_cn,
               video.thumbnail_media_id || null,
               index,
-              video.is_active ? 1 : 0
+              (video.is_active === 1 || video.is_active === true || video.is_active === "on") ? 1 : 0
             )
           );
         });
