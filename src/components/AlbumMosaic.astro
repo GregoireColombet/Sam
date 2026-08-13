@@ -70,7 +70,7 @@ const t = labels[locale];
   const linksGrid = document.getElementById("modal-platform-links-grid");
   const noLinksMsg = document.getElementById("modal-no-links-msg");
 
-  function openModal(title: string, image: string, links: any[], date: string) {
+  function openModal(title: string, image: string, links: any[]) {
     if (!modal) return;
     
     if (modalImg) {
@@ -78,7 +78,7 @@ const t = labels[locale];
       modalImg.alt = title;
     }
     if (modalTitle) {
-      modalTitle.textContent = `${title} (${date})`;
+      modalTitle.textContent = title;
     }
 
     if (linksGrid) {
@@ -122,14 +122,13 @@ const t = labels[locale];
     item.addEventListener("click", () => {
       const title = item.getAttribute("data-title") || "";
       const image = item.getAttribute("data-image") || "";
-      const date = item.getAttribute("data-date") || "";
       let links: any[] = [];
       try {
         links = JSON.parse(item.getAttribute("data-links") || "[]");
       } catch (e) {
         console.error(e);
       }
-      openModal(title, image, links, date);
+      openModal(title, image, links);
     });
   });
 
