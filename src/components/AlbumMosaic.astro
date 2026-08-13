@@ -19,22 +19,16 @@ const t = labels[locale];
     ) : (
       <div class="mosaic">
         {albums.map((album) => (
-          <div class="mosaic-card">
-            <button 
-              class="mosaic-item" 
-              data-title={album.title}
-              data-image={album.image.url}
-              data-links={JSON.stringify(album.links || [])}
-              data-date={album.productionDate}
-              aria-label={album.title}
-            >
-              <img src={album.image.url} alt={album.image.alt || album.title} loading="lazy" />
-            </button>
-            <div class="mosaic-info">
-              <span class="mosaic-title" title={album.title}>{album.title}</span>
-              <span class="mosaic-date">{album.productionDate}</span>
-            </div>
-          </div>
+          <button 
+            class="mosaic-item" 
+            data-title={album.title}
+            data-image={album.image.url}
+            data-links={JSON.stringify(album.links || [])}
+            data-date={album.productionDate}
+            aria-label={album.title}
+          >
+            <img src={album.image.url} alt={album.image.alt || album.title} loading="lazy" />
+          </button>
         ))}
       </div>
     )}
@@ -404,37 +398,6 @@ const t = labels[locale];
     font-size: 0.95rem;
     text-align: center;
     padding: 16px 0;
-  }
-
-  .mosaic-card {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .mosaic-info {
-    text-align: center;
-    padding: 0 4px;
-  }
-
-  .mosaic-title {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--ice-white);
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    letter-spacing: 0.5px;
-  }
-
-  .mosaic-date {
-    display: block;
-    font-size: 0.72rem;
-    color: var(--coral-red);
-    font-weight: 600;
-    letter-spacing: 0.5px;
   }
 
   @keyframes zoomIn {
