@@ -167,9 +167,10 @@ a voice, and the moment it reaches someone’s heart.`,
 };
 
 
-const bonusTitle = getLocalized(bonusSettings?.title, locale);
-const bonusText = getLocalized(bonusSettings?.text, locale);
-const bonusImageUrl = bonusSettings?.imageUrl || "";
+const bonusIsActive = bonusSettings?.isActive;
+const bonusTitle = bonusIsActive ? getLocalized(bonusSettings?.title, locale) : null;
+const bonusText = bonusIsActive ? getLocalized(bonusSettings?.text, locale) : "";
+const bonusImageUrl = bonusIsActive ? (bonusSettings?.imageUrl || "") : "";
 ---
 
 <BaseLayout locale={locale} title={`Sam Lee | About`}>
@@ -252,111 +253,113 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
 
 <script>
   const bonusBtn = document.getElementById("bonus-btn");
-  const bonusModal = document.getElementById("bonus-modal");
-  const bonusClose = document.getElementById("bonus-modal-close");
-  const gaugeBar = document.getElementById("scroll-gauge-bar");
-  const gaugeNumber = document.getElementById("scroll-gauge-number");
-  const gaugeContainer = document.querySelector(".scroll-gauge-container");
-  const nav = document.querySelector("[data-site-nav]");
+  if (bonusBtn) {
+    const bonusModal = document.getElementById("bonus-modal");
+    const bonusClose = document.getElementById("bonus-modal-close");
+    const gaugeBar = document.getElementById("scroll-gauge-bar");
+    const gaugeNumber = document.getElementById("scroll-gauge-number");
+    const gaugeContainer = document.querySelector(".scroll-gauge-container");
+    const nav = document.querySelector("[data-site-nav]");
 
-  // Append gauge container to the nav bar so it aligns perfectly at its bottom
-  if (nav && gaugeContainer) {
-    nav.appendChild(gaugeContainer);
-  }
-
-  let progress = 0;
-  let timer: number | null = null;
-  let lastScrollY = window.scrollY;
-
-  function updateGauge(value: number) {
-    progress = Math.round(value);
-    if (gaugeBar) {
-      gaugeBar.style.width = `${progress}%`;
+    // Append gauge container to the nav bar so it aligns perfectly at its bottom
+    if (nav && gaugeContainer) {
+      nav.appendChild(gaugeContainer);
     }
-    if (gaugeNumber) {
-      gaugeNumber.textContent = `${progress}%`;
+
+    let progress = 0;
+    let timer: number | null = null;
+    let lastScrollY = window.scrollY;
+
+    function updateGauge(value: number) {
+      progress = Math.round(value);
+      if (gaugeBar) {
+        gaugeBar.style.width = `${progress}%`;
+      }
+      if (gaugeNumber) {
+        gaugeNumber.textContent = `${progress}%`;
+      }
     }
-  }
 
-  function handleScroll() {
-    const windowHeight = window.innerHeight;
-    const scrollY = window.scrollY;
-    const documentHeight = document.documentElement.scrollHeight;
-    const maxScroll = documentHeight - windowHeight;
+    function handleScroll() {
+      const windowHeight = window.innerHeight;
+      const scrollY = window.scrollY;
+      const documentHeight = document.documentElement.scrollHeight;
+      const maxScroll = documentHeight - windowHeight;
 
-    const isAtBottom = maxScroll <= 0 || (windowHeight + scrollY) >= (documentHeight - 15);
+      const isAtBottom = maxScroll <= 0 || (windowHeight + scrollY) >= (documentHeight - 15);
 
-    if (scrollY !== lastScrollY) {
-      lastScrollY = scrollY;
-      // Scroll position changed (page moved)
-      if (timer) {
-        clearInterval(timer);
-        timer = null;
+      if (scrollY !== lastScrollY) {
+        lastScrollY = scrollY;
+        // Scroll position changed (page moved)
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+        if (bonusBtn) {
+          bonusBtn.style.display = "none";
+        }
+        // Set progress based on scroll position (0% to 80%)
+        const scrollPercent = maxScroll > 0 ? (scrollY / maxScroll) * 80 : 80;
+        updateGauge(Math.max(0, Math.min(80, scrollPercent)));
+      }
+
+      if (isAtBottom) {
+        // Start/continue the timer if not already running and not yet 100%
+        if (!timer && progress < 100 && bonusModal && !bonusModal.classList.contains("open")) {
+          if (progress < 80) {
+            updateGauge(80);
+          }
+          timer = window.setInterval(() => {
+            if (progress < 100) {
+              updateGauge(Math.min(100, progress + 5));
+              if (progress >= 100) {
+                if (timer) {
+                  clearInterval(timer);
+                  timer = null;
+                }
+                if (bonusBtn) {
+                  bonusBtn.style.display = "inline-block";
+                  bonusBtn.style.animation = "fadeIn 0.5s ease forwards";
+                }
+              }
+            }
+          }, 500); // 0.5 second fills 5% (fills remaining 20% in 2 seconds)
+        }
+      } else {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll);
+    // Initial check on load
+    handleScroll();
+
+    bonusBtn.addEventListener("click", () => {
+      if (bonusModal) {
+        bonusModal.classList.add("open");
+      }
+    });
+
+    bonusClose?.addEventListener("click", () => {
+      if (bonusModal) {
+        bonusModal.classList.remove("open");
       }
       if (bonusBtn) {
         bonusBtn.style.display = "none";
       }
-      // Set progress based on scroll position (0% to 80%)
-      const scrollPercent = maxScroll > 0 ? (scrollY / maxScroll) * 80 : 80;
-      updateGauge(Math.max(0, Math.min(80, scrollPercent)));
-    }
-
-    if (isAtBottom) {
-      // Start/continue the timer if not already running and not yet 100%
-      if (!timer && progress < 100 && bonusModal && !bonusModal.classList.contains("open")) {
-        if (progress < 80) {
-          updateGauge(80);
-        }
-        timer = window.setInterval(() => {
-          if (progress < 100) {
-            updateGauge(Math.min(100, progress + 5));
-            if (progress >= 100) {
-              if (timer) {
-                clearInterval(timer);
-                timer = null;
-              }
-              if (bonusBtn) {
-                bonusBtn.style.display = "inline-block";
-                bonusBtn.style.animation = "fadeIn 0.5s ease forwards";
-              }
-            }
-          }
-        }, 500); // 0.5 second fills 5% (fills remaining 20% in 2 seconds)
-      }
-    } else {
       if (timer) {
         clearInterval(timer);
         timer = null;
       }
-    }
+      updateGauge(80);
+      // Restart the process immediately if still at bottom
+      lastScrollY = window.scrollY;
+      handleScroll();
+    });
   }
-
-  window.addEventListener("scroll", handleScroll);
-  // Initial check on load
-  handleScroll();
-
-  bonusBtn?.addEventListener("click", () => {
-    if (bonusModal) {
-      bonusModal.classList.add("open");
-    }
-  });
-
-  bonusClose?.addEventListener("click", () => {
-    if (bonusModal) {
-      bonusModal.classList.remove("open");
-    }
-    if (bonusBtn) {
-      bonusBtn.style.display = "none";
-    }
-    if (timer) {
-      clearInterval(timer);
-      timer = null;
-    }
-    updateGauge(80);
-    // Restart the process immediately if still at bottom
-    lastScrollY = window.scrollY;
-    handleScroll();
-  });
 </script>
 
 <style>

@@ -76,7 +76,7 @@ if (db) {
       merch_url_en: "", merch_url_zh_tw: "", merch_url_zh_cn: "", merch_is_active: 0,
       bonus_title_en: "", bonus_title_zh_tw: "", bonus_title_zh_cn: "",
       bonus_text_en: "", bonus_text_zh_tw: "", bonus_text_zh_cn: "",
-      bonus_media_id: null
+      bonus_media_id: null, bonus_is_active: 0
     };
     mediaList = mediaResult.results || [];
   } catch (e: any) {
@@ -544,6 +544,15 @@ function getMediaUrl(id: number | null) {
                 <button type="button" class="btn-select-media">Select Image</button>
                 <button type="button" class="btn-clear-media" style={settings.bonus_media_id ? "" : "display:none;"}>Clear</button>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group checkbox-cell" style="margin-top: 0; align-self: start;">
+            <div class="row-group">
+              <input type="checkbox" id="bonus-active" name="bonus_is_active" checked={settings.bonus_is_active === 1} />
+              <label for="bonus-active" style="text-transform: none; font-size: 0.95rem; font-weight: normal; cursor: pointer;">Bonus Page Active (show loading bar and button)</label>
             </div>
           </div>
         </div>

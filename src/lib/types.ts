@@ -75,5 +75,6 @@ export type BonusSettings = {
   text: LocalizedText;
   imageUrl: string;
   mediaId: number | null;
+  isActive: boolean;
 };
 

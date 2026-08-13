@@ -978,7 +978,8 @@ bonusForm?.addEventListener("submit", async (e) => {
       bonus_text_en: formData.get("bonus_text_en"),
       bonus_text_zh_tw: formData.get("bonus_text_zh_tw"),
       bonus_text_zh_cn: formData.get("bonus_text_zh_cn"),
-      bonus_media_id: formData.get("bonus_media_id") ? Number(formData.get("bonus_media_id")) : null
+      bonus_media_id: formData.get("bonus_media_id") ? Number(formData.get("bonus_media_id")) : null,
+      bonus_is_active: formData.get("bonus_is_active") === "on"
     };
 
     const res = await fetch("/sam-admin/api/settings", {

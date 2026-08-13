@@ -262,7 +262,8 @@ export async function getBonusSettings(env?: RuntimeEnv): Promise<BonusSettings 
     const settings = await db.prepare(
       `select s.bonus_title_en, s.bonus_title_zh_tw, s.bonus_title_zh_cn,
               s.bonus_text_en, s.bonus_text_zh_tw, s.bonus_text_zh_cn,
-              s.bonus_media_id, m.r2_key as bonus_media_key, m.alt_text as bonus_media_alt
+              s.bonus_media_id, s.bonus_is_active,
+              m.r2_key as bonus_media_key, m.alt_text as bonus_media_alt
        from site_settings s
        left join media_assets m on m.id = s.bonus_media_id
        where s.id = 1`
@@ -280,7 +281,8 @@ export async function getBonusSettings(env?: RuntimeEnv): Promise<BonusSettings 
         zhCN: String(settings.bonus_text_zh_cn || "")
       },
       mediaId: settings.bonus_media_id ? Number(settings.bonus_media_id) : null,
-      imageUrl: settings.bonus_media_key ? mediaUrl(env, String(settings.bonus_media_key)) : ""
+      imageUrl: settings.bonus_media_key ? mediaUrl(env, String(settings.bonus_media_key)) : "",
+      isActive: Number(settings.bonus_is_active || 0) === 1
     };
   } catch {
     return null;
