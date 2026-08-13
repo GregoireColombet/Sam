@@ -1157,7 +1157,7 @@ function getMediaUrl(id: number | null) {
     height: 45px;
   }
 
-  :global(#ticket-links-modal) .picker-preview {
+  :global(#ticket-links-modal .picker-preview) {
     background: #101010 !important;
     border: 1px solid var(--admin-line) !important;
     width: 60px;
@@ -1167,11 +1167,12 @@ function getMediaUrl(id: number | null) {
     overflow: hidden;
   }
 
-  :global(#ticket-links-modal) .picker-preview img {
+  :global(#ticket-links-modal .picker-preview img) {
     width: 40px !important;
     height: 25px !important;
     object-fit: contain !important;
     background: transparent !important;
+    border: 1px solid #FF747D !important;
   }
 
   .no-img {
