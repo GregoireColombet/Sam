@@ -177,6 +177,7 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
   {bonusTitle && (
     <div class="scroll-gauge-container">
       <div class="scroll-gauge-bar" id="scroll-gauge-bar"></div>
+      <div class="scroll-gauge-number" id="scroll-gauge-number">0%</div>
     </div>
   )}
   <main class="page-main">
@@ -254,6 +255,7 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
   const bonusModal = document.getElementById("bonus-modal");
   const bonusClose = document.getElementById("bonus-modal-close");
   const gaugeBar = document.getElementById("scroll-gauge-bar");
+  const gaugeNumber = document.getElementById("scroll-gauge-number");
   const gaugeContainer = document.querySelector(".scroll-gauge-container");
   const nav = document.querySelector("[data-site-nav]");
 
@@ -267,9 +269,12 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
   let lastScrollY = window.scrollY;
 
   function updateGauge(value: number) {
-    progress = value;
+    progress = Math.round(value);
     if (gaugeBar) {
       gaugeBar.style.width = `${progress}%`;
+    }
+    if (gaugeNumber) {
+      gaugeNumber.textContent = `${progress}%`;
     }
   }
 
@@ -316,7 +321,7 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
               }
             }
           }
-        }, 1000); // 1 second fills 5%
+        }, 500); // 0.5 second fills 5% (fills remaining 20% in 2 seconds)
       }
     } else {
       if (timer) {
@@ -362,10 +367,10 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
 
   :global([data-site-nav]) .scroll-gauge-container {
     position: absolute;
-    bottom: -4px; /* Align precisely at the bottom edge */
+    bottom: -18px; /* Align precisely at the bottom edge */
     left: 0;
     width: 100%;
-    height: 4px;
+    height: 18px;
     background: var(--dark);
     z-index: 100;
   }
@@ -376,6 +381,19 @@ const bonusImageUrl = bonusSettings?.imageUrl || "";
     background: var(--coral-red, #FF747D);
     box-shadow: 0 4px 16px var(--coral-red, #FF747D), 0 2px 6px var(--coral-red, #FF747D);
     transition: width 0.1s ease-out;
+  }
+
+  :global([data-site-nav]) .scroll-gauge-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--aqua-glow, #82E8E7);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 5px rgba(0, 0, 0, 0.95);
+    pointer-events: none;
+    z-index: 101;
   }
 
   .page-main {
