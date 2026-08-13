@@ -45,6 +45,7 @@ const t = labels[locale];
         <div class="album-modal-left">
           <img id="modal-album-img" src="" alt="Album Cover" />
           <h3 id="modal-album-title-text"></h3>
+          <div id="modal-album-date-text" style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500; margin-top: -8px;"></div>
         </div>
         <div class="album-modal-right">
           <h4 class="modal-platform-header">{t.choosePlatform}</h4>
@@ -70,7 +71,9 @@ const t = labels[locale];
   const linksGrid = document.getElementById("modal-platform-links-grid");
   const noLinksMsg = document.getElementById("modal-no-links-msg");
 
-  function openModal(title: string, image: string, links: any[]) {
+  const modalDate = document.getElementById("modal-album-date-text");
+
+  function openModal(title: string, image: string, links: any[], date: string) {
     if (!modal) return;
     
     if (modalImg) {
@@ -78,7 +81,11 @@ const t = labels[locale];
       modalImg.alt = title;
     }
     if (modalTitle) {
-      modalTitle.textContent = title;
+      modalTitle.textContent = `Title: ${title}`;
+    }
+    if (modalDate) {
+      const year = date ? date.split("-")[0] : "";
+      modalDate.textContent = `Release date: ${year}`;
     }
 
     if (linksGrid) {
@@ -122,13 +129,14 @@ const t = labels[locale];
     item.addEventListener("click", () => {
       const title = item.getAttribute("data-title") || "";
       const image = item.getAttribute("data-image") || "";
+      const date = item.getAttribute("data-date") || "";
       let links: any[] = [];
       try {
         links = JSON.parse(item.getAttribute("data-links") || "[]");
       } catch (e) {
         console.error(e);
       }
-      openModal(title, image, links);
+      openModal(title, image, links, date);
     });
   });
 
@@ -296,8 +304,11 @@ const t = labels[locale];
   .album-modal-left {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 16px;
+    width: 100%;
+    max-width: 240px;
+    margin: 0 auto;
   }
 
   .album-modal-left img {
