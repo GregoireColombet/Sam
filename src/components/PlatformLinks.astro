@@ -3,12 +3,13 @@ import type { PlatformLink } from "@/lib/types";
 
 type Props = {
   links: PlatformLink[];
+  variant?: "default" | "tour";
 };
 
-const { links } = Astro.props;
+const { links, variant = "default" } = Astro.props;
 ---
 
-<div class="external-grid">
+<div class={variant === "tour" ? "ticket-grid" : "external-grid"}>
   {links.map((link) => (
     <a class="platform-link" href={link.url} target="_blank" rel="noopener noreferrer">
       <img src={link.logo.url} alt={link.logo.alt || link.name} loading="lazy" />
@@ -16,3 +17,21 @@ const { links } = Astro.props;
     </a>
   ))}
 </div>
+
+<style>
+  .ticket-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  @media (min-width: 640px) {
+    .ticket-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .ticket-grid > *:only-child {
+      grid-column: 2;
+    }
+  }
+</style>

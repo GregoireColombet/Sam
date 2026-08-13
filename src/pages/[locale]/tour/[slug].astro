@@ -36,7 +36,7 @@ const t = labels[locale];
             <p class="tour-meta">{tourData.tour.localDate} · {tourData.tour.localTime} · {tourData.tour.timezone}</p>
             <p class="tour-description">{getLocalized(tourData.tour.description, locale)}</p>
             <h2>{t.ticketLinks}</h2>
-            {tourData.links.length > 0 ? <PlatformLinks links={tourData.links} /> : <div class="empty-state">{t.comingSoon}</div>}
+            {tourData.links.length > 0 ? <PlatformLinks links={tourData.links} variant="tour" /> : <div class="empty-state">{t.comingSoon}</div>}
 
           </>
         ) : (
