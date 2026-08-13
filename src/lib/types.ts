@@ -39,6 +39,7 @@ export type AlbumPlatformLink = {
 export type AlbumCover = {
   id: number;
   title: string;
+  productionDate: string;
   image: MediaAsset;
   links?: AlbumPlatformLink[];
 };

@@ -375,7 +375,7 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
           `select a.*, m.r2_key, m.alt_text
            from album_covers a
            left join media_assets m on m.id = a.image_media_id
-           order by a.sort_order asc`
+           order by a.production_date desc`
         ).all();
         const linksResult = await db.prepare(
           `select * from album_platform_links`
@@ -404,9 +404,9 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
         for (let index = 0; index < body.albums.length; index++) {
           const album = body.albums[index];
           const insertAlbum = await db.prepare(
-            `insert into album_covers (title, image_media_id, sort_order, is_active)
+            `insert into album_covers (title, image_media_id, production_date, is_active)
              values (?, ?, ?, ?) RETURNING id`
-          ).bind(album.title, album.image_media_id, index, album.is_active ? 1 : 0).first<{ id: number }>();
+          ).bind(album.title, album.image_media_id, album.production_date || album.productionDate || '2000-01-01', album.is_active ? 1 : 0).first<{ id: number }>();
 
           const newAlbumId = insertAlbum?.id;
           if (newAlbumId && album.links && Array.isArray(album.links)) {

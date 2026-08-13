@@ -80,7 +80,7 @@ export async function getLandingContent(env?: RuntimeEnv): Promise<LandingConten
          from album_covers a
          join media_assets m on m.id = a.image_media_id
          where a.is_active = 1
-         order by a.sort_order asc, a.id asc`
+         order by a.production_date desc, a.id desc`
       ).all<Record<string, unknown>>(),
       db.prepare(
         `select v.*, m.r2_key as thumbnail_key, m.alt_text as thumbnail_alt
@@ -152,6 +152,7 @@ export async function getLandingContent(env?: RuntimeEnv): Promise<LandingConten
       albums: (albums.results || []).map((row) => ({
         id: Number(row.id),
         title: String(row.title || ""),
+        productionDate: String(row.production_date || ""),
         image: {
           id: Number(row.image_media_id || 0),
           url: mediaUrl(env, String(row.image_key || "")),

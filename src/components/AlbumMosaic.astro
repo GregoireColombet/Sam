@@ -19,15 +19,22 @@ const t = labels[locale];
     ) : (
       <div class="mosaic">
         {albums.map((album) => (
-          <button 
-            class="mosaic-item" 
-            data-title={album.title}
-            data-image={album.image.url}
-            data-links={JSON.stringify(album.links || [])}
-            aria-label={album.title}
-          >
-            <img src={album.image.url} alt={album.image.alt || album.title} loading="lazy" />
-          </button>
+          <div class="mosaic-card">
+            <button 
+              class="mosaic-item" 
+              data-title={album.title}
+              data-image={album.image.url}
+              data-links={JSON.stringify(album.links || [])}
+              data-date={album.productionDate}
+              aria-label={album.title}
+            >
+              <img src={album.image.url} alt={album.image.alt || album.title} loading="lazy" />
+            </button>
+            <div class="mosaic-info">
+              <span class="mosaic-title" title={album.title}>{album.title}</span>
+              <span class="mosaic-date">{album.productionDate}</span>
+            </div>
+          </div>
         ))}
       </div>
     )}
@@ -69,7 +76,7 @@ const t = labels[locale];
   const linksGrid = document.getElementById("modal-platform-links-grid");
   const noLinksMsg = document.getElementById("modal-no-links-msg");
 
-  function openModal(title: string, image: string, links: any[]) {
+  function openModal(title: string, image: string, links: any[], date: string) {
     if (!modal) return;
     
     if (modalImg) {
@@ -77,7 +84,7 @@ const t = labels[locale];
       modalImg.alt = title;
     }
     if (modalTitle) {
-      modalTitle.textContent = title;
+      modalTitle.textContent = `${title} (${date})`;
     }
 
     if (linksGrid) {
@@ -121,13 +128,14 @@ const t = labels[locale];
     item.addEventListener("click", () => {
       const title = item.getAttribute("data-title") || "";
       const image = item.getAttribute("data-image") || "";
+      const date = item.getAttribute("data-date") || "";
       let links: any[] = [];
       try {
         links = JSON.parse(item.getAttribute("data-links") || "[]");
       } catch (e) {
         console.error(e);
       }
-      openModal(title, image, links);
+      openModal(title, image, links, date);
     });
   });
 
@@ -396,6 +404,37 @@ const t = labels[locale];
     font-size: 0.95rem;
     text-align: center;
     padding: 16px 0;
+  }
+
+  .mosaic-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mosaic-info {
+    text-align: center;
+    padding: 0 4px;
+  }
+
+  .mosaic-title {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ice-white);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.5px;
+  }
+
+  .mosaic-date {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--coral-red);
+    font-weight: 600;
+    letter-spacing: 0.5px;
   }
 
   @keyframes zoomIn {

@@ -597,6 +597,7 @@ function openAlbumEditor(album: any = null) {
     if (titleEl) titleEl.textContent = "Edit Album Cover";
     (document.getElementById("album-id") as HTMLInputElement).value = album.id;
     (document.getElementById("album-title") as HTMLInputElement).value = album.title;
+    (document.getElementById("album-date") as HTMLInputElement).value = album.production_date || album.productionDate || "";
     (document.getElementById("album-image-id") as HTMLInputElement).value = album.image_media_id || "";
     
     const preview = document.getElementById("album-image-preview");
@@ -621,6 +622,7 @@ function openAlbumEditor(album: any = null) {
     if (titleEl) titleEl.textContent = "Add Album Cover";
     form.reset();
     (document.getElementById("album-id") as HTMLInputElement).value = "";
+    (document.getElementById("album-date") as HTMLInputElement).value = "";
     (document.getElementById("album-image-id") as HTMLInputElement).value = "";
     const preview = document.getElementById("album-image-preview");
     if (preview) preview.innerHTML = `<span class="no-img">No Image</span>`;
@@ -649,6 +651,7 @@ albumFormEl?.addEventListener("submit", async (e) => {
   const data = new FormData(albumFormEl);
   const id = data.get("id") ? Number(data.get("id")) : undefined;
   const title = String(data.get("title"));
+  const production_date = String(data.get("production_date"));
   const image_media_id = Number(data.get("image_media_id"));
   const is_active = data.get("is_active") === "on";
 
@@ -668,7 +671,7 @@ albumFormEl?.addEventListener("submit", async (e) => {
     }
   });
 
-  const newItem = { id, title, image_media_id, is_active, links };
+  const newItem = { id, title, image_media_id, production_date, is_active, links };
 
   let updatedList = [...availableAlbums];
   if (id) {

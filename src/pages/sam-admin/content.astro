@@ -22,7 +22,7 @@ if (db) {
     const [newsRow, toursResult, albumsResult, videosResult, socialsResult, settingsRow, mediaResult, musicLinksResult, albumLinksResult] = await Promise.all([
       db.prepare(`select * from news_blocks where id = 1`).first<any>(),
       db.prepare(`select * from tour_dates order by starts_at_utc desc`).all<any>(),
-      db.prepare(`select * from album_covers order by sort_order asc`).all<any>(),
+      db.prepare(`select * from album_covers order by production_date desc`).all<any>(),
       db.prepare(`select * from video_links order by sort_order asc`).all<any>(),
       db.prepare(`select * from social_links order by sort_order asc`).all<any>(),
       db.prepare(`select * from site_settings where id = 1`).first<any>(),
@@ -312,6 +312,7 @@ function getMediaUrl(id: number | null) {
             <tr>
               <th>Cover</th>
               <th>Album Title</th>
+              <th>Release Date</th>
               <th>Platform Links</th>
               <th>Status</th>
               <th>Actions</th>
@@ -326,6 +327,7 @@ function getMediaUrl(id: number | null) {
                   </div>
                 </td>
                 <td><strong>{album.title}</strong></td>
+                <td><code style="font-size: 0.9rem; background: rgba(0, 0, 0, 0.05); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--admin-line);">{album.production_date || album.productionDate}</code></td>
                 <td>
                   <div style="font-size: 0.85rem; color: var(--admin-text-muted); display: flex; flex-direction: column; gap: 4px;">
                     {album.links && album.links.length > 0 ? (
@@ -732,6 +734,11 @@ function getMediaUrl(id: number | null) {
             <div class="form-group">
               <label for="album-title">Album Title</label>
               <input type="text" id="album-title" name="title" required />
+            </div>
+
+            <div class="form-group">
+              <label for="album-date">Release Date</label>
+              <input type="date" id="album-date" name="production_date" required />
             </div>
 
             <div class="form-group">
