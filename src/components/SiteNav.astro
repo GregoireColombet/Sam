@@ -19,7 +19,7 @@ const merchExternal = Boolean(merchUrl);
   </a>
   <nav class="desktop-nav" aria-label="Primary navigation">
     <a href={localePath(locale)}>{t.home}</a>
-    <a href={localePath(locale, "/music")}>{t.music}</a>
+    <a href={localePath(locale, "/music")}>{t.streaming}</a>
     <a href={`${localePath(locale)}#tour`} data-scroll-tour>{t.tour}</a>
     <a href={merchHref} target={merchExternal ? "_blank" : undefined} rel={merchExternal ? "noopener noreferrer" : undefined}>
       {t.merch}
@@ -41,7 +41,7 @@ const merchExternal = Boolean(merchUrl);
   </div>
   <nav class="mobile-menu" data-mobile-menu aria-label="Mobile navigation">
     <a href={localePath(locale)}>{t.home}</a>
-    <a href={localePath(locale, "/music")}>{t.music}</a>
+    <a href={localePath(locale, "/music")}>{t.streaming}</a>
     <a href={`${localePath(locale)}#tour`} data-scroll-tour>{t.tour}</a>
     <a href={merchHref} target={merchExternal ? "_blank" : undefined} rel={merchExternal ? "noopener noreferrer" : undefined}>
       {t.merch}

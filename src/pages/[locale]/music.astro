@@ -23,12 +23,12 @@ const [links, landing, merchUrl] = await Promise.all([
 const t = labels[locale];
 ---
 
-<BaseLayout locale={locale} title={`Sam Lee | ${t.music}`}>
+<BaseLayout locale={locale} title={`Sam Lee | ${t.streaming}`}>
   <SiteNav locale={locale} merchUrl={merchUrl} />
   <main class="page-main">
     <section class="section">
       <div class="container">
-        <h1 class="section-title">{t.music}</h1>
+        <h1 class="section-title">{t.streaming}</h1>
         {links.length > 0 ? <PlatformLinks links={links} /> : <div class="empty-state">{t.musicComingSoon}</div>}
       </div>
     </section>

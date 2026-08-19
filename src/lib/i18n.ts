@@ -18,6 +18,7 @@ export function localePath(locale: Locale, path = "") {
 type Labels = {
   home: string;
   music: string;
+  streaming: string;
   tour: string;
   merch: string;
   past: string;
@@ -48,6 +49,7 @@ export const labels: Record<Locale, Labels> = {
   en: {
     home: "Home",
     music: "Music album",
+    streaming: "Streaming",
     tour: "Tour",
     merch: "Merchandising",
     past: "Past",
@@ -76,6 +78,7 @@ export const labels: Record<Locale, Labels> = {
   "zh-TW": {
     home: "首頁",
     music: "音樂專輯",
+    streaming: "線上串流",
     tour: "巡演",
     merch: "周邊商品",
     past: "過去",
@@ -104,6 +107,7 @@ export const labels: Record<Locale, Labels> = {
   "zh-CN": {
     home: "首页",
     music: "音乐专辑",
+    streaming: "线上串流",
     tour: "巡演",
     merch: "周边商品",
     past: "过去",
