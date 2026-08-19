@@ -343,22 +343,45 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
     if (method === "POST") {
       try {
         const body = await request.json() as { tour_date_id: number; links: any[] };
-        
-        // Re-write all ticket links in a simple transaction/batch
-        const batch = [
-          db.prepare(`delete from tour_ticket_links where tour_date_id = ?`).bind(body.tour_date_id)
-        ];
-        
-        body.links.forEach((link, index) => {
-          batch.push(
-            db.prepare(
-              `insert into tour_ticket_links (tour_date_id, name, url, logo_media_id, sort_order, is_active)
-               values (?, ?, ?, ?, ?, ?)`
-            ).bind(body.tour_date_id, link.name, link.url, link.logo_media_id, index, link.is_active ? 1 : 0)
-          );
+        const incomingLinks = body.links || [];
+
+        // Get existing link IDs for this tour date
+        const existing = await db.prepare(`select id from tour_ticket_links where tour_date_id = ?`).bind(body.tour_date_id).all<{ id: number }>();
+        const existingIds = new Set((existing.results || []).map(r => r.id));
+
+        // Delete links not in the payload
+        const incomingIds = new Set(incomingLinks.map((l: any) => Number(l.id)).filter(id => !isNaN(id) && id > 0));
+        const toDelete = [...existingIds].filter(id => !incomingIds.has(id));
+
+        if (toDelete.length > 0) {
+          const deleteBatch = toDelete.map(id => db.prepare(`delete from tour_ticket_links where id = ?`).bind(id));
+          await db.batch(deleteBatch);
+        }
+
+        // Insert or update incoming links
+        const batch: any[] = [];
+        incomingLinks.forEach((link, index) => {
+          const isActiveVal = (link.is_active === 1 || link.is_active === true || link.is_active === "on") ? 1 : 0;
+          if (link.id && existingIds.has(Number(link.id))) {
+            batch.push(
+              db.prepare(
+                `update tour_ticket_links set name = ?, url = ?, logo_media_id = ?, sort_order = ?, is_active = ?, updated_at = current_timestamp where id = ?`
+              ).bind(link.name, link.url, link.logo_media_id, index, isActiveVal, Number(link.id))
+            );
+          } else {
+            batch.push(
+              db.prepare(
+                `insert into tour_ticket_links (tour_date_id, name, url, logo_media_id, sort_order, is_active)
+                 values (?, ?, ?, ?, ?, ?)`
+              ).bind(body.tour_date_id, link.name, link.url, link.logo_media_id, index, isActiveVal)
+            );
+          }
         });
+
+        if (batch.length > 0) {
+          await db.batch(batch);
+        }
         
-        await db.batch(batch);
         await logActivity(env, admin.email, "update_tour_links", "tour_date", body.tour_date_id);
         return json({ ok: true });
       } catch (e: any) {
@@ -396,28 +419,55 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
     if (method === "POST") {
       try {
         const body = await request.json() as { albums: any[] };
-        
-        // Delete all albums (cascades to links)
-        await db.prepare(`delete from album_covers`).run();
+        const incomingAlbums = body.albums || [];
 
-        // Sequentially insert each album and its custom links
-        for (let index = 0; index < body.albums.length; index++) {
-          const album = body.albums[index];
-          const insertAlbum = await db.prepare(
-            `insert into album_covers (title, image_media_id, production_date, is_single)
-             values (?, ?, ?, ?) RETURNING id`
-          ).bind(album.title, album.image_media_id, album.production_date || album.productionDate || '2000-01-01', album.is_single ? 1 : 0).first<{ id: number }>();
+        // 1. Get existing albums from DB
+        const existing = await db.prepare(`select id from album_covers`).all<{ id: number }>();
+        const existingIds = new Set((existing.results || []).map(r => r.id));
 
-          const newAlbumId = insertAlbum?.id;
-          if (newAlbumId && album.links && Array.isArray(album.links)) {
-            const linkBatch = album.links.map((link: any) =>
-              db.prepare(
-                `insert into album_platform_links (album_id, platform_id, url)
-                 values (?, ?, ?)`
-              ).bind(newAlbumId, link.platformId || link.platform_id, link.url)
-            );
-            if (linkBatch.length > 0) {
-              await db.batch(linkBatch);
+        // 2. Identify which ones to delete
+        const incomingIds = new Set(incomingAlbums.map(a => a.id).filter(Boolean) as number[]);
+        const toDelete = [...existingIds].filter(id => !incomingIds.has(id));
+
+        // 3. Delete the ones that are no longer in the list
+        if (toDelete.length > 0) {
+          const deleteBatch = toDelete.map(id => db.prepare(`delete from album_covers where id = ?`).bind(id));
+          await db.batch(deleteBatch);
+        }
+
+        // 4. Update or Insert each incoming album
+        for (const album of incomingAlbums) {
+          let albumId = album.id;
+          const isSingleVal = (album.is_single === 1 || album.is_single === true || album.is_single === "on") ? 1 : 0;
+          const prodDate = album.production_date || album.productionDate || '2000-01-01';
+
+          if (albumId && existingIds.has(albumId)) {
+            // Update existing
+            await db.prepare(
+              `update album_covers set title = ?, image_media_id = ?, production_date = ?, is_single = ?, updated_at = current_timestamp where id = ?`
+            ).bind(album.title, album.image_media_id, prodDate, isSingleVal, albumId).run();
+          } else {
+            // Insert new
+            const insertResult = await db.prepare(
+              `insert into album_covers (title, image_media_id, production_date, is_single)
+               values (?, ?, ?, ?) RETURNING id`
+            ).bind(album.title, album.image_media_id, prodDate, isSingleVal).first<{ id: number }>();
+            albumId = insertResult?.id;
+          }
+
+          if (albumId) {
+            // Sync platform links for this album: delete all existing links for this album, then insert new ones
+            await db.prepare(`delete from album_platform_links where album_id = ?`).bind(albumId).run();
+            if (album.links && Array.isArray(album.links)) {
+              const linkBatch = album.links.map((link: any) =>
+                db.prepare(
+                  `insert into album_platform_links (album_id, platform_id, url)
+                   values (?, ?, ?)`
+                ).bind(albumId, link.platformId || link.platform_id, link.url)
+              );
+              if (linkBatch.length > 0) {
+                await db.batch(linkBatch);
+              }
             }
           }
         }
@@ -444,29 +494,59 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
     if (method === "POST") {
       try {
         const body = await request.json() as { videos: any[] };
-        const batch = [db.prepare(`delete from video_links`)];
-        
-        body.videos.forEach((video, index) => {
-          batch.push(
-            db.prepare(
-              `insert into video_links (title, provider_en, url_en, provider_zh_tw, url_zh_tw, provider_zh_cn, url_zh_cn, thumbnail_media_id, sort_order, is_active)
-               values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-            ).bind(
-              video.title,
-              video.providerEn || video.provider_en || "cloudflare",
-              video.urlEn || video.url_en,
-              video.providerZhTw || video.provider_zh_tw || "cloudflare",
-              video.urlZhTw || video.url_zh_tw,
-              video.providerZhCn || video.provider_zh_cn || "cloudflare",
-              video.urlZhCn || video.url_zh_cn,
-              video.thumbnail_media_id || null,
-              index,
-              (video.is_active === 1 || video.is_active === true || video.is_active === "on") ? 1 : 0
-            )
-          );
+        const incomingVideos = body.videos || [];
+
+        // Get existing video IDs
+        const existing = await db.prepare(`select id from video_links`).all<{ id: number }>();
+        const existingIds = new Set((existing.results || []).map(r => r.id));
+
+        // Delete missing videos
+        const incomingIds = new Set(incomingVideos.map(v => v.id).filter(Boolean) as number[]);
+        const toDelete = [...existingIds].filter(id => !incomingIds.has(id));
+
+        if (toDelete.length > 0) {
+          const deleteBatch = toDelete.map(id => db.prepare(`delete from video_links where id = ?`).bind(id));
+          await db.batch(deleteBatch);
+        }
+
+        // Insert or update incoming videos
+        const batch: any[] = [];
+        incomingVideos.forEach((video, index) => {
+          const isActiveVal = (video.is_active === 1 || video.is_active === true || video.is_active === "on") ? 1 : 0;
+          const providerEnVal = video.providerEn || video.provider_en || "cloudflare";
+          const providerZhTwVal = video.providerZhTw || video.provider_zh_tw || "cloudflare";
+          const providerZhCnVal = video.providerZhCn || video.provider_zh_cn || "cloudflare";
+          const urlEnVal = video.urlEn || video.url_en;
+          const urlZhTwVal = video.urlZhTw || video.url_zh_tw;
+          const urlZhCnVal = video.urlZhCn || video.url_zh_cn;
+          const thumbnailMediaIdVal = video.thumbnail_media_id || null;
+
+          if (video.id && existingIds.has(Number(video.id))) {
+            batch.push(
+              db.prepare(
+                `update video_links set title = ?, provider_en = ?, url_en = ?, provider_zh_tw = ?, url_zh_tw = ?, provider_zh_cn = ?, url_zh_cn = ?, thumbnail_media_id = ?, sort_order = ?, is_active = ?, updated_at = current_timestamp where id = ?`
+              ).bind(
+                video.title, providerEnVal, urlEnVal, providerZhTwVal, urlZhTwVal, providerZhCnVal, urlZhCnVal,
+                thumbnailMediaIdVal, index, isActiveVal, Number(video.id)
+              )
+            );
+          } else {
+            batch.push(
+              db.prepare(
+                `insert into video_links (title, provider_en, url_en, provider_zh_tw, url_zh_tw, provider_zh_cn, url_zh_cn, thumbnail_media_id, sort_order, is_active)
+                 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+              ).bind(
+                video.title, providerEnVal, urlEnVal, providerZhTwVal, urlZhTwVal, providerZhCnVal, urlZhCnVal,
+                thumbnailMediaIdVal, index, isActiveVal
+              )
+            );
+          }
         });
-        
-        await db.batch(batch);
+
+        if (batch.length > 0) {
+          await db.batch(batch);
+        }
+
         await logActivity(env, admin.email, "update_videos", "video_links", null, `Updated ${body.videos.length} videos`);
         return json({ ok: true });
       } catch (e: any) {
@@ -489,18 +569,45 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
     if (method === "POST") {
       try {
         const body = await request.json() as { socials: any[] };
-        const batch = [db.prepare(`delete from social_links`)];
-        
-        body.socials.forEach((social, index) => {
-          batch.push(
-            db.prepare(
-              `insert into social_links (name, url, logo_media_id, sort_order, is_active)
-               values (?, ?, ?, ?, ?)`
-            ).bind(social.name, social.url, social.logo_media_id, index, social.is_active ? 1 : 0)
-          );
+        const incomingSocials = body.socials || [];
+
+        // Get existing IDs
+        const existing = await db.prepare(`select id from social_links`).all<{ id: number }>();
+        const existingIds = new Set((existing.results || []).map(r => r.id));
+
+        // Delete missing socials
+        const incomingIds = new Set(incomingSocials.map(s => s.id).filter(Boolean) as number[]);
+        const toDelete = [...existingIds].filter(id => !incomingIds.has(id));
+
+        if (toDelete.length > 0) {
+          const deleteBatch = toDelete.map(id => db.prepare(`delete from social_links where id = ?`).bind(id));
+          await db.batch(deleteBatch);
+        }
+
+        // Insert or update incoming socials
+        const batch: any[] = [];
+        incomingSocials.forEach((social, index) => {
+          const isActiveVal = (social.is_active === 1 || social.is_active === true || social.is_active === "on") ? 1 : 0;
+          if (social.id && existingIds.has(Number(social.id))) {
+            batch.push(
+              db.prepare(
+                `update social_links set name = ?, url = ?, logo_media_id = ?, sort_order = ?, is_active = ?, updated_at = current_timestamp where id = ?`
+              ).bind(social.name, social.url, social.logo_media_id, index, isActiveVal, Number(social.id))
+            );
+          } else {
+            batch.push(
+              db.prepare(
+                `insert into social_links (name, url, logo_media_id, sort_order, is_active)
+                 values (?, ?, ?, ?, ?)`
+              ).bind(social.name, social.url, social.logo_media_id, index, isActiveVal)
+            );
+          }
         });
-        
-        await db.batch(batch);
+
+        if (batch.length > 0) {
+          await db.batch(batch);
+        }
+
         await logActivity(env, admin.email, "update_socials", "social_links", null, `Updated ${body.socials.length} social links`);
         return json({ ok: true });
       } catch (e: any) {
@@ -523,19 +630,18 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
     if (method === "POST") {
       try {
         const body = await request.json() as { musicLinks: any[] };
+        const incomingMusic = body.musicLinks || [];
 
         // 1. Fetch existing platform IDs
-        const existingResult = await db.prepare(`select id from music_platform_links`).all();
-        const existingIds = (existingResult.results || []).map((row: any) => Number(row.id));
+        const existingResult = await db.prepare(`select id from music_platform_links`).all<{ id: number }>();
+        const existingIds = new Set((existingResult.results || []).map((row) => Number(row.id)));
 
-        // 2. Identify incoming IDs
-        const incomingIds = new Set(body.musicLinks.map((link: any) => Number(link.id)).filter(id => !isNaN(id)));
-
-        // 3. Find deleted IDs
-        const deletedIds = existingIds.filter(id => !incomingIds.has(id));
+        // 2. Identify deleted ones
+        const incomingIds = new Set(incomingMusic.map((link) => Number(link.id)).filter(id => !isNaN(id) && id > 0));
+        const deletedIds = [...existingIds].filter(id => !incomingIds.has(id));
 
         if (deletedIds.length > 0) {
-          // 4. Check if any deleted platform is referenced in album_platform_links
+          // Check reference check
           const queryPlaceholders = deletedIds.map(() => "?").join(",");
           const checkRefs = await db.prepare(
             `select count(*) as count from album_platform_links where platform_id in (${queryPlaceholders})`
@@ -547,27 +653,27 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
               { status: 400 }
             );
           }
+
+          const deleteBatch = deletedIds.map(id => db.prepare(`delete from music_platform_links where id = ?`).bind(id));
+          await db.batch(deleteBatch);
         }
 
-        // Delete all music platforms first
-        await db.prepare(`delete from music_platform_links`).run();
-
-        // Batch insert the new platform list, keeping original IDs if they exist
+        // 3. Update or Insert
         const batch: any[] = [];
-        body.musicLinks.forEach((link, index) => {
-          if (link.id) {
+        incomingMusic.forEach((link, index) => {
+          const isActiveVal = (link.is_active === 1 || link.is_active === true || link.is_active === "on") ? 1 : 0;
+          if (link.id && existingIds.has(Number(link.id))) {
             batch.push(
               db.prepare(
-                `insert into music_platform_links (id, name, url, logo_media_id, sort_order, is_active)
-                 values (?, ?, ?, ?, ?, ?)`
-              ).bind(Number(link.id), link.name, link.url, link.logo_media_id, index, link.is_active ? 1 : 0)
+                `update music_platform_links set name = ?, url = ?, logo_media_id = ?, sort_order = ?, is_active = ?, updated_at = current_timestamp where id = ?`
+              ).bind(link.name, link.url, link.logo_media_id, index, isActiveVal, Number(link.id))
             );
           } else {
             batch.push(
               db.prepare(
                 `insert into music_platform_links (name, url, logo_media_id, sort_order, is_active)
                  values (?, ?, ?, ?, ?)`
-              ).bind(link.name, link.url, link.logo_media_id, index, link.is_active ? 1 : 0)
+              ).bind(link.name, link.url, link.logo_media_id, index, isActiveVal)
             );
           }
         });
