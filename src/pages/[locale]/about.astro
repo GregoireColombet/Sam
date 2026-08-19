@@ -607,6 +607,10 @@ const bonusImageUrl = bonusIsActive ? (bonusSettings?.imageUrl || "") : "";
       max-width: 90%;
       padding: 50px 20px 20px;
     }
+
+    :global(html[lang="en"]) .paragraph {
+      line-height: 1.4;
+    }
   }
 
   .bonus-modal-content::-webkit-scrollbar {
