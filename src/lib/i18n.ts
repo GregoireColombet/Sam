@@ -47,7 +47,7 @@ type Labels = {
 export const labels: Record<Locale, Labels> = {
   en: {
     home: "Home",
-    music: "Music",
+    music: "Music album",
     tour: "Tour",
     merch: "Merchandising",
     past: "Past",
@@ -71,11 +71,11 @@ export const labels: Record<Locale, Labels> = {
     choosePlatform: "Choose a platform",
     backHome: "Back home",
     video: " Moments",
-    single: "Single"
+    single: "Music single"
   },
   "zh-TW": {
     home: "首頁",
-    music: "音樂",
+    music: "音樂專輯",
     tour: "巡演",
     merch: "周邊商品",
     past: "過去",
@@ -99,11 +99,11 @@ export const labels: Record<Locale, Labels> = {
     choosePlatform: "選擇平台",
     backHome: "回首頁",
     video: " 精彩瞬間",
-    single: "單曲"
+    single: "音樂單曲"
   },
   "zh-CN": {
     home: "首页",
-    music: "音乐",
+    music: "音乐专辑",
     tour: "巡演",
     merch: "周边商品",
     past: "过去",
@@ -127,7 +127,7 @@ export const labels: Record<Locale, Labels> = {
     choosePlatform: "选择平台",
     backHome: "回首页",
     video: " 精彩瞬间",
-    single: "单曲"
+    single: "音乐单曲"
   }
 };
 
@@ -146,4 +146,3 @@ export function getLocalizedVideoUrl(
   if (locale === "zh-CN") return video.urlZhCn;
   return video.urlZhTw;
 }
-
