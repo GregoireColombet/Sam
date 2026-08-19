@@ -404,9 +404,9 @@ export const ALL: APIRoute = async ({ request, params, locals }) => {
         for (let index = 0; index < body.albums.length; index++) {
           const album = body.albums[index];
           const insertAlbum = await db.prepare(
-            `insert into album_covers (title, image_media_id, production_date, is_active)
+            `insert into album_covers (title, image_media_id, production_date, is_single)
              values (?, ?, ?, ?) RETURNING id`
-          ).bind(album.title, album.image_media_id, album.production_date || album.productionDate || '2000-01-01', album.is_active ? 1 : 0).first<{ id: number }>();
+          ).bind(album.title, album.image_media_id, album.production_date || album.productionDate || '2000-01-01', album.is_single ? 1 : 0).first<{ id: number }>();
 
           const newAlbumId = insertAlbum?.id;
           if (newAlbumId && album.links && Array.isArray(album.links)) {

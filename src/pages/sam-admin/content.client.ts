@@ -590,7 +590,7 @@ document.querySelectorAll(".btn-delete-music").forEach(btn => {
 // ==========================================
 // 2. ALBUM COVERS CONTROLLER
 // ==========================================
-function openAlbumEditor(album: any = null) {
+function openAlbumEditor(album: any = null, isSingleDefault = false) {
   const titleEl = document.getElementById("album-modal-title");
   const form = document.getElementById("album-editor-form") as HTMLFormElement;
   if (album) {
@@ -608,7 +608,7 @@ function openAlbumEditor(album: any = null) {
         preview.innerHTML = `<span class="no-img">No Image</span>`;
       }
     }
-    (document.getElementById("album-active") as HTMLInputElement).checked = album.is_active === 1;
+    (document.getElementById("album-single") as HTMLInputElement).checked = album.is_single === 1 || album.is_single === true;
 
     // Prefill custom platform links
     const modalLinksList = document.getElementById("modal-album-links-list");
@@ -626,7 +626,7 @@ function openAlbumEditor(album: any = null) {
     (document.getElementById("album-image-id") as HTMLInputElement).value = "";
     const preview = document.getElementById("album-image-preview");
     if (preview) preview.innerHTML = `<span class="no-img">No Image</span>`;
-    (document.getElementById("album-active") as HTMLInputElement).checked = true;
+    (document.getElementById("album-single") as HTMLInputElement).checked = isSingleDefault;
 
     // Reset custom platform links
     const modalLinksList = document.getElementById("modal-album-links-list");
@@ -637,7 +637,8 @@ function openAlbumEditor(album: any = null) {
   document.getElementById("album-editor-modal")?.classList.add("open");
 }
 
-document.getElementById("btn-add-album")?.addEventListener("click", () => openAlbumEditor());
+document.getElementById("btn-add-album")?.addEventListener("click", () => openAlbumEditor(null, false));
+document.getElementById("btn-add-single")?.addEventListener("click", () => openAlbumEditor(null, true));
 document.querySelectorAll(".btn-edit-album").forEach(btn => {
   btn.addEventListener("click", () => {
     const data = JSON.parse(btn.getAttribute("data-album") || "{}");
@@ -653,7 +654,7 @@ albumFormEl?.addEventListener("submit", async (e) => {
   const title = String(data.get("title"));
   const production_date = String(data.get("production_date"));
   const image_media_id = Number(data.get("image_media_id"));
-  const is_active = data.get("is_active") === "on";
+  const is_single = data.get("is_single") === "on";
 
   if (!image_media_id) {
     alert("Please select a cover image.");
@@ -671,7 +672,7 @@ albumFormEl?.addEventListener("submit", async (e) => {
     }
   });
 
-  const newItem = { id, title, image_media_id, production_date, is_active, links };
+  const newItem = { id, title, image_media_id, production_date, is_single, links };
 
   let updatedList = [...availableAlbums];
   if (id) {

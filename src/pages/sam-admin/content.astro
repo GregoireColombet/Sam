@@ -10,6 +10,8 @@ const baseMediaUrl = (env?.PUBLIC_MEDIA_BASE_URL || "/media").replace(/\/$/, "")
 let news: any = null;
 let tours: any[] = [];
 let albums: any[] = [];
+let singles: any[] = [];
+let allAlbums: any[] = [];
 let videos: any[] = [];
 let socials: any[] = [];
 let musicLinks: any[] = [];
@@ -40,7 +42,7 @@ if (db) {
     const allAlbumLinks = albumLinksResult.results || [];
     const allMedia = mediaResult.results || [];
     
-    albums = (albumsResult.results || []).map((album: any) => {
+    allAlbums = (albumsResult.results || []).map((album: any) => {
       const media = allMedia.find((m: any) => m.id === album.image_media_id);
       return {
         ...album,
@@ -48,6 +50,8 @@ if (db) {
         links: allAlbumLinks.filter((l: any) => l.album_id === album.id)
       };
     });
+    albums = allAlbums.filter((a: any) => a.is_single === 0);
+    singles = allAlbums.filter((a: any) => a.is_single === 1);
     
     videos = (videosResult.results || []).map((video: any) => {
       const media = allMedia.find((m: any) => m.id === video.thumbnail_media_id);
@@ -303,9 +307,9 @@ function getMediaUrl(id: number | null) {
       <div class="card-form" style="margin-top: 2rem;">
         <div class="actions-bar">
           <h2>Album Covers (Mosaic Grid)</h2>
-          <button type="button" class="btn-primary" id="btn-add-album">Add Cover</button>
+          <button type="button" class="btn-primary" id="btn-add-album">Add album</button>
         </div>
-        <p class="admin-muted">Add album covers here. Order is set by sorting position. Albums link to the public Music page.</p>
+        <p class="admin-muted">Add album covers here. Order is set by release date. Albums link to the public Music page.</p>
 
         <table class="admin-table">
           <thead>
@@ -314,7 +318,6 @@ function getMediaUrl(id: number | null) {
               <th>Album Title</th>
               <th>Release Date</th>
               <th>Platform Links</th>
-              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -341,11 +344,6 @@ function getMediaUrl(id: number | null) {
                   </div>
                 </td>
                 <td>
-                  <span class:list={["badge", album.is_active === 1 ? "badge-active" : "badge-inactive"]}>
-                    {album.is_active === 1 ? "Active" : "Hidden"}
-                  </span>
-                </td>
-                <td>
                   <button class="btn-edit-album" data-album={JSON.stringify(album)}>Edit</button>
                   <button class="btn-delete-album delete-btn" data-id={album.id}>Delete</button>
                 </td>
@@ -354,6 +352,60 @@ function getMediaUrl(id: number | null) {
             {albums.length === 0 && (
               <tr>
                 <td colspan="5" class="admin-muted" style="text-align: center; padding: 24px;">No album covers configured.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card-form" style="margin-top: 2rem;">
+        <div class="actions-bar">
+          <h2>Single Covers</h2>
+          <button type="button" class="btn-primary" id="btn-add-single">Add single</button>
+        </div>
+        <p class="admin-muted">Add single covers here. Order is set by release date. Singles link to the public Music page.</p>
+
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Cover</th>
+              <th>Single Title</th>
+              <th>Release Date</th>
+              <th>Platform Links</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {singles.map((single) => (
+              <tr data-album-id={single.id}>
+                <td>
+                  <div class="picker-preview select-sm" style="width: 50px; height: 50px; border: 1px solid var(--admin-line); background: var(--admin-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
+                    <img src={getMediaUrl(single.image_media_id)} alt={single.title} style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                  </div>
+                </td>
+                <td><strong>{single.title}</strong></td>
+                <td><code style="font-size: 0.9rem; background: rgba(0, 0, 0, 0.05); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--admin-line);">{single.production_date || single.productionDate}</code></td>
+                <td>
+                  <div style="font-size: 0.85rem; color: var(--admin-text-muted); display: flex; flex-direction: column; gap: 4px;">
+                    {single.links && single.links.length > 0 ? (
+                      single.links.map((l: any) => {
+                        const plat = musicLinks.find(p => p.id === l.platform_id || p.id === l.platformId);
+                        return <div><strong>{plat ? plat.name : "Platform"}:</strong> <a href={l.url} target="_blank" class="admin-muted" style="text-decoration: underline; color: var(--text-muted);">Link</a></div>;
+                      })
+                    ) : (
+                      <span class="admin-muted">No custom links</span>
+                    )}
+                  </div>
+                </td>
+                <td>
+                  <button class="btn-edit-album" data-album={JSON.stringify(single)}>Edit</button>
+                  <button class="btn-delete-album delete-btn" data-id={single.id}>Delete</button>
+                </td>
+              </tr>
+            ))}
+            {singles.length === 0 && (
+              <tr>
+                <td colspan="5" class="admin-muted" style="text-align: center; padding: 24px;">No single covers configured.</td>
               </tr>
             )}
           </tbody>
@@ -767,8 +819,8 @@ function getMediaUrl(id: number | null) {
           </div>
 
           <div class="form-group row-group">
-            <input type="checkbox" id="album-active" name="is_active" checked />
-            <label for="album-active">Active (Visible on landing page)</label>
+            <input type="checkbox" id="album-single" name="is_single" checked />
+            <label for="album-single">Single album (if not checked it is an album)</label>
           </div>
 
           <div class="album-platform-links-section" style="margin-top: 12px; padding: 12px; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--line); border-radius: 4px; display: flex; flex-direction: column; gap: 8px; width: 100%;">

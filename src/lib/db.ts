@@ -79,7 +79,7 @@ export async function getLandingContent(env?: RuntimeEnv): Promise<LandingConten
         `select a.*, m.r2_key as image_key, m.alt_text as image_alt
          from album_covers a
          join media_assets m on m.id = a.image_media_id
-         where a.is_active = 1
+         where a.is_single = 0
          order by a.production_date desc, a.id desc`
       ).all<Record<string, unknown>>(),
       db.prepare(
