@@ -680,14 +680,20 @@ function getMediaUrl(id: number | null) {
             </div>
             <div class="form-group">
               <label for="tour-timezone">Timezone</label>
-              <input type="text" id="tour-timezone" name="timezone" placeholder="Asia/Taipei" required />
+              <select id="tour-timezone" name="timezone" required>
+                <option value="Asia/Taipei" selected>Asia/Taipei</option>
+                <option value="Asia/Hong_Kong">Asia/Hong_Kong</option>
+                <option value="Asia/Shanghai">Asia/Shanghai</option>
+                <option value="Asia/Singapore">Asia/Singapore</option>
+                <option value="Asia/Tokyo">Asia/Tokyo</option>
+                <option value="Asia/Seoul">Asia/Seoul</option>
+                <option value="Europe/London">Europe/London</option>
+                <option value="Europe/Paris">Europe/Paris</option>
+                <option value="America/New_York">America/New_York</option>
+                <option value="America/Los_Angeles">America/Los_Angeles</option>
+                <option value="UTC">UTC</option>
+              </select>
             </div>
-          </div>
-
-          <div class="form-group">
-            <label for="tour-starts-utc">Universal time (if Taiwan +8h)</label>
-            <input type="datetime-local" id="tour-starts-utc" name="starts_at_utc" required />
-            <span class="field-hint">Chronological order sorter.</span>
           </div>
 
           <div class="form-grid">

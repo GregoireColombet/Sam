@@ -169,8 +169,7 @@ function openTourEditor(tour: any = null) {
     (document.getElementById("tour-id") as HTMLInputElement).value = tour.id;
     (document.getElementById("tour-local-date") as HTMLInputElement).value = tour.local_date;
     (document.getElementById("tour-local-time") as HTMLInputElement).value = tour.local_time.slice(0, 5);
-    (document.getElementById("tour-timezone") as HTMLInputElement).value = tour.timezone;
-    (document.getElementById("tour-starts-utc") as HTMLInputElement).value = tour.starts_at_utc.slice(0, 16);
+    (document.getElementById("tour-timezone") as any).value = tour.timezone;
     (document.getElementById("tour-loc-en") as HTMLInputElement).value = tour.location_en;
     (document.getElementById("tour-loc-tw") as HTMLInputElement).value = tour.location_zh_tw;
     (document.getElementById("tour-loc-cn") as HTMLInputElement).value = tour.location_zh_cn;
@@ -182,7 +181,7 @@ function openTourEditor(tour: any = null) {
     if (titleEl) titleEl.textContent = "Add Tour Date";
     tourForm.reset();
     (document.getElementById("tour-id") as HTMLInputElement).value = "";
-    (document.getElementById("tour-timezone") as HTMLInputElement).value = "Asia/Taipei";
+    (document.getElementById("tour-timezone") as any).value = "Asia/Taipei";
     (document.getElementById("tour-active") as HTMLInputElement).checked = true;
   }
 
@@ -225,6 +224,31 @@ document.querySelectorAll(".btn-delete-tour").forEach((btn) => {
   });
 });
 
+function getUtcString(localDate: string, localTime: string, timezone: string): string {
+  const localDateTime = `${localDate}T${localTime}:00`;
+  const date = new Date(localDateTime + "Z");
+  try {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: timezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
+    });
+    const parts = formatter.formatToParts(date);
+    const partMap = Object.fromEntries(parts.map(p => [p.type, p.value]));
+    const formattedStr = `${partMap.year}-${partMap.month}-${partMap.day}T${partMap.hour}:${partMap.minute}:${partMap.second}Z`;
+    const formattedDate = new Date(formattedStr);
+    const offsetMs = date.getTime() - formattedDate.getTime();
+    return new Date(date.getTime() + offsetMs).toISOString();
+  } catch (e) {
+    return new Date(localDateTime).toISOString();
+  }
+}
+
 // Submit Tour Form
 tourForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -235,7 +259,11 @@ tourForm?.addEventListener("submit", async (e) => {
     local_date: data.get("local_date"),
     local_time: data.get("local_time"),
     timezone: data.get("timezone"),
-    starts_at_utc: new Date(String(data.get("starts_at_utc"))).toISOString(),
+    starts_at_utc: getUtcString(
+      String(data.get("local_date")),
+      String(data.get("local_time")),
+      String(data.get("timezone"))
+    ),
     location_en: data.get("location_en"),
     location_zh_tw: data.get("location_zh_tw"),
     location_zh_cn: data.get("location_zh_cn"),
