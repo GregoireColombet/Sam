@@ -30,7 +30,7 @@ const t = labels[locale];
     <Hero />
     {content.news && <NewsBlock locale={locale} news={content.news} />}
     <TourSection locale={locale} tours={content.tours} />
-    <AlbumMosaic locale={locale} albums={content.albums} />
+    <AlbumMosaic locale={locale} albums={content.albums} singles={content.singles} />
     <VideoCarousel locale={locale} videos={content.videos} />
   </main>
   <Footer locale={locale} socialLinks={content.socialLinks} />

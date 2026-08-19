@@ -67,6 +67,7 @@ export type LandingContent = {
   news: NewsBlock | null;
   tours: TourDate[];
   albums: AlbumCover[];
+  singles: AlbumCover[];
   videos: VideoLink[];
   socialLinks: PlatformLink[];
 };

@@ -5,9 +5,10 @@ import type { AlbumCover } from "@/lib/types";
 type Props = {
   locale: Locale;
   albums: AlbumCover[];
+  singles: AlbumCover[];
 };
 
-const { locale, albums } = Astro.props;
+const { locale, albums, singles } = Astro.props;
 const t = labels[locale];
 ---
 
@@ -28,6 +29,30 @@ const t = labels[locale];
             aria-label={album.title}
           >
             <img src={album.image.url} alt={album.image.alt || album.title} loading="lazy" />
+          </button>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
+
+<section class="section albums" style="padding-top: 0;">
+  <div class="container">
+    <h2 class="section-title">{t.single}</h2>
+    {singles.length === 0 ? (
+      <div class="empty-state">{t.albumComingSoon}</div>
+    ) : (
+      <div class="mosaic">
+        {singles.map((single) => (
+          <button 
+            class="mosaic-item" 
+            data-title={single.title}
+            data-image={single.image.url}
+            data-links={JSON.stringify(single.links || [])}
+            data-date={single.productionDate}
+            aria-label={single.title}
+          >
+            <img src={single.image.url} alt={single.image.alt || single.title} loading="lazy" />
           </button>
         ))}
       </div>
