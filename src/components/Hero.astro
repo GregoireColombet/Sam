@@ -38,7 +38,11 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
 
   .hero-shade {
     background:
-      linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.1) 50%, #0F1418 100%),
+      /* Smooth fade from the page background color (--bg / #0F1418) at the bottom up into transparency */
+      linear-gradient(to top, var(--bg) 0%, rgba(15, 20, 24, 0.9) 15%, rgba(15, 20, 24, 0) 50%),
+      /* Top-down dark vignette */
+      linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 50%),
+      /* Center radial accent light */
       radial-gradient(circle at 50% 44%, rgba(130, 232, 231, 0.25), transparent 45%);
   }
 
