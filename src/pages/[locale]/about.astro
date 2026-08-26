@@ -445,10 +445,11 @@ const bonusImageUrl = bonusIsActive ? (bonusSettings?.imageUrl || "") : "";
     color: var(--aqua-glow);
     text-transform: uppercase;
     margin: 0 0 16px;
+    width: fit-content;
   }
 
   .section-title::after {
-    width: 35%;
+    width: 100%;
   }
 
   .section-subtitle {
@@ -609,7 +610,7 @@ const bonusImageUrl = bonusIsActive ? (bonusSettings?.imageUrl || "") : "";
     }
 
     :global(html[lang="en"]) .paragraph {
-      line-height: 1.4;
+      line-height: 1.3;
     }
   }
 
