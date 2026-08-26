@@ -17,24 +17,16 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
 <style>
   .hero {
     position: relative;
-    margin-top: 72px;
-    display: grid;
-    grid-template-areas: "hero";
+    margin-top: 0;
+    display: block;
     overflow: hidden;
     background: #080808;
   }
 
-  .hero-video,
-  .hero-shade,
-  .hero-content {
-    grid-area: hero;
-    width: 100%;
-  }
-
   .hero-video {
+    width: 100%;
     height: auto;
     display: block;
-    object-fit: contain;
   }
 
   .hero-shade {
@@ -51,10 +43,11 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
   }
 
   .hero-content {
-    position: relative;
+    position: absolute;
+    inset: 0;
     z-index: 1;
     text-align: center;
-    padding: 48px 24px;
+    padding: 24px;
     display: flex;
     justify-content: center;
     align-items: center;
