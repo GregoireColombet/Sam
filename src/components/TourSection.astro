@@ -53,28 +53,13 @@ const now = Date.now();
   .tour-section {
     background: transparent;
     color: var(--ice-white);
-    width: calc(100% - 4px);
+    width: 100%;
     margin: 0 auto;
-    padding: 108px 24px 48px;
-    border-left: 1px solid rgba(130, 232, 231, 0.4);
-    border-right: 1px solid rgba(130, 232, 231, 0.4);
-    border-top: none;
-    border-bottom: none;
+    padding: 108px 0 48px;
   }
 
   .tour-section :global(.section-title) {
     margin-bottom: 70px;
-  }
-
-  @media (min-width: 768px) {
-    .tour-section {
-      width: calc(100% - 2 * clamp(34px, 5vw, 100px));
-    }
-  }
-
-  .tour-section :global(.container) {
-    width: 100%;
-    max-width: none;
   }
 
   .tour-list {
