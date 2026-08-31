@@ -12,7 +12,7 @@ const { locale, albums, singles } = Astro.props;
 const t = labels[locale];
 ---
 
-<section class="section albums">
+<section class="section albums album-section">
   <div class="container">
     <h2 class="section-title">{t.music}</h2>
     {albums.length === 0 ? (
@@ -36,7 +36,7 @@ const t = labels[locale];
   </div>
 </section>
 
-<section class="section albums" style="padding-top: 60px;">
+<section class="section albums single-section" style="padding-top: 60px;">
   <div class="container">
     <h2 class="section-title">{t.single}</h2>
     {singles.length === 0 ? (
@@ -178,7 +178,10 @@ const t = labels[locale];
 
 <style>
   .albums {
-    background: var(--night-graphite);
+    background-color: var(--night-graphite);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     width: calc(100% - 4px);
     margin: 0 auto;
     padding: 108px 24px 48px;
@@ -186,6 +189,14 @@ const t = labels[locale];
     border-right: 1px solid rgba(130, 232, 231, 0.4);
     border-top: none;
     border-bottom: none;
+  }
+
+  .album-section {
+    background-image: url("/assets/backgrounds/concrete-texture-180.jpg");
+  }
+
+  .single-section {
+    background-image: url("/assets/backgrounds/concrete-texture.jpg");
   }
 
   .albums :global(.section-title) {

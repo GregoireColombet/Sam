@@ -101,7 +101,7 @@ export const labels: Record<Locale, Labels> = {
     ticketLinks: "購票平台",
     choosePlatform: "選擇平台",
     backHome: "回首頁",
-    video: " 精彩瞬間",
+    video: "此刻",
     single: "音樂單曲"
   },
   "zh-CN": {
@@ -130,7 +130,7 @@ export const labels: Record<Locale, Labels> = {
     ticketLinks: "购票平台",
     choosePlatform: "选择平台",
     backHome: "回首页",
-    video: " 精彩瞬间",
+    video: "此刻",
     single: "音乐单曲"
   }
 };

@@ -454,6 +454,7 @@ const bonusImageUrl = bonusIsActive ? (bonusSettings?.imageUrl || "") : "";
 
   .section-subtitle {
     font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    font-style: italic;
     font-weight: normal;
     color: var(--ice-white);
     opacity: 0.95;
@@ -607,10 +608,6 @@ const bonusImageUrl = bonusIsActive ? (bonusSettings?.imageUrl || "") : "";
       width: 90%;
       max-width: 90%;
       padding: 50px 20px 20px;
-    }
-
-    .paragraph {
-      text-align: left;
     }
 
     :global(html[lang="en"]) .paragraph {
