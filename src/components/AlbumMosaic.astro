@@ -275,7 +275,9 @@ const t = labels[locale];
       const padRight = parseFloat(computedStyle.paddingRight) || 0;
       const usableWidth = this.viewport.clientWidth - padLeft - padRight;
       this.isMobile = window.innerWidth <= 768;
-      this.gap = this.isMobile ? 16 : 24;
+
+      // Option 2: Gap is strictly larger than horizontal padding so adjacent slides at rest sit outside the overflow boundary
+      this.gap = this.isMobile ? (padRight + 12) : (padRight + 14);
 
       if (this.isMobile) {
         this.slideWidth = usableWidth;
