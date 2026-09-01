@@ -62,10 +62,15 @@ const merchExternal = Boolean(merchUrl);
     min-height: 72px;
     padding: 14px clamp(16px, 4vw, 48px);
     color: #fff;
+    background: rgba(15, 20, 24, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(130, 232, 231, 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     transition:
       background 180ms ease,
-      border-color 180ms ease;
-    border-bottom: 1px solid transparent;
+      border-color 180ms ease,
+      box-shadow 180ms ease;
     text-shadow: 0 1px 16px rgba(0, 0, 0, 0.65);
   }
 

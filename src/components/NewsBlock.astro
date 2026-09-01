@@ -59,17 +59,17 @@ const t = labels[locale];
 <style>
   .news {
     position: relative;
-    background-color: var(--night-graphite);
-    background-image: url("/assets/backgrounds/concrete-texture.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background-color: rgba(255, 255, 255, 0.30);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     overflow: hidden;
     width: calc(100% - 30px);
+    max-width: var(--max);
     margin: 0 auto;
     padding: 48px 0;
-    border: 3px solid var(--coral-red);
-    border-radius: 14px;
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   }
 
   .news-content {
@@ -104,9 +104,10 @@ const t = labels[locale];
   .eyebrow {
     margin: 0 0 12px;
     color: var(--coral-red);
-    font-weight: normal;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
   }
 
   h2 {
@@ -117,14 +118,16 @@ const t = labels[locale];
     font-weight: normal;
     letter-spacing: -0.02em;
     text-transform: uppercase;
-    color: var(--aqua-glow);
+    color: var(--ice-white);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(130, 232, 231, 0.25);
   }
 
   p {
     max-width: 680px;
-    color: var(--ice-white);
+    color: #ffffff;
     font-size: 1.05rem;
     line-height: 1.7;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
   }
 
   .countdown-container {
@@ -143,16 +146,21 @@ const t = labels[locale];
   .countdown span {
     min-width: 86px;
     padding: 14px;
-    border: 1px solid var(--line);
-    background: var(--night-graphite);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(15, 20, 24, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 8px;
     text-align: center;
-    color: var(--text-muted);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: border-color 200ms ease;
+    color: var(--ice-white);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: border-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
   }
 
   .countdown span:hover {
     border-color: var(--aqua-glow);
+    box-shadow: 0 0 15px rgba(130, 232, 231, 0.3);
+    transform: translateY(-2px);
   }
 
   .countdown strong {
@@ -160,6 +168,6 @@ const t = labels[locale];
     color: var(--aqua-glow);
     font-size: 2.2rem;
     font-weight: 900;
-    text-shadow: 0 0 8px rgba(130, 232, 231, 0.4);
+    text-shadow: 0 0 10px rgba(130, 232, 231, 0.5);
   }
 </style>

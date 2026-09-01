@@ -284,16 +284,21 @@ const t = labels[locale];
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(15, 20, 24, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--line);
+    border-radius: 8px;
     display: grid;
     place-items: center;
     overflow: hidden;
-    transition: border-color 220ms ease;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    transition: border-color 220ms ease, box-shadow 220ms ease;
   }
 
   .video-card:hover .video-img-wrapper {
     border-color: var(--aqua-glow);
+    box-shadow: 0 0 16px rgba(130, 232, 231, 0.3);
   }
 
   .video-card img {
@@ -346,6 +351,7 @@ const t = labels[locale];
     font-weight: 700;
     line-height: 1.4;
     color: var(--ice-white);
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
     transition: color 220ms ease;
   }
 
