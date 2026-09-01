@@ -145,9 +145,21 @@ const { locale, title = "Sam Lee", description = "Official website of Sam Lee." 
   body {
     margin: 0;
     min-height: 100vh;
+    min-height: 100dvh;
     background: transparent;
     color: var(--text);
     position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  main {
+    flex: 1 0 auto;
+  }
+
+  footer,
+  .footer {
+    margin-top: auto;
   }
 
   .fixed-background-layer {
