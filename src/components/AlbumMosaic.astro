@@ -18,8 +18,10 @@ const t = labels[locale];
     {albums.length === 0 ? (
       <div class="empty-state">{t.albumComingSoon}</div>
     ) : (
-      <div class="album-carousel-wrapper" data-carousel="albums" tabindex="0" role="region" aria-label={t.music}>
-        <button class="carousel-arrow prev" data-carousel-prev aria-label="Previous album" type="button">◀</button>
+      <div class:list={["album-carousel-wrapper", { "is-single": albums.length === 1 }]} data-carousel="albums" tabindex="0" role="region" aria-label={t.music}>
+        {albums.length > 1 && (
+          <button class="carousel-arrow prev" data-carousel-prev aria-label="Previous album" type="button">◀</button>
+        )}
         <div class="album-carousel-viewport">
           <div class="album-carousel-track" data-carousel-track>
             {albums.map((album) => (
@@ -37,7 +39,9 @@ const t = labels[locale];
             ))}
           </div>
         </div>
-        <button class="carousel-arrow next" data-carousel-next aria-label="Next album" type="button">▶</button>
+        {albums.length > 1 && (
+          <button class="carousel-arrow next" data-carousel-next aria-label="Next album" type="button">▶</button>
+        )}
       </div>
     )}
   </div>
@@ -49,8 +53,10 @@ const t = labels[locale];
     {singles.length === 0 ? (
       <div class="empty-state">{t.albumComingSoon}</div>
     ) : (
-      <div class="album-carousel-wrapper" data-carousel="singles" tabindex="0" role="region" aria-label={t.single}>
-        <button class="carousel-arrow prev" data-carousel-prev aria-label="Previous single" type="button">◀</button>
+      <div class:list={["album-carousel-wrapper", { "is-single": singles.length === 1 }]} data-carousel="singles" tabindex="0" role="region" aria-label={t.single}>
+        {singles.length > 1 && (
+          <button class="carousel-arrow prev" data-carousel-prev aria-label="Previous single" type="button">◀</button>
+        )}
         <div class="album-carousel-viewport">
           <div class="album-carousel-track" data-carousel-track>
             {singles.map((single) => (
@@ -68,7 +74,9 @@ const t = labels[locale];
             ))}
           </div>
         </div>
-        <button class="carousel-arrow next" data-carousel-next aria-label="Next single" type="button">▶</button>
+        {singles.length > 1 && (
+          <button class="carousel-arrow next" data-carousel-next aria-label="Next single" type="button">▶</button>
+        )}
       </div>
     )}
   </div>
@@ -418,6 +426,21 @@ const t = labels[locale];
     max-width: 1000px;
     margin: 0 auto;
     outline: none;
+  }
+
+  .album-carousel-wrapper.is-single {
+    justify-content: center;
+  }
+
+  .album-carousel-wrapper.is-single .album-carousel-track {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .album-carousel-wrapper.is-single .album-card {
+    max-width: 440px;
+    width: 100%;
+    margin: 0 auto !important;
   }
 
   .album-carousel-wrapper:focus-visible {

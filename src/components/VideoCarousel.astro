@@ -17,13 +17,14 @@ const t = labels[locale];
     {videos.length === 0 ? (
       <div class="empty-state">{t.videoComingSoon}</div>
     ) : (
-      <div class="carousel-wrapper">
-        <button class="carousel-arrow prev" data-carousel-prev aria-label="Previous videos" type="button">◀</button>
-        <div class="video-strip">
+      <div class:list={["carousel-wrapper", { "is-single": videos.length === 1 }]}>
+        {videos.length > 1 && (
+          <button class="carousel-arrow prev" data-carousel-prev aria-label="Previous videos" type="button">◀</button>
+        )}
+        <div class:list={["video-strip", { "is-single": videos.length === 1 }]}>
           {videos.map((video) => (
             <button class="video-card" data-video-url={getLocalizedVideoUrl(video, locale)} data-video-title={video.title} type="button">
               <span class="video-img-wrapper">
-
                 {video.thumbnail ? (
                   <img src={video.thumbnail.url} alt={video.thumbnail.alt || video.title} loading="lazy" />
                 ) : (
@@ -35,7 +36,9 @@ const t = labels[locale];
             </button>
           ))}
         </div>
-        <button class="carousel-arrow next" data-carousel-next aria-label="Next videos" type="button">▶</button>
+        {videos.length > 1 && (
+          <button class="carousel-arrow next" data-carousel-next aria-label="Next videos" type="button">▶</button>
+        )}
       </div>
     )}
   </div>
@@ -259,6 +262,10 @@ const t = labels[locale];
     filter: drop-shadow(0 0 10px var(--aqua-glow)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
   }
 
+  .carousel-wrapper.is-single {
+    justify-content: center;
+  }
+
   .video-strip {
     flex: 1;
     display: grid;
@@ -270,6 +277,18 @@ const t = labels[locale];
     scroll-snap-type: x mandatory;
     scrollbar-width: thin;
     scrollbar-color: var(--aqua-glow) transparent;
+  }
+
+  .video-strip.is-single {
+    display: flex;
+    justify-content: center;
+    grid-auto-columns: unset;
+    overflow-x: visible;
+  }
+
+  .video-strip.is-single .video-card {
+    width: 100%;
+    max-width: 480px;
   }
 
   .video-card {
