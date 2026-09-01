@@ -18,19 +18,26 @@ const t = labels[locale];
     {albums.length === 0 ? (
       <div class="empty-state">{t.albumComingSoon}</div>
     ) : (
-      <div class="mosaic">
-        {albums.map((album) => (
-          <button 
-            class="mosaic-item" 
-            data-title={album.title}
-            data-image={album.image.url}
-            data-links={JSON.stringify(album.links || [])}
-            data-date={album.productionDate}
-            aria-label={album.title}
-          >
-            <img src={album.image.url} alt={album.image.alt || album.title} loading="lazy" />
-          </button>
-        ))}
+      <div class="album-carousel-wrapper" data-carousel="albums" tabindex="0" role="region" aria-label={t.music}>
+        <button class="carousel-arrow prev" data-carousel-prev aria-label="Previous album" type="button">◀</button>
+        <div class="album-carousel-viewport">
+          <div class="album-carousel-track" data-carousel-track>
+            {albums.map((album) => (
+              <button 
+                class="album-card" 
+                data-title={album.title}
+                data-image={album.image.url}
+                data-links={JSON.stringify(album.links || [])}
+                data-date={album.productionDate}
+                aria-label={album.title}
+                type="button"
+              >
+                <img src={album.image.url} alt={album.image.alt || album.title} loading="lazy" />
+              </button>
+            ))}
+          </div>
+        </div>
+        <button class="carousel-arrow next" data-carousel-next aria-label="Next album" type="button">▶</button>
       </div>
     )}
   </div>
@@ -42,26 +49,33 @@ const t = labels[locale];
     {singles.length === 0 ? (
       <div class="empty-state">{t.albumComingSoon}</div>
     ) : (
-      <div class="mosaic">
-        {singles.map((single) => (
-          <button 
-            class="mosaic-item" 
-            data-title={single.title}
-            data-image={single.image.url}
-            data-links={JSON.stringify(single.links || [])}
-            data-date={single.productionDate}
-            aria-label={single.title}
-          >
-            <img src={single.image.url} alt={single.image.alt || single.title} loading="lazy" />
-          </button>
-        ))}
+      <div class="album-carousel-wrapper" data-carousel="singles" tabindex="0" role="region" aria-label={t.single}>
+        <button class="carousel-arrow prev" data-carousel-prev aria-label="Previous single" type="button">◀</button>
+        <div class="album-carousel-viewport">
+          <div class="album-carousel-track" data-carousel-track>
+            {singles.map((single) => (
+              <button 
+                class="album-card" 
+                data-title={single.title}
+                data-image={single.image.url}
+                data-links={JSON.stringify(single.links || [])}
+                data-date={single.productionDate}
+                aria-label={single.title}
+                type="button"
+              >
+                <img src={single.image.url} alt={single.image.alt || single.title} loading="lazy" />
+              </button>
+            ))}
+          </div>
+        </div>
+        <button class="carousel-arrow next" data-carousel-next aria-label="Next single" type="button">▶</button>
       </div>
     )}
   </div>
 </section>
 
 <!-- Overlay Modal for custom platform links -->
-<div id="album-overlay-modal" class="album-overlay" aria-hidden="true">
+<div id="album-overlay-modal" class="album-overlay" aria-hidden="true" role="dialog">
   <div class="album-modal-backdrop"></div>
   <div class="album-modal-wrapper">
     <div class="album-modal-box">
@@ -87,7 +101,7 @@ const t = labels[locale];
 </div>
 
 <script>
-  const mosaicItems = document.querySelectorAll(".mosaic-item");
+  // Modal Management
   const modal = document.getElementById("album-overlay-modal");
   const backdrop = modal?.querySelector(".album-modal-backdrop");
   const closeBtn = modal?.querySelector(".album-modal-close-btn");
@@ -95,7 +109,6 @@ const t = labels[locale];
   const modalTitle = document.getElementById("modal-album-title-text");
   const linksGrid = document.getElementById("modal-platform-links-grid");
   const noLinksMsg = document.getElementById("modal-no-links-msg");
-
   const modalDate = document.getElementById("modal-album-date-text");
 
   function openModal(title: string, image: string, links: any[], date: string) {
@@ -110,12 +123,12 @@ const t = labels[locale];
     }
     if (modalDate) {
       const year = date ? date.split("-")[0] : "";
-      modalDate.textContent = `Release date: ${year}`;
+      modalDate.textContent = year ? `Release date: ${year}` : "";
     }
 
     if (linksGrid) {
       linksGrid.innerHTML = "";
-      if (links.length > 0) {
+      if (links && links.length > 0) {
         if (noLinksMsg) noLinksMsg.style.display = "none";
         linksGrid.style.display = "grid";
         
@@ -150,29 +163,230 @@ const t = labels[locale];
     document.body.style.overflow = "";
   }
 
-  mosaicItems.forEach((item) => {
-    item.addEventListener("click", () => {
-      const title = item.getAttribute("data-title") || "";
-      const image = item.getAttribute("data-image") || "";
-      const date = item.getAttribute("data-date") || "";
-      let links: any[] = [];
-      try {
-        links = JSON.parse(item.getAttribute("data-links") || "[]");
-      } catch (e) {
-        console.error(e);
-      }
-      openModal(title, image, links, date);
-    });
-  });
-
   closeBtn?.addEventListener("click", closeModal);
   backdrop?.addEventListener("click", closeModal);
 
-  // Close on Escape key press
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && modal?.classList.contains("show")) {
       closeModal();
     }
+  });
+
+  // Carousel Controller Class
+  class CarouselController {
+    wrapper: HTMLElement;
+    viewport: HTMLElement;
+    track: HTMLElement;
+    prevBtn: HTMLElement | null;
+    nextBtn: HTMLElement | null;
+    originalCards: HTMLElement[];
+    totalOriginal: number;
+    cloneBuffer: number = 0;
+    allCards: HTMLElement[] = [];
+    currentIndex: number = 0;
+    isTransitioning: boolean = false;
+    gap: number = 24;
+    slideWidth: number = 0;
+    isMobile: boolean = false;
+
+    // Touch support
+    touchStartX: number = 0;
+    touchEndX: number = 0;
+
+    constructor(wrapper: HTMLElement) {
+      this.wrapper = wrapper;
+      this.viewport = wrapper.querySelector(".album-carousel-viewport") as HTMLElement;
+      this.track = wrapper.querySelector("[data-carousel-track]") as HTMLElement;
+      this.prevBtn = wrapper.querySelector("[data-carousel-prev]");
+      this.nextBtn = wrapper.querySelector("[data-carousel-next]");
+      
+      this.originalCards = Array.from(this.track.querySelectorAll(".album-card")) as HTMLElement[];
+      this.totalOriginal = this.originalCards.length;
+      
+      if (this.totalOriginal === 0) return;
+
+      if (this.totalOriginal === 1) {
+        if (this.prevBtn) this.prevBtn.style.display = "none";
+        if (this.nextBtn) this.nextBtn.style.display = "none";
+        this.track.style.justifyContent = "center";
+        this.attachCardClick(this.originalCards[0]);
+        return;
+      }
+
+      // Build clone buffer (at least 4 clones on each side so 2.5 visible items are always filled)
+      this.cloneBuffer = Math.max(4, this.totalOriginal);
+      this.setupClones();
+      this.currentIndex = this.cloneBuffer;
+
+      this.updateDimensions();
+      this.applyTransform(false);
+
+      this.bindEvents();
+    }
+
+    setupClones() {
+      // Create head clones (elements before index 0)
+      const headClones: HTMLElement[] = [];
+      for (let i = 0; i < this.cloneBuffer; i++) {
+        const itemIndex = ((this.totalOriginal - ((this.cloneBuffer - i) % this.totalOriginal)) % this.totalOriginal);
+        const clone = this.originalCards[itemIndex].cloneNode(true) as HTMLElement;
+        clone.classList.add("carousel-clone");
+        headClones.push(clone);
+      }
+
+      // Create tail clones (elements after index totalOriginal - 1)
+      const tailClones: HTMLElement[] = [];
+      for (let i = 0; i < this.cloneBuffer; i++) {
+        const itemIndex = i % this.totalOriginal;
+        const clone = this.originalCards[itemIndex].cloneNode(true) as HTMLElement;
+        clone.classList.add("carousel-clone");
+        tailClones.push(clone);
+      }
+
+      // Clear track and insert all
+      this.track.innerHTML = "";
+      headClones.forEach(c => this.track.appendChild(c));
+      this.originalCards.forEach(c => this.track.appendChild(c));
+      tailClones.forEach(c => this.track.appendChild(c));
+
+      this.allCards = Array.from(this.track.querySelectorAll(".album-card")) as HTMLElement[];
+      this.allCards.forEach(card => this.attachCardClick(card));
+    }
+
+    attachCardClick(card: HTMLElement) {
+      card.addEventListener("click", () => {
+        const title = card.getAttribute("data-title") || "";
+        const image = card.getAttribute("data-image") || "";
+        const date = card.getAttribute("data-date") || "";
+        let links: any[] = [];
+        try {
+          links = JSON.parse(card.getAttribute("data-links") || "[]");
+        } catch (e) {
+          console.error(e);
+        }
+        openModal(title, image, links, date);
+      });
+    }
+
+    updateDimensions() {
+      if (!this.viewport) return;
+      const viewportWidth = this.viewport.clientWidth;
+      this.isMobile = window.innerWidth <= 768;
+      this.gap = this.isMobile ? 16 : 24;
+
+      if (this.isMobile) {
+        this.slideWidth = viewportWidth;
+      } else {
+        // Desktop: 2 full pictures + 0.25 peek left + 0.25 peek right = 2.5 picture units + 3 gaps
+        this.slideWidth = (viewportWidth - 3 * this.gap) / 2.5;
+      }
+
+      this.allCards.forEach(card => {
+        card.style.width = `${this.slideWidth}px`;
+        card.style.marginRight = `${this.gap}px`;
+      });
+    }
+
+    getOffsetForIndex(index: number): number {
+      if (this.isMobile) {
+        return - index * (this.slideWidth + this.gap);
+      } else {
+        // In desktop mode:
+        // Visible items: [0.25 of item (index-1)] [gap] [item index] [gap] [item index+1] [gap] [0.25 of item (index+2)]
+        // Viewport starts 0.25 * slideWidth into item (index-1)
+        const peekWidth = 0.25 * this.slideWidth;
+        return peekWidth + this.gap - index * (this.slideWidth + this.gap);
+      }
+    }
+
+    applyTransform(animated: boolean) {
+      if (animated) {
+        this.track.style.transition = "transform 320ms cubic-bezier(0.25, 1, 0.5, 1)";
+      } else {
+        this.track.style.transition = "none";
+      }
+      const offset = this.getOffsetForIndex(this.currentIndex);
+      this.track.style.transform = `translate3d(${offset}px, 0, 0)`;
+    }
+
+    next() {
+      if (this.isTransitioning) return;
+      this.isTransitioning = true;
+      this.currentIndex++;
+      this.applyTransform(true);
+    }
+
+    prev() {
+      if (this.isTransitioning) return;
+      this.isTransitioning = true;
+      this.currentIndex--;
+      this.applyTransform(true);
+    }
+
+    handleTransitionEnd() {
+      this.isTransitioning = false;
+
+      // Wrap around seamlessly
+      if (this.currentIndex >= this.cloneBuffer + this.totalOriginal) {
+        this.currentIndex -= this.totalOriginal;
+        this.applyTransform(false);
+      } else if (this.currentIndex < this.cloneBuffer) {
+        this.currentIndex += this.totalOriginal;
+        this.applyTransform(false);
+      }
+    }
+
+    bindEvents() {
+      this.prevBtn?.addEventListener("click", () => this.prev());
+      this.nextBtn?.addEventListener("click", () => this.next());
+
+      this.track.addEventListener("transitionend", (e) => {
+        if (e.target === this.track) {
+          this.handleTransitionEnd();
+        }
+      });
+
+      // Resize observer
+      const resizeObserver = new ResizeObserver(() => {
+        this.updateDimensions();
+        this.applyTransform(false);
+      });
+      resizeObserver.observe(this.viewport);
+
+      // Keyboard accessibility
+      this.wrapper.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          this.prev();
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          this.next();
+        }
+      });
+
+      // Touch / Swipe support
+      this.viewport.addEventListener("touchstart", (e) => {
+        this.touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+
+      this.viewport.addEventListener("touchend", (e) => {
+        this.touchEndX = e.changedTouches[0].screenX;
+        const diff = this.touchStartX - this.touchEndX;
+        if (Math.abs(diff) > 40) {
+          if (diff > 0) {
+            this.next();
+          } else {
+            this.prev();
+          }
+        }
+      }, { passive: true });
+    }
+  }
+
+  // Initialize all carousels on page
+  const carouselWrappers = document.querySelectorAll(".album-carousel-wrapper");
+  carouselWrappers.forEach((wrapper) => {
+    new CarouselController(wrapper as HTMLElement);
   });
 </script>
 
@@ -197,27 +411,76 @@ const t = labels[locale];
     margin-bottom: 70px;
   }
 
-  .mosaic {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 28px;
+  /* Carousel Structure */
+  .album-carousel-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
     max-width: 1000px;
     margin: 0 auto;
+    outline: none;
   }
 
-  .mosaic-item {
+  .album-carousel-wrapper:focus-visible {
+    outline: 2px solid var(--aqua-glow);
+    outline-offset: 8px;
+    border-radius: 8px;
+  }
+
+  .carousel-arrow {
+    background: transparent;
+    border: none;
+    color: var(--aqua-glow);
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 10;
+    transition: transform 180ms ease, opacity 180ms ease;
+    opacity: 0.8;
+    line-height: 1;
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  .carousel-arrow:hover {
+    transform: scale(1.2);
+    opacity: 1;
+    text-shadow: 0 0 8px var(--aqua-glow);
+  }
+
+  .album-carousel-viewport {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    /* Vertical padding compensation so card hover scale/shadow isn't clipped by overflow: hidden */
+    padding: 24px 0;
+    margin: -24px 0;
+  }
+
+  .album-carousel-track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    will-change: transform;
+    user-select: none;
+  }
+
+  .album-card {
     background: none;
     border: none;
     padding: 0;
     margin: 0;
     cursor: pointer;
-    width: 100%;
     aspect-ratio: 1;
     display: block;
     outline: none;
+    flex-shrink: 0;
+    position: relative;
   }
 
-  .mosaic-item img {
+  .album-card img {
     width: 100%;
     height: 100%;
     aspect-ratio: 1;
@@ -225,14 +488,16 @@ const t = labels[locale];
     border-radius: 6px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
     filter: saturate(0.9);
+    display: block;
+    pointer-events: none;
     transition:
       transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
       filter 250ms cubic-bezier(0.4, 0, 0.2, 1),
       box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .mosaic-item:hover img,
-  .mosaic-item:focus img {
+  .album-card:hover img,
+  .album-card:focus img {
     transform: scale(1.05) translateY(-3px);
     filter: saturate(1.2) contrast(1.1);
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.7), 0 0 16px rgba(130, 232, 231, 0.4);
@@ -240,10 +505,14 @@ const t = labels[locale];
     z-index: 10;
   }
 
-  @media (max-width: 520px) {
-    .mosaic {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+  @media (max-width: 768px) {
+    .album-carousel-wrapper {
+      gap: 6px;
+    }
+
+    .carousel-arrow {
+      font-size: 1.6rem;
+      padding: 4px;
     }
   }
 
