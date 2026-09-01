@@ -20,6 +20,7 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
     margin-top: calc(var(--header-height, 72px) - 1px);
     display: block;
     width: 100%;
+    aspect-ratio: 1920 / 804;
     overflow: hidden;
     background: transparent;
     line-height: 0;
@@ -28,11 +29,10 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
 
   .hero-video {
     width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    display: block;
-    vertical-align: bottom;
+    height: 100%;
     object-fit: cover;
+    object-position: center;
+    display: block;
     background: transparent;
   }
 
