@@ -59,8 +59,9 @@ const merchExternal = Boolean(merchUrl);
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: 24px;
-    min-height: 72px;
-    padding: 14px clamp(16px, 4vw, 48px);
+    height: var(--header-height, 72px);
+    min-height: var(--header-height, 72px);
+    padding: 0 clamp(16px, 4vw, 48px);
     color: #fff;
     background: rgba(15, 20, 24, 0.95);
     backdrop-filter: blur(16px);
@@ -84,6 +85,7 @@ const merchExternal = Boolean(merchUrl);
   }
 
   .site-nav.menu-is-open {
+    height: auto;
     background: #0F1418 !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
     color: #fff !important;

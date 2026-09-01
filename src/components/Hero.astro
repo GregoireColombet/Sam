@@ -17,27 +17,29 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
 <style>
   .hero {
     position: relative;
-    margin-top: 0;
+    margin-top: calc(var(--header-height, 72px) - 1px);
     display: block;
+    width: 100%;
     overflow: hidden;
     background: transparent;
+    line-height: 0;
+    font-size: 0;
   }
 
   .hero-video {
     width: 100%;
     height: auto;
+    aspect-ratio: 16 / 9;
     display: block;
+    vertical-align: bottom;
+    object-fit: cover;
+    background: transparent;
   }
 
   .hero-shade {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background:
-      /* Top-down dark vignette */
-      linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 50%),
-      /* Center radial accent light */
-      radial-gradient(circle at 50% 44%, rgba(130, 232, 231, 0.25), transparent 45%);
   }
 
   .hero-content {
