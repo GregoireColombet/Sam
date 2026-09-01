@@ -20,7 +20,7 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
     margin-top: 0;
     display: block;
     overflow: hidden;
-    background: #080808;
+    background: transparent;
   }
 
   .hero-video {
@@ -34,8 +34,6 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
     inset: 0;
     pointer-events: none;
     background:
-      /* Smooth fade from the page background color (--bg / #0F1418) at the bottom up into transparency */
-      linear-gradient(to top, var(--bg) 0%, rgba(15, 20, 24, 0.9) 15%, rgba(15, 20, 24, 0) 50%),
       /* Top-down dark vignette */
       linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 50%),
       /* Center radial accent light */
