@@ -25,8 +25,8 @@ const t = labels[locale];
         <div class="album-carousel-viewport">
           <div class="album-carousel-track" data-carousel-track>
             {albums.map((album) => (
-              <button 
-                class="album-card" 
+              <button
+                class="album-card"
                 data-title={album.title}
                 data-image={album.image.url}
                 data-links={JSON.stringify(album.links || [])}
@@ -60,8 +60,8 @@ const t = labels[locale];
         <div class="album-carousel-viewport">
           <div class="album-carousel-track" data-carousel-track>
             {singles.map((single) => (
-              <button 
-                class="album-card" 
+              <button
+                class="album-card"
                 data-title={single.title}
                 data-image={single.image.url}
                 data-links={JSON.stringify(single.links || [])}
@@ -121,7 +121,7 @@ const t = labels[locale];
 
   function openModal(title: string, image: string, links: any[], date: string) {
     if (!modal) return;
-    
+
     if (modalImg) {
       modalImg.src = image;
       modalImg.alt = title;
@@ -139,14 +139,14 @@ const t = labels[locale];
       if (links && links.length > 0) {
         if (noLinksMsg) noLinksMsg.style.display = "none";
         linksGrid.style.display = "grid";
-        
+
         links.forEach((link: any) => {
           const btn = document.createElement("a");
           btn.className = "platform-btn";
           btn.href = link.url;
           btn.target = "_blank";
           btn.rel = "noopener noreferrer";
-          
+
           btn.innerHTML = `
             ${link.logo?.url ? `<img src="${link.logo.url}" alt="${link.name}" class="platform-icon" />` : ""}
             <span class="platform-name">${link.name}</span>
@@ -207,10 +207,10 @@ const t = labels[locale];
       this.track = wrapper.querySelector("[data-carousel-track]") as HTMLElement;
       this.prevBtn = wrapper.querySelector("[data-carousel-prev]");
       this.nextBtn = wrapper.querySelector("[data-carousel-next]");
-      
+
       this.originalCards = Array.from(this.track.querySelectorAll(".album-card")) as HTMLElement[];
       this.totalOriginal = this.originalCards.length;
-      
+
       if (this.totalOriginal === 0) return;
 
       if (this.totalOriginal === 1) {
@@ -524,7 +524,7 @@ const t = labels[locale];
   .album-card:focus img {
     transform: scale(1.03) translateY(-2px);
     filter: saturate(1.2) contrast(1.1);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6), 0 0 8px rgba(130, 232, 231, 0.35);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.6), 0 0 8px rgba(130, 232, 231, 0.35);
     position: relative;
     z-index: 10;
   }
