@@ -245,20 +245,18 @@ const t = labels[locale];
     padding: 8px;
     z-index: 10;
     transition: transform 180ms ease, opacity 180ms ease, text-shadow 180ms ease, filter 180ms ease;
-    opacity: 0.9;
+    opacity: 0.85;
     line-height: 1;
-    -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.85);
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.9);
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 8px rgba(0, 0, 0, 0.85));
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
     user-select: none;
   }
 
   .carousel-arrow:hover {
     transform: scale(1.2);
     opacity: 1;
-    -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.95);
-    text-shadow: 0 0 10px var(--aqua-glow), 0 2px 6px rgba(0, 0, 0, 0.95);
-    filter: drop-shadow(0 0 12px var(--aqua-glow)) drop-shadow(0 2px 8px #000);
+    text-shadow: 0 0 10px var(--aqua-glow), 0 2px 8px rgba(0, 0, 0, 0.4);
+    filter: drop-shadow(0 0 10px var(--aqua-glow)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
   }
 
   .video-strip {

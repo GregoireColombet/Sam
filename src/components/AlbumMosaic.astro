@@ -270,15 +270,18 @@ const t = labels[locale];
 
     updateDimensions() {
       if (!this.viewport) return;
-      const viewportWidth = this.viewport.clientWidth;
+      const computedStyle = window.getComputedStyle(this.viewport);
+      const padLeft = parseFloat(computedStyle.paddingLeft) || 0;
+      const padRight = parseFloat(computedStyle.paddingRight) || 0;
+      const usableWidth = this.viewport.clientWidth - padLeft - padRight;
       this.isMobile = window.innerWidth <= 768;
       this.gap = this.isMobile ? 16 : 24;
 
       if (this.isMobile) {
-        this.slideWidth = viewportWidth;
+        this.slideWidth = usableWidth;
       } else {
         // Desktop: exactly 2 full pictures in view (no peek on left/right)
-        this.slideWidth = (viewportWidth - this.gap) / 2;
+        this.slideWidth = (usableWidth - this.gap) / 2;
       }
 
       this.allCards.forEach(card => {
@@ -430,30 +433,28 @@ const t = labels[locale];
     padding: 8px;
     z-index: 10;
     transition: transform 180ms ease, opacity 180ms ease, text-shadow 180ms ease, filter 180ms ease;
-    opacity: 0.9;
+    opacity: 0.85;
     line-height: 1;
     flex-shrink: 0;
-    -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.85);
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.9);
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 8px rgba(0, 0, 0, 0.85));
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
     user-select: none;
   }
 
   .carousel-arrow:hover {
     transform: scale(1.2);
     opacity: 1;
-    -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.95);
-    text-shadow: 0 0 10px var(--aqua-glow), 0 2px 6px rgba(0, 0, 0, 0.95);
-    filter: drop-shadow(0 0 12px var(--aqua-glow)) drop-shadow(0 2px 8px #000);
+    text-shadow: 0 0 10px var(--aqua-glow), 0 2px 8px rgba(0, 0, 0, 0.4);
+    filter: drop-shadow(0 0 10px var(--aqua-glow)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
   }
 
   .album-carousel-viewport {
     flex: 1;
     overflow: hidden;
     position: relative;
-    /* Generous vertical padding compensation so card hover scale and shadows are never truncated */
-    padding: 48px 0;
-    margin: -48px 0;
+    /* Generous vertical and horizontal padding compensation so card hover scale and shadows are never truncated */
+    padding: 48px 32px;
+    margin: -48px -32px;
   }
 
   .album-carousel-track {
@@ -506,6 +507,11 @@ const t = labels[locale];
   @media (max-width: 768px) {
     .album-carousel-wrapper {
       gap: 6px;
+    }
+
+    .album-carousel-viewport {
+      padding: 32px 16px;
+      margin: -32px -16px;
     }
 
     .carousel-arrow {
