@@ -277,8 +277,8 @@ const t = labels[locale];
       if (this.isMobile) {
         this.slideWidth = viewportWidth;
       } else {
-        // Desktop: 2 full pictures + 0.25 peek left + 0.25 peek right = 2.5 picture units + 3 gaps
-        this.slideWidth = (viewportWidth - 3 * this.gap) / 2.5;
+        // Desktop: exactly 2 full pictures in view (no peek on left/right)
+        this.slideWidth = (viewportWidth - this.gap) / 2;
       }
 
       this.allCards.forEach(card => {
@@ -288,15 +288,7 @@ const t = labels[locale];
     }
 
     getOffsetForIndex(index: number): number {
-      if (this.isMobile) {
-        return - index * (this.slideWidth + this.gap);
-      } else {
-        // In desktop mode:
-        // Visible items: [0.25 of item (index-1)] [gap] [item index] [gap] [item index+1] [gap] [0.25 of item (index+2)]
-        // Viewport starts 0.25 * slideWidth into item (index-1)
-        const peekWidth = 0.25 * this.slideWidth;
-        return peekWidth + this.gap - index * (this.slideWidth + this.gap);
-      }
+      return - index * (this.slideWidth + this.gap);
     }
 
     applyTransform(animated: boolean) {
@@ -437,26 +429,31 @@ const t = labels[locale];
     cursor: pointer;
     padding: 8px;
     z-index: 10;
-    transition: transform 180ms ease, opacity 180ms ease;
-    opacity: 0.8;
+    transition: transform 180ms ease, opacity 180ms ease, text-shadow 180ms ease, filter 180ms ease;
+    opacity: 0.9;
     line-height: 1;
     flex-shrink: 0;
+    -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.85);
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.9);
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 8px rgba(0, 0, 0, 0.85));
     user-select: none;
   }
 
   .carousel-arrow:hover {
     transform: scale(1.2);
     opacity: 1;
-    text-shadow: 0 0 8px var(--aqua-glow);
+    -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.95);
+    text-shadow: 0 0 10px var(--aqua-glow), 0 2px 6px rgba(0, 0, 0, 0.95);
+    filter: drop-shadow(0 0 12px var(--aqua-glow)) drop-shadow(0 2px 8px #000);
   }
 
   .album-carousel-viewport {
     flex: 1;
     overflow: hidden;
     position: relative;
-    /* Vertical padding compensation so card hover scale/shadow isn't clipped by overflow: hidden */
-    padding: 24px 0;
-    margin: -24px 0;
+    /* Generous vertical padding compensation so card hover scale and shadows are never truncated */
+    padding: 48px 0;
+    margin: -48px 0;
   }
 
   .album-carousel-track {
@@ -478,6 +475,7 @@ const t = labels[locale];
     outline: none;
     flex-shrink: 0;
     position: relative;
+    overflow: visible;
   }
 
   .album-card img {
