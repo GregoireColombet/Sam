@@ -34,7 +34,15 @@ const t = labels[locale];
                 aria-label={album.title}
                 type="button"
               >
-                <img src={album.image.url} alt={album.image.alt || album.title} loading="lazy" />
+                <span class="album-img-wrapper">
+                  <img src={album.image.url} alt={album.image.alt || album.title} loading="lazy" />
+                </span>
+                <span class="album-info-card">
+                  <strong class="album-title">{album.title}</strong>
+                  {album.productionDate && (
+                    <span class="album-date">{album.productionDate.split("-")[0]}</span>
+                  )}
+                </span>
               </button>
             ))}
           </div>
@@ -69,7 +77,15 @@ const t = labels[locale];
                 aria-label={single.title}
                 type="button"
               >
-                <img src={single.image.url} alt={single.image.alt || single.title} loading="lazy" />
+                <span class="album-img-wrapper">
+                  <img src={single.image.url} alt={single.image.alt || single.title} loading="lazy" />
+                </span>
+                <span class="album-info-card">
+                  <strong class="album-title">{single.title}</strong>
+                  {single.productionDate && (
+                    <span class="album-date">{single.productionDate.split("-")[0]}</span>
+                  )}
+                </span>
               </button>
             ))}
           </div>
@@ -496,15 +512,23 @@ const t = labels[locale];
     padding: 0;
     margin: 0;
     cursor: pointer;
-    aspect-ratio: 1;
-    display: block;
+    display: flex;
+    flex-direction: column;
     outline: none;
     flex-shrink: 0;
     position: relative;
     overflow: visible;
+    text-align: center;
   }
 
-  .album-card img {
+  .album-img-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    display: block;
+  }
+
+  .album-img-wrapper img {
     width: 100%;
     height: 100%;
     aspect-ratio: 1;
@@ -520,13 +544,66 @@ const t = labels[locale];
       box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .album-card:hover img,
-  .album-card:focus img {
+  .album-card:hover .album-img-wrapper img,
+  .album-card:focus .album-img-wrapper img {
     transform: scale(1.03) translateY(-2px);
     filter: saturate(1.2) contrast(1.1);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6), 0 0 8px rgba(130, 232, 231, 0.35);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6), 0 0 8px rgba(130, 232, 231, 0.35);
     position: relative;
     z-index: 10;
+  }
+
+  .album-info-card {
+    margin-top: 14px;
+    width: 100%;
+    padding: 10px 16px;
+    background-color: rgba(255, 255, 255, 0.30);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition:
+      background-color 220ms ease,
+      box-shadow 220ms ease,
+      transform 220ms ease;
+  }
+
+  .album-card:hover .album-info-card,
+  .album-card:focus .album-info-card {
+    background-color: rgba(255, 255, 255, 0.38);
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.45), 0 0 12px rgba(130, 232, 231, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .album-title {
+    color: var(--ice-white);
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    transition: color 220ms ease, text-shadow 220ms ease;
+    word-break: break-word;
+  }
+
+  .album-card:hover .album-title,
+  .album-card:focus .album-title {
+    color: var(--aqua-glow);
+    text-shadow: 0 0 10px rgba(130, 232, 231, 0.5), 0 1px 4px rgba(0, 0, 0, 0.9);
+  }
+
+  .album-date {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    font-family: "Syncopate", sans-serif;
   }
 
   @media (max-width: 768px) {
@@ -537,6 +614,19 @@ const t = labels[locale];
     .album-carousel-viewport {
       padding: 32px 16px;
       margin: -32px -16px;
+    }
+
+    .album-info-card {
+      margin-top: 10px;
+      padding: 8px 12px;
+    }
+
+    .album-title {
+      font-size: 0.95rem;
+    }
+
+    .album-date {
+      font-size: 0.8rem;
     }
 
     .carousel-arrow {
