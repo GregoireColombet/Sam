@@ -27,6 +27,8 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
     width: 100%;
     height: auto;
     display: block;
+    mix-blend-mode: screen;
+    background: transparent;
   }
 
   .hero-shade {
@@ -34,10 +36,8 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
     inset: 0;
     pointer-events: none;
     background:
-      /* Top-down dark vignette */
-      linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 50%),
       /* Center radial accent light */
-      radial-gradient(circle at 50% 44%, rgba(130, 232, 231, 0.25), transparent 45%);
+      radial-gradient(circle at 50% 44%, rgba(130, 232, 231, 0.2), transparent 50%);
   }
 
   .hero-content {
