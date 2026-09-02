@@ -3,7 +3,7 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import SiteNav from "@/components/SiteNav.astro";
 import Footer from "@/components/Footer.astro";
 import { getLandingContent, getMerchUrl, getBonusSettings } from "@/lib/db";
-import { isLocale, type Locale, getLocalized } from "@/lib/i18n";
+import { isLocale, labels, type Locale, getLocalized } from "@/lib/i18n";
 
 export const prerender = false;
 
@@ -20,23 +20,7 @@ const [landing, merchUrl, bonusSettings] = await Promise.all([
   getBonusSettings(env)
 ]);
 
-const pastTitles = {
-  en: "Past",
-  "zh-TW": "過去",
-  "zh-CN": "过去"
-};
-
-const presentTitles = {
-  en: "Present",
-  "zh-TW": "現在",
-  "zh-CN": "现在"
-};
-
-const futureTitles = {
-  en: "Future",
-  "zh-TW": "未來",
-  "zh-CN": "未来"
-};
+const t = labels[locale];
 
 const pastSubtitles = {
   en: "Some voices are made to outlast time.",
@@ -166,14 +150,40 @@ a voice, and the moment it reaches someone’s heart.`,
 一个声音，抵达另一个人心里的瞬间。`
 };
 
+const chapters = [
+  {
+    title: t.past,
+    subtitle: pastSubtitles[locale],
+    text: pastText[locale],
+    image: "/assets/about/about_debut.jpg",
+    alt: "Sam Lee Past Journey",
+    reverse: false
+  },
+  {
+    title: t.present,
+    subtitle: presentSubtitles[locale],
+    text: presentText[locale],
+    image: "/assets/about/about_tennis.jpg",
+    alt: "Sam Lee Present Journey",
+    reverse: true
+  },
+  {
+    title: t.future,
+    subtitle: futureSubtitles[locale],
+    text: futureText[locale],
+    image: "/assets/about/about_venture.jpg",
+    alt: "Sam Lee Future Journey",
+    reverse: false
+  }
+];
 
 const bonusIsActive = bonusSettings?.isActive;
 const bonusTitle = bonusIsActive ? getLocalized(bonusSettings?.title, locale) : null;
 const bonusText = bonusIsActive ? getLocalized(bonusSettings?.text, locale) : "";
-const bonusImageUrl = bonusIsActive ? (bonusSettings?.imageUrl || "") : "";
+const bonusImageUrl = bonusIsActive ? bonusSettings?.imageUrl || "" : "";
 ---
 
-<BaseLayout locale={locale} title={`Sam Lee | About`}>
+<BaseLayout locale={locale} title={`Sam Lee | ${t.about}`}>
   <SiteNav locale={locale} merchUrl={merchUrl} />
   {bonusTitle && (
     <div class="scroll-gauge-container">
@@ -183,51 +193,21 @@ const bonusImageUrl = bonusIsActive ? (bonusSettings?.imageUrl || "") : "";
   )}
   <main class="page-main">
     <div class="about-container">
-
-      <!-- Past Section -->
-      <section class="about-section direction-row">
-        <div class="media-column">
-          <div class="image-wrapper">
-            <img src="/assets/about/about_debut.jpg" alt="Sam Lee Past Journey" class="past-image" />
+      {chapters.map((chapter) => (
+        <section class:list={["about-section", chapter.reverse ? "direction-row-reverse" : "direction-row"]}>
+          <div class="media-column">
+            <div class="image-wrapper">
+              <img src={chapter.image} alt={chapter.alt} class="chapter-image" loading="lazy" />
+            </div>
           </div>
-        </div>
-        <div class="text-column">
-          <h2 class="section-title">{pastTitles[locale]}</h2>
-          <p class="section-subtitle">{pastSubtitles[locale]}</p>
-          <div class="section-divider"></div>
-          <p class="paragraph">{pastText[locale]}</p>
-        </div>
-      </section>
-
-      <!-- Present Section -->
-      <section class="about-section direction-row-reverse">
-        <div class="media-column">
-          <div class="image-wrapper">
-            <img src="/assets/about/about_tennis.jpg" alt="Sam Lee Present Journey" class="present-image" />
+          <div class="text-column">
+            <h2 class="section-title">{chapter.title}</h2>
+            <p class="section-subtitle">{chapter.subtitle}</p>
+            <div class="section-divider"></div>
+            <p class="paragraph">{chapter.text}</p>
           </div>
-        </div>
-        <div class="text-column">
-          <h2 class="section-title">{presentTitles[locale]}</h2>
-          <p class="section-subtitle">{presentSubtitles[locale]}</p>
-          <div class="section-divider"></div>
-          <p class="paragraph">{presentText[locale]}</p>
-        </div>
-      </section>
-
-      <!-- Future Section -->
-      <section class="about-section direction-row">
-        <div class="media-column">
-          <div class="image-wrapper">
-            <img src="/assets/about/about_venture.jpg" alt="Sam Lee Future Journey" class="future-image" />
-          </div>
-        </div>
-        <div class="text-column">
-          <h2 class="section-title">{futureTitles[locale]}</h2>
-          <p class="section-subtitle">{futureSubtitles[locale]}</p>
-          <div class="section-divider"></div>
-          <p class="paragraph">{futureText[locale]}</p>
-        </div>
-      </section>
+        </section>
+      ))}
 
       {bonusTitle && (
         <div class="bonus-button-container">
@@ -237,7 +217,7 @@ const bonusImageUrl = bonusIsActive ? (bonusSettings?.imageUrl || "") : "";
     </div>
 
     {bonusTitle && (
-      <div id="bonus-modal" class="bonus-modal">
+      <div id="bonus-modal" class="bonus-modal" role="dialog" aria-hidden="true">
         <div class="bonus-modal-content">
           <button id="bonus-modal-close" class="bonus-modal-close" aria-label="Close">&times;</button>
           {bonusImageUrl && <img src={bonusImageUrl} alt={bonusTitle} class="bonus-modal-image" />}
@@ -251,126 +231,16 @@ const bonusImageUrl = bonusIsActive ? (bonusSettings?.imageUrl || "") : "";
   <Footer locale={locale} socialLinks={landing.socialLinks} />
 </BaseLayout>
 
-<script>
-  const bonusBtn = document.getElementById("bonus-btn");
-  if (bonusBtn) {
-    const bonusModal = document.getElementById("bonus-modal");
-    const bonusClose = document.getElementById("bonus-modal-close");
-    const gaugeBar = document.getElementById("scroll-gauge-bar");
-    const gaugeNumber = document.getElementById("scroll-gauge-number");
-    const gaugeContainer = document.querySelector(".scroll-gauge-container");
-    const nav = document.querySelector("[data-site-nav]");
-
-    // Append gauge container to the nav bar so it aligns perfectly at its bottom
-    if (nav && gaugeContainer) {
-      nav.appendChild(gaugeContainer);
-    }
-
-    let progress = 0;
-    let timer: number | null = null;
-    let lastScrollY = window.scrollY;
-
-    function updateGauge(value: number) {
-      progress = Math.round(value);
-      if (gaugeBar) {
-        gaugeBar.style.width = `${progress}%`;
-      }
-      if (gaugeNumber) {
-        gaugeNumber.textContent = `${progress}%`;
-      }
-    }
-
-    function handleScroll() {
-      const windowHeight = window.innerHeight;
-      const scrollY = window.scrollY;
-      const documentHeight = document.documentElement.scrollHeight;
-      const maxScroll = documentHeight - windowHeight;
-
-      const isAtBottom = maxScroll <= 0 || (windowHeight + scrollY) >= (documentHeight - 15);
-
-      if (scrollY !== lastScrollY) {
-        lastScrollY = scrollY;
-        // Scroll position changed (page moved)
-        if (timer) {
-          clearInterval(timer);
-          timer = null;
-        }
-        if (bonusBtn) {
-          bonusBtn.style.display = "none";
-        }
-        // Set progress based on scroll position (0% to 80%)
-        const scrollPercent = maxScroll > 0 ? (scrollY / maxScroll) * 80 : 80;
-        updateGauge(Math.max(0, Math.min(80, scrollPercent)));
-      }
-
-      if (isAtBottom) {
-        // Start/continue the timer if not already running and not yet 100%
-        if (!timer && progress < 100 && bonusModal && !bonusModal.classList.contains("open")) {
-          if (progress < 80) {
-            updateGauge(80);
-          }
-          timer = window.setInterval(() => {
-            if (progress < 100) {
-              updateGauge(Math.min(100, progress + 5));
-              if (progress >= 100) {
-                if (timer) {
-                  clearInterval(timer);
-                  timer = null;
-                }
-                if (bonusBtn) {
-                  bonusBtn.style.display = "inline-block";
-                  bonusBtn.style.animation = "fadeIn 0.5s ease forwards";
-                }
-              }
-            }
-          }, 500); // 0.5 second fills 5% (fills remaining 20% in 2 seconds)
-        }
-      } else {
-        if (timer) {
-          clearInterval(timer);
-          timer = null;
-        }
-      }
-    }
-
-    window.addEventListener("scroll", handleScroll);
-    // Initial check on load
-    handleScroll();
-
-    bonusBtn.addEventListener("click", () => {
-      if (bonusModal) {
-        bonusModal.classList.add("open");
-      }
-    });
-
-    bonusClose?.addEventListener("click", () => {
-      if (bonusModal) {
-        bonusModal.classList.remove("open");
-      }
-      if (bonusBtn) {
-        bonusBtn.style.display = "none";
-      }
-      if (timer) {
-        clearInterval(timer);
-        timer = null;
-      }
-      updateGauge(80);
-      // Restart the process immediately if still at bottom
-      lastScrollY = window.scrollY;
-      handleScroll();
-    });
-  }
-</script>
+<script src="./about.client.ts"></script>
 
 <style>
-  /* Style when gauge is appended inside fixed site-nav */
   :global([data-site-nav]) {
     position: relative;
   }
 
   :global([data-site-nav]) .scroll-gauge-container {
     position: absolute;
-    bottom: -18px; /* Align precisely at the bottom edge */
+    bottom: -18px;
     left: 0;
     width: 100%;
     height: 18px;
@@ -482,36 +352,14 @@ const bonusImageUrl = bonusIsActive ? (bonusSettings?.imageUrl || "") : "";
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   }
 
-  .past-image {
+  .chapter-image {
     width: 100%;
     height: auto;
     display: block;
     transition: transform 0.6s ease;
   }
 
-  .image-wrapper:hover .past-image {
-    transform: scale(1.02);
-  }
-
-  .present-image {
-    width: 100%;
-    height: auto;
-    display: block;
-    transition: transform 0.6s ease;
-  }
-
-  .image-wrapper:hover .present-image {
-    transform: scale(1.02);
-  }
-
-  .future-image {
-    width: 100%;
-    height: auto;
-    display: block;
-    transition: transform 0.6s ease;
-  }
-
-  .image-wrapper:hover .future-image {
+  .image-wrapper:hover .chapter-image {
     transform: scale(1.02);
   }
 
@@ -523,10 +371,6 @@ const bonusImageUrl = bonusIsActive ? (bonusSettings?.imageUrl || "") : "";
     text-align: justify;
     color: var(--ice-white);
     white-space: pre-line;
-  }
-
-  .mt-4 {
-    margin-top: 1.5rem;
   }
 
   .bonus-button-container {

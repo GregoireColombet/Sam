@@ -1,5 +1,6 @@
 ---
 import AdminLayout from "@/layouts/AdminLayout.astro";
+import MediaPickerControl from "@/components/admin/MediaPickerControl.astro";
 
 export const prerender = false;
 
@@ -21,7 +22,17 @@ let error = "";
 
 if (db) {
   try {
-    const [newsRow, toursResult, albumsResult, videosResult, socialsResult, settingsRow, mediaResult, musicLinksResult, albumLinksResult] = await Promise.all([
+    const [
+      newsRow,
+      toursResult,
+      albumsResult,
+      videosResult,
+      socialsResult,
+      settingsRow,
+      mediaResult,
+      musicLinksResult,
+      albumLinksResult
+    ] = await Promise.all([
       db.prepare(`select * from news_blocks where id = 1`).first<any>(),
       db.prepare(`select * from tour_dates order by starts_at_utc desc`).all<any>(),
       db.prepare(`select * from album_covers order by production_date desc`).all<any>(),
@@ -34,14 +45,20 @@ if (db) {
     ]);
 
     news = newsRow || {
-      title_en: "", title_zh_tw: "", title_zh_cn: "",
-      body_en: "", body_zh_tw: "", body_zh_cn: "",
-      background_media_id: null, countdown_at_utc: "", is_active: 0
+      title_en: "",
+      title_zh_tw: "",
+      title_zh_cn: "",
+      body_en: "",
+      body_zh_tw: "",
+      body_zh_cn: "",
+      background_media_id: null,
+      countdown_at_utc: "",
+      is_active: 0
     };
     tours = toursResult.results || [];
     const allAlbumLinks = albumLinksResult.results || [];
     const allMedia = mediaResult.results || [];
-    
+
     allAlbums = (albumsResult.results || []).map((album: any) => {
       const media = allMedia.find((m: any) => m.id === album.image_media_id);
       return {
@@ -52,7 +69,7 @@ if (db) {
     });
     albums = allAlbums.filter((a: any) => a.is_single === 0);
     singles = allAlbums.filter((a: any) => a.is_single === 1);
-    
+
     videos = (videosResult.results || []).map((video: any) => {
       const media = allMedia.find((m: any) => m.id === video.thumbnail_media_id);
       return {
@@ -60,7 +77,7 @@ if (db) {
         r2_key: media ? media.r2_key : undefined
       };
     });
-    
+
     socials = (socialsResult.results || []).map((soc: any) => {
       const media = allMedia.find((m: any) => m.id === soc.logo_media_id);
       return {
@@ -68,7 +85,7 @@ if (db) {
         r2_key: media ? media.r2_key : undefined
       };
     });
-    
+
     musicLinks = (musicLinksResult.results || []).map((link: any) => {
       const media = allMedia.find((m: any) => m.id === link.logo_media_id);
       return {
@@ -77,10 +94,18 @@ if (db) {
       };
     });
     settings = settingsRow || {
-      merch_url_en: "", merch_url_zh_tw: "", merch_url_zh_cn: "", merch_is_active: 0,
-      bonus_title_en: "", bonus_title_zh_tw: "", bonus_title_zh_cn: "",
-      bonus_text_en: "", bonus_text_zh_tw: "", bonus_text_zh_cn: "",
-      bonus_media_id: null, bonus_is_active: 0
+      merch_url_en: "",
+      merch_url_zh_tw: "",
+      merch_url_zh_cn: "",
+      merch_is_active: 0,
+      bonus_title_en: "",
+      bonus_title_zh_tw: "",
+      bonus_title_zh_cn: "",
+      bonus_text_en: "",
+      bonus_text_zh_tw: "",
+      bonus_text_zh_cn: "",
+      bonus_media_id: null,
+      bonus_is_active: 0
     };
     mediaList = mediaResult.results || [];
   } catch (e: any) {
@@ -154,26 +179,16 @@ function getMediaUrl(id: number | null) {
         </div>
 
         <div class="form-grid">
-          <!-- Background Image Picker -->
           <div class="form-group">
             <label>Background Image</label>
-            <div class="media-picker-control" data-field="background_media_id">
-              <input type="hidden" name="background_media_id" value={news.background_media_id || ""} />
-              <div class="picker-preview">
-                {news.background_media_id ? (
-                  <img src={getMediaUrl(news.background_media_id)} alt="Selected Background" />
-                ) : (
-                  <span class="no-img">No Image Selected</span>
-                )}
-              </div>
-              <div class="picker-actions">
-                <button type="button" class="btn-select-media">Select Image</button>
-                <button type="button" class="btn-clear-media" style={news.background_media_id ? "" : "display:none;"}>Clear</button>
-              </div>
-            </div>
+            <MediaPickerControl
+              field="background_media_id"
+              name="background_media_id"
+              value={news.background_media_id}
+              previewUrl={getMediaUrl(news.background_media_id)}
+            />
           </div>
 
-          <!-- Countdown Picker -->
           <div class="form-group">
             <label>Countdown Target (UTC Date/Time)</label>
             <input 
@@ -184,7 +199,6 @@ function getMediaUrl(id: number | null) {
             <span class="field-hint">Leave blank to disable the countdown clock. Use UTC time.</span>
           </div>
 
-          <!-- Status toggle -->
           <div class="form-group row-group">
             <input type="checkbox" id="news-active" name="is_active" checked={news.is_active === 1} />
             <label for="news-active">Display News block on website</label>
@@ -202,7 +216,6 @@ function getMediaUrl(id: number | null) {
         <button class="btn-primary" id="btn-add-tour">Add Tour Date</button>
       </div>
 
-      <!-- Tour Dates Table -->
       <table class="admin-table">
         <thead>
           <tr>
@@ -231,7 +244,7 @@ function getMediaUrl(id: number | null) {
                   <div>繁: {t.location_zh_tw}</div>
                   <div>简: {t.location_zh_cn}</div>
                 </td>
-                <td class="admin-muted" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <td class="admin-muted truncate-cell">
                   {t.description_zh_tw}
                 </td>
                 <td>
@@ -278,12 +291,12 @@ function getMediaUrl(id: number | null) {
             {musicLinks.map((link) => (
               <tr data-music-id={link.id}>
                 <td>
-                  <div class="picker-preview select-sm" style="width: 40px; height: 40px; border: 1px solid var(--admin-line); background: var(--admin-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
-                    <img src={getMediaUrl(link.logo_media_id)} alt={link.name} style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                  <div class="picker-preview select-sm thumb-preview-box">
+                    <img src={getMediaUrl(link.logo_media_id)} alt={link.name} class="contain-img" />
                   </div>
                 </td>
                 <td><strong>{link.name}</strong></td>
-                <td><a href={link.url} target="_blank" class="admin-muted" style="text-decoration: underline; color: var(--text-muted);">Link</a></td>
+                <td><a href={link.url} target="_blank" class="table-link">Link</a></td>
                 <td>
                   <span class:list={["badge", link.is_active === 1 ? "badge-active" : "badge-inactive"]}>
                     {link.is_active === 1 ? "Active" : "Hidden"}
@@ -325,18 +338,18 @@ function getMediaUrl(id: number | null) {
             {albums.map((album) => (
               <tr data-album-id={album.id}>
                 <td>
-                  <div class="picker-preview select-sm" style="width: 50px; height: 50px; border: 1px solid var(--admin-line); background: var(--admin-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
-                    <img src={getMediaUrl(album.image_media_id)} alt={album.title} style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                  <div class="picker-preview select-sm thumb-preview-box" style="width: 50px; height: 50px;">
+                    <img src={getMediaUrl(album.image_media_id)} alt={album.title} class="contain-img" />
                   </div>
                 </td>
                 <td><strong>{album.title}</strong></td>
-                <td><code style="font-size: 0.9rem; background: rgba(0, 0, 0, 0.05); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--admin-line);">{album.production_date || album.productionDate}</code></td>
+                <td><code class="date-tag">{album.production_date || album.productionDate}</code></td>
                 <td>
-                  <div style="font-size: 0.85rem; color: var(--admin-text-muted); display: flex; flex-direction: column; gap: 4px;">
+                  <div class="album-links-col">
                     {album.links && album.links.length > 0 ? (
                       album.links.map((l: any) => {
-                        const plat = musicLinks.find(p => p.id === l.platform_id || p.id === l.platformId);
-                        return <div><strong>{plat ? plat.name : "Platform"}:</strong> <a href={l.url} target="_blank" class="admin-muted" style="text-decoration: underline; color: var(--text-muted);">Link</a></div>;
+                        const plat = musicLinks.find((p) => p.id === l.platform_id || p.id === l.platformId);
+                        return <div><strong>{plat ? plat.name : "Platform"}:</strong> <a href={l.url} target="_blank" class="table-link">Link</a></div>;
                       })
                     ) : (
                       <span class="admin-muted">No custom links</span>
@@ -379,18 +392,18 @@ function getMediaUrl(id: number | null) {
             {singles.map((single) => (
               <tr data-album-id={single.id}>
                 <td>
-                  <div class="picker-preview select-sm" style="width: 50px; height: 50px; border: 1px solid var(--admin-line); background: var(--admin-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
-                    <img src={getMediaUrl(single.image_media_id)} alt={single.title} style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                  <div class="picker-preview select-sm thumb-preview-box" style="width: 50px; height: 50px;">
+                    <img src={getMediaUrl(single.image_media_id)} alt={single.title} class="contain-img" />
                   </div>
                 </td>
                 <td><strong>{single.title}</strong></td>
-                <td><code style="font-size: 0.9rem; background: rgba(0, 0, 0, 0.05); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--admin-line);">{single.production_date || single.productionDate}</code></td>
+                <td><code class="date-tag">{single.production_date || single.productionDate}</code></td>
                 <td>
-                  <div style="font-size: 0.85rem; color: var(--admin-text-muted); display: flex; flex-direction: column; gap: 4px;">
+                  <div class="album-links-col">
                     {single.links && single.links.length > 0 ? (
                       single.links.map((l: any) => {
-                        const plat = musicLinks.find(p => p.id === l.platform_id || p.id === l.platformId);
-                        return <div><strong>{plat ? plat.name : "Platform"}:</strong> <a href={l.url} target="_blank" class="admin-muted" style="text-decoration: underline; color: var(--text-muted);">Link</a></div>;
+                        const plat = musicLinks.find((p) => p.id === l.platform_id || p.id === l.platformId);
+                        return <div><strong>{plat ? plat.name : "Platform"}:</strong> <a href={l.url} target="_blank" class="table-link">Link</a></div>;
                       })
                     ) : (
                       <span class="admin-muted">No custom links</span>
@@ -436,9 +449,9 @@ function getMediaUrl(id: number | null) {
             {videos.map((vid) => (
               <tr data-video-id={vid.id}>
                 <td>
-                  <div class="picker-preview select-sm" style="width: 50px; height: 50px; border: 1px solid var(--admin-line); background: var(--admin-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
+                  <div class="picker-preview select-sm thumb-preview-box" style="width: 50px; height: 50px;">
                     {vid.thumbnail_media_id ? (
-                      <img src={getMediaUrl(vid.thumbnail_media_id)} alt={vid.title} style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                      <img src={getMediaUrl(vid.thumbnail_media_id)} alt={vid.title} class="contain-img" />
                     ) : (
                       <span class="no-img">No Image</span>
                     )}
@@ -469,7 +482,6 @@ function getMediaUrl(id: number | null) {
 
     <!-- SOCIALS & MERCH TAB -->
     <div class="tab-pane" id="tab-socials-merch">
-      <!-- Merch Form -->
       <form id="merch-form" class="admin-form card-form mb-4">
         <h2>Merchandising External Shop Settings</h2>
         <p class="admin-muted">Configure external shops (e.g. Shopee, Shopify) per language. If inactive, the public shop link redirects to "Coming soon".</p>
@@ -508,7 +520,6 @@ function getMediaUrl(id: number | null) {
         <button type="submit" class="btn-submit">Save Merch Settings</button>
       </form>
 
-      <!-- Socials Form -->
       <div class="card-form">
         <div class="actions-bar">
           <h2>Footer Social Platforms</h2>
@@ -530,12 +541,12 @@ function getMediaUrl(id: number | null) {
             {socials.map((soc) => (
               <tr data-social-id={soc.id}>
                 <td>
-                  <div class="picker-preview select-sm" style="width: 40px; height: 40px; border: 1px solid var(--admin-line); background: var(--admin-bg); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
-                    <img src={getMediaUrl(soc.logo_media_id)} alt={soc.name} style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                  <div class="picker-preview select-sm thumb-preview-box">
+                    <img src={getMediaUrl(soc.logo_media_id)} alt={soc.name} class="contain-img" />
                   </div>
                 </td>
                 <td><strong>{soc.name}</strong></td>
-                <td><a href={soc.url} target="_blank" class="admin-muted" style="text-decoration: underline; color: var(--text-muted);">Link</a></td>
+                <td><a href={soc.url} target="_blank" class="table-link">Link</a></td>
                 <td>
                   <span class:list={["badge", soc.is_active === 1 ? "badge-active" : "badge-inactive"]}>
                     {soc.is_active === 1 ? "Active" : "Hidden"}
@@ -596,20 +607,12 @@ function getMediaUrl(id: number | null) {
         <div class="form-grid">
           <div class="form-group">
             <label>Bonus Image</label>
-            <div class="media-picker-control" data-field="bonus_media_id">
-              <input type="hidden" name="bonus_media_id" value={settings.bonus_media_id || ""} />
-              <div class="picker-preview">
-                {settings.bonus_media_id ? (
-                  <img src={getMediaUrl(settings.bonus_media_id)} alt="Selected Bonus Image" />
-                ) : (
-                  <span class="no-img">No Image Selected</span>
-                )}
-              </div>
-              <div class="picker-actions">
-                <button type="button" class="btn-select-media">Select Image</button>
-                <button type="button" class="btn-clear-media" style={settings.bonus_media_id ? "" : "display:none;"}>Clear</button>
-              </div>
-            </div>
+            <MediaPickerControl
+              field="bonus_media_id"
+              name="bonus_media_id"
+              value={settings.bonus_media_id}
+              previewUrl={getMediaUrl(settings.bonus_media_id)}
+            />
           </div>
         </div>
 
@@ -628,7 +631,7 @@ function getMediaUrl(id: number | null) {
 
   </div>
 
-  <!-- MEDIA PICKER MODAL (HIDDEN BY DEFAULT) -->
+  <!-- MEDIA PICKER MODAL -->
   <div class="admin-modal" id="media-picker-modal">
     <div class="modal-content">
       <header class="modal-header">
@@ -643,7 +646,7 @@ function getMediaUrl(id: number | null) {
           {mediaList.map((m) => (
             <div class="modal-media-item" data-id={m.id} data-url={`${baseMediaUrl}/${m.r2_key}`} data-name={m.file_name} data-media-type={m.content_type.startsWith("video/") ? "video" : "image"}>
               {m.content_type.startsWith("video/") ? (
-                <div class="video-placeholder-preview" style="aspect-ratio: 4/3; background: #111; display: grid; place-items: center; position: relative; width: 100%; height: 100%; min-height: 80px;">
+                <div class="video-placeholder-preview">
                   <span style="font-size: 1.5rem;">📹</span>
                 </div>
               ) : (
@@ -658,7 +661,7 @@ function getMediaUrl(id: number | null) {
     </div>
   </div>
 
-  <!-- TOUR EDITOR MODAL (HIDDEN BY DEFAULT) -->
+  <!-- TOUR EDITOR MODAL -->
   <div class="admin-modal" id="tour-editor-modal">
     <div class="modal-content modal-lg">
       <header class="modal-header">
@@ -731,7 +734,7 @@ function getMediaUrl(id: number | null) {
             <label for="tour-active">Active (Visible on landing page)</label>
           </div>
 
-          <div class="modal-footer-buttons" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <div class="modal-footer-buttons">
             <button type="button" class="btn-secondary" id="btn-cancel-tour">Cancel</button>
             <button type="submit" class="btn-submit" id="btn-save-tour" style="margin: 0;">Save Tour Date</button>
           </div>
@@ -740,7 +743,7 @@ function getMediaUrl(id: number | null) {
     </div>
   </div>
 
-  <!-- MUSIC EDITOR MODAL (HIDDEN BY DEFAULT) -->
+  <!-- MUSIC EDITOR MODAL -->
   <div class="admin-modal" id="music-editor-modal">
     <div class="modal-content">
       <header class="modal-header">
@@ -763,15 +766,13 @@ function getMediaUrl(id: number | null) {
 
           <div class="form-group">
             <label>Logo Icon</label>
-            <div class="media-picker-control" data-field="music-logo-picker" id="music-logo-control">
-              <input type="hidden" name="logo_media_id" id="music-logo-id" required />
-              <div class="picker-preview select-sm" id="music-logo-preview">
-                <span class="no-img">No Image</span>
-              </div>
-              <div class="picker-actions">
-                <button type="button" class="btn-select-media btn-xs">Select</button>
-              </div>
-            </div>
+            <MediaPickerControl
+              field="music-logo-picker"
+              name="logo_media_id"
+              idPrefix="music-logo"
+              selectButtonText="Select"
+              small={true}
+            />
           </div>
 
           <div class="form-group row-group">
@@ -779,7 +780,7 @@ function getMediaUrl(id: number | null) {
             <label for="music-active">Active (Visible on music page)</label>
           </div>
 
-          <div class="modal-footer-buttons" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <div class="modal-footer-buttons">
             <button type="button" class="btn-secondary" id="btn-cancel-music">Cancel</button>
             <button type="submit" class="btn-submit" id="btn-save-music" style="margin: 0;">Save</button>
           </div>
@@ -788,7 +789,7 @@ function getMediaUrl(id: number | null) {
     </div>
   </div>
 
-  <!-- ALBUM EDITOR MODAL (HIDDEN BY DEFAULT) -->
+  <!-- ALBUM EDITOR MODAL -->
   <div class="admin-modal" id="album-editor-modal">
     <div class="modal-content modal-lg">
       <header class="modal-header">
@@ -812,15 +813,13 @@ function getMediaUrl(id: number | null) {
 
             <div class="form-group">
               <label>Cover Image</label>
-              <div class="media-picker-control" data-field="album-cover-picker" id="album-cover-control">
-                <input type="hidden" name="image_media_id" id="album-image-id" required />
-                <div class="picker-preview select-sm" id="album-image-preview">
-                  <span class="no-img">No Image</span>
-                </div>
-                <div class="picker-actions">
-                  <button type="button" class="btn-select-media btn-xs">Select</button>
-                </div>
-              </div>
+              <MediaPickerControl
+                field="album-cover-picker"
+                name="image_media_id"
+                idPrefix="album-image"
+                selectButtonText="Select"
+                small={true}
+              />
             </div>
           </div>
 
@@ -829,19 +828,19 @@ function getMediaUrl(id: number | null) {
             <label for="album-single">Single album (if not checked it is an album)</label>
           </div>
 
-          <div class="album-platform-links-section" style="margin-top: 12px; padding: 12px; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--line); border-radius: 4px; display: flex; flex-direction: column; gap: 8px; width: 100%;">
-            <h4 style="margin: 0; font-size: 0.9rem; color: var(--ice-white);">Platform Custom Links</h4>
-            <div class="album-links-list" id="modal-album-links-list" style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+          <div class="album-platform-links-section">
+            <h4>Platform Custom Links</h4>
+            <div class="album-links-list" id="modal-album-links-list">
               {musicLinks.map((platform) => (
-                <div class="album-platform-link-row" data-platform-id={platform.id} style="display: flex; align-items: center; gap: 8px;">
-                  <span style="min-width: 120px; font-size: 0.85rem; color: var(--text-muted);">{platform.name}</span>
-                  <input type="url" class="album-platform-url" placeholder="https://... (leave blank to omit)" style="flex: 1; padding: 6px 12px; font-size: 0.85rem; background: var(--night-pitch); border: 1px solid var(--line); color: var(--ice-white); border-radius: 4px;" />
+                <div class="album-platform-link-row" data-platform-id={platform.id}>
+                  <span class="platform-row-name">{platform.name}</span>
+                  <input type="url" class="album-platform-url" placeholder="https://... (leave blank to omit)" />
                 </div>
               ))}
             </div>
           </div>
 
-          <div class="modal-footer-buttons" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <div class="modal-footer-buttons">
             <button type="button" class="btn-secondary" id="btn-cancel-album">Cancel</button>
             <button type="submit" class="btn-submit" id="btn-save-album" style="margin: 0;">Save</button>
           </div>
@@ -850,7 +849,7 @@ function getMediaUrl(id: number | null) {
     </div>
   </div>
 
-  <!-- VIDEO EDITOR MODAL (HIDDEN BY DEFAULT) -->
+  <!-- VIDEO EDITOR MODAL -->
   <div class="admin-modal" id="video-editor-modal">
     <div class="modal-content modal-lg">
       <header class="modal-header">
@@ -869,29 +868,26 @@ function getMediaUrl(id: number | null) {
 
             <div class="form-group">
               <label>Thumbnail Cover</label>
-              <div class="media-picker-control" data-media-type="image" data-field="video-thumb-picker" id="video-thumb-control">
-                <input type="hidden" name="thumbnail_media_id" id="video-thumbnail-id" />
-                <div class="picker-preview select-sm" id="video-thumbnail-preview">
-                  <span class="no-img">No Image</span>
-                </div>
-                <div class="picker-actions">
-                  <button type="button" class="btn-select-media btn-xs">Select</button>
-                </div>
-              </div>
+              <MediaPickerControl
+                field="video-thumb-picker"
+                name="thumbnail_media_id"
+                idPrefix="video-thumbnail"
+                mediaType="image"
+                selectButtonText="Select"
+                small={true}
+              />
             </div>
           </div>
 
           <div class="form-group">
             <label>Choose Video File (Cloudflare)</label>
-            <div class="media-picker-control" data-media-type="video" data-field="video-asset-picker" id="video-asset-control">
-              <input type="hidden" name="url_en" id="video-asset-url" required />
-              <div class="picker-preview select-sm" id="video-asset-preview" style="width: 100%; height: 45px; display: flex; align-items: center; justify-content: center; background: var(--admin-bg);">
-                <span class="no-img">No Video Selected</span>
-              </div>
-              <div class="picker-actions">
-                <button type="button" class="btn-select-media btn-xs">Select Video</button>
-              </div>
-            </div>
+            <MediaPickerControl
+              field="video-asset-picker"
+              name="url_en"
+              idPrefix="video-asset"
+              mediaType="video"
+              selectButtonText="Select Video"
+            />
           </div>
 
           <div class="form-group row-group">
@@ -899,7 +895,7 @@ function getMediaUrl(id: number | null) {
             <label for="video-active">Active (Visible on landing page)</label>
           </div>
 
-          <div class="modal-footer-buttons" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <div class="modal-footer-buttons">
             <button type="button" class="btn-secondary" id="btn-cancel-video">Cancel</button>
             <button type="submit" class="btn-submit" id="btn-save-video" style="margin: 0;">Save</button>
           </div>
@@ -908,7 +904,7 @@ function getMediaUrl(id: number | null) {
     </div>
   </div>
 
-  <!-- SOCIAL EDITOR MODAL (HIDDEN BY DEFAULT) -->
+  <!-- SOCIAL EDITOR MODAL -->
   <div class="admin-modal" id="social-editor-modal">
     <div class="modal-content">
       <header class="modal-header">
@@ -931,15 +927,13 @@ function getMediaUrl(id: number | null) {
 
           <div class="form-group">
             <label>Custom Logo (R2)</label>
-            <div class="media-picker-control" data-field="social-logo-picker" id="social-logo-control">
-              <input type="hidden" name="logo_media_id" id="social-logo-id" required />
-              <div class="picker-preview select-sm" id="social-logo-preview">
-                <span class="no-img">No Image</span>
-              </div>
-              <div class="picker-actions">
-                <button type="button" class="btn-select-media btn-xs">Select</button>
-              </div>
-            </div>
+            <MediaPickerControl
+              field="social-logo-picker"
+              name="logo_media_id"
+              idPrefix="social-logo"
+              selectButtonText="Select"
+              small={true}
+            />
           </div>
 
           <div class="form-group row-group">
@@ -947,7 +941,7 @@ function getMediaUrl(id: number | null) {
             <label for="social-active">Active (Visible in footer)</label>
           </div>
 
-          <div class="modal-footer-buttons" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <div class="modal-footer-buttons">
             <button type="button" class="btn-secondary" id="btn-cancel-social">Cancel</button>
             <button type="submit" class="btn-submit" id="btn-save-social" style="margin: 0;">Save</button>
           </div>
@@ -956,7 +950,7 @@ function getMediaUrl(id: number | null) {
     </div>
   </div>
 
-  <!-- TICKET LINKS MODAL (HIDDEN BY DEFAULT) -->
+  <!-- TICKET LINKS MODAL -->
   <div class="admin-modal" id="ticket-links-modal">
     <div class="modal-content modal-lg">
       <header class="modal-header">
@@ -968,9 +962,7 @@ function getMediaUrl(id: number | null) {
         <form id="ticket-links-form" class="admin-form">
           <input type="hidden" id="ticket-tour-id" />
           
-          <div class="sortable-list" id="ticket-links-container">
-            <!-- Dynamically populated -->
-          </div>
+          <div class="sortable-list" id="ticket-links-container"></div>
           
           <div class="pt-2" style="display: flex; gap: 12px;">
             <button type="button" class="btn-primary" id="btn-add-ticket-row">Add Platform Link</button>
@@ -981,7 +973,7 @@ function getMediaUrl(id: number | null) {
     </div>
   </div>
 
-  <!-- PLATFORM WARNING MODAL (HIDDEN BY DEFAULT) -->
+  <!-- PLATFORM WARNING MODAL -->
   <div class="admin-modal" id="platform-warning-modal">
     <div class="modal-content" style="max-width: 450px;">
       <header class="modal-header">
@@ -989,31 +981,26 @@ function getMediaUrl(id: number | null) {
         <button type="button" class="btn-close-modal" id="btn-close-warning-modal">&times;</button>
       </header>
       <div class="modal-body" style="padding: 1.5rem; text-align: center;">
-        <p id="platform-warning-message" style="color: var(--ice-white); margin-bottom: 1.5rem; line-height: 1.5; font-size: 0.95rem;">Can not delete the platform, there is albums using it. Delete first all the albums, then the platform</p>
+        <p id="platform-warning-message" style="color: var(--ice-white); margin-bottom: 1.5rem; line-height: 1.5; font-size: 0.95rem;">Cannot delete the platform, there are albums using it. Remove it from all albums first.</p>
         <button type="button" class="btn-primary" id="btn-close-warning-modal-ok">OK</button>
       </div>
     </div>
   </div>
 
-  <!-- Embedded data for client-side forms -->
+  <!-- Embedded JSON data for client-side forms -->
   <script id="music-platforms-data" type="application/json" is:inline set:html={JSON.stringify(musicLinks)}></script>
   <script id="albums-data" type="application/json" is:inline set:html={JSON.stringify(allAlbums)}></script>
   <script id="videos-data" type="application/json" is:inline set:html={JSON.stringify(videos)}></script>
   <script id="socials-data" type="application/json" is:inline set:html={JSON.stringify(socials)}></script>
-
 </AdminLayout>
 
-
-
 <script src="./content.client.ts"></script>
-
 
 <style>
   .content-header {
     margin-bottom: 28px;
   }
 
-  /* Tabs Navigation styling */
   .tab-buttons {
     display: flex;
     flex-wrap: wrap;
@@ -1044,7 +1031,6 @@ function getMediaUrl(id: number | null) {
     border-color: #7d5b2f;
   }
 
-  /* Tab panes styling */
   .tab-pane {
     display: none;
   }
@@ -1066,7 +1052,6 @@ function getMediaUrl(id: number | null) {
     font-size: 1.25rem;
   }
 
-  /* Form & card styling */
   .card-form {
     padding: 32px;
     border: 1px solid var(--admin-line);
@@ -1123,7 +1108,6 @@ function getMediaUrl(id: number | null) {
     resize: vertical;
   }
 
-  /* Toggle Switch Styles */
   .switch-container {
     display: flex;
     align-items: center;
@@ -1177,7 +1161,6 @@ function getMediaUrl(id: number | null) {
     transition: color 0.2s ease;
   }
 
-  /* Checked state transitions */
   .switch-toggle-label input:checked + .switch-layout .switch-slider-track {
     background-color: #7d5b2f;
   }
@@ -1259,6 +1242,21 @@ function getMediaUrl(id: number | null) {
     opacity: 0.9;
   }
 
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--admin-line);
+    color: var(--admin-text);
+    font-weight: 700;
+    font-size: 0.85rem;
+    min-height: 36px;
+    padding: 0 16px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
   .badge {
     display: inline-block;
     padding: 4px 8px;
@@ -1284,90 +1282,103 @@ function getMediaUrl(id: number | null) {
     margin-top: 2px;
   }
 
-  /* Media Picker Styling */
-  .media-picker-control {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+  .truncate-cell {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .thumb-preview-box {
+    width: 40px;
+    height: 40px;
     border: 1px solid var(--admin-line);
     background: var(--admin-bg);
-    padding: 10px;
-  }
-
-  .picker-preview {
-    width: 80px;
-    height: 60px;
-    background: #fff;
-    border: 1px solid var(--admin-line);
-    display: grid;
-    place-items: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
+    border-radius: 4px;
   }
 
-  .picker-preview img {
-    width: 100%;
-    height: 100%;
+  .contain-img {
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
   }
 
-  .picker-preview.select-sm {
-    width: 60px;
-    height: 45px;
-  }
-
-  :global(#ticket-links-modal .picker-preview) {
-    background: #101010 !important;
-    border: 1px solid var(--admin-line) !important;
-    width: 60px;
-    height: 45px;
-    display: grid;
-    place-items: center;
-    overflow: hidden;
-  }
-
-  :global(#ticket-links-modal .picker-preview img) {
-    width: 40px !important;
-    height: 25px !important;
-    object-fit: contain !important;
-    background: transparent !important;
-  }
-
-  .no-img {
-    font-size: 0.7rem;
+  .table-link {
+    text-decoration: underline;
     color: var(--admin-muted);
-    text-align: center;
-    padding: 4px;
   }
 
-  .picker-actions {
+  .date-tag {
+    font-size: 0.9rem;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--admin-line);
+  }
+
+  .album-links-col {
+    font-size: 0.85rem;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
   }
 
-  .btn-select-media {
-    background: var(--admin-text);
-    color: #fff;
-    border: none;
-    font-size: 0.8rem;
-    font-weight: 700;
+  .album-platform-links-section {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--admin-line);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .album-platform-links-section h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--admin-text);
+  }
+
+  .album-links-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .album-platform-link-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .platform-row-name {
+    min-width: 120px;
+    font-size: 0.85rem;
+    color: var(--admin-muted);
+  }
+
+  .album-platform-url {
+    flex: 1;
     padding: 6px 12px;
-    cursor: pointer;
+    font-size: 0.85rem;
+    background: #fff;
+    border: 1px solid var(--admin-line);
+    color: var(--admin-text);
+    border-radius: 4px;
   }
 
-  .btn-clear-media {
-    background: transparent;
-    color: #e55353;
-    border: 1px solid rgba(229,83,83,0.3);
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 4px 8px;
-    cursor: pointer;
-  }
-
-  .btn-xs {
-    padding: 4px 8px;
-    font-size: 0.75rem;
+  .modal-footer-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
   }
 
   /* Sortable Lists styling */
@@ -1377,7 +1388,7 @@ function getMediaUrl(id: number | null) {
     margin-bottom: 24px;
   }
 
-  .sortable-row {
+  :global(.sortable-row) {
     display: flex;
     align-items: center;
     gap: 18px;
@@ -1386,7 +1397,7 @@ function getMediaUrl(id: number | null) {
     background: var(--admin-bg);
   }
 
-  .drag-handle {
+  :global(.drag-handle) {
     cursor: move;
     font-weight: 800;
     color: var(--admin-muted);
@@ -1394,12 +1405,12 @@ function getMediaUrl(id: number | null) {
     user-select: none;
   }
 
-  .sortable-row .form-group {
+  :global(.sortable-row .form-group) {
     flex: 1;
     margin-bottom: 0;
   }
 
-  .remove-btn {
+  :global(.remove-btn) {
     border: 1px solid rgba(229,83,83,0.4);
     background: transparent;
     color: #e55353;
@@ -1411,32 +1422,17 @@ function getMediaUrl(id: number | null) {
     margin-top: 14px;
   }
 
-  .remove-btn:hover {
+  :global(.remove-btn:hover) {
     background: #e55353;
     color: #fff;
   }
 
-  .empty-list-msg {
+  :global(.empty-list-msg) {
     text-align: center;
     padding: 32px;
     color: var(--admin-muted);
     border: 1px dashed var(--admin-line);
     background: #fff;
-  }
-
-  /* Video row custom details */
-  .video-row {
-    align-items: flex-start;
-  }
-
-  .video-row .remove-btn {
-    margin-top: 24px;
-  }
-
-  .video-grid-inputs {
-    flex: 1;
-    display: grid;
-    gap: 8px;
   }
 
   .pt-2 {
@@ -1508,7 +1504,6 @@ function getMediaUrl(id: number | null) {
     flex: 1;
   }
 
-  /* Modal Media Grid */
   .media-search-bar {
     margin-bottom: 14px;
   }
@@ -1548,6 +1543,17 @@ function getMediaUrl(id: number | null) {
     background: #fff;
   }
 
+  .video-placeholder-preview {
+    aspect-ratio: 4/3;
+    background: #111;
+    display: grid;
+    place-items: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 80px;
+  }
+
   .modal-item-name {
     font-size: 0.72rem;
     padding: 6px;
@@ -1558,25 +1564,24 @@ function getMediaUrl(id: number | null) {
     color: var(--admin-text);
   }
 
-  /* Responsive styling */
   @media (max-width: 760px) {
     .card-form {
       padding: 16px;
     }
     
-    .sortable-row {
+    :global(.sortable-row) {
       flex-direction: column;
       align-items: stretch;
       gap: 12px;
     }
 
-    .remove-btn,
-    .checkbox-cell {
+    :global(.remove-btn),
+    :global(.checkbox-cell) {
       margin-top: 0;
       align-self: flex-start;
     }
 
-    .drag-handle {
+    :global(.drag-handle) {
       align-self: center;
     }
   }

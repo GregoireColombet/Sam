@@ -7,7 +7,7 @@ type Props = {
 
 const { title } = Astro.props;
 const env = Astro.locals.runtime?.env;
-const admin = Astro.locals.admin || await getAdminContext(env, Astro.request);
+const admin = Astro.locals.admin || (await getAdminContext(env, Astro.request));
 
 if (!admin) {
   return Astro.redirect("/sam-admin/login");
@@ -33,7 +33,7 @@ if (!admin) {
           {admin.role === "owner" && <a href="/sam-admin/activity">Activity</a>}
         </nav>
       </div>
-      
+
       <div class="admin-user-sec">
         <div class="user-info">
           <span class="user-email">{admin.email}</span>
@@ -49,55 +49,11 @@ if (!admin) {
       <slot />
     </main>
 
-    <script>
-      let activeFetchCount = 0;
-      const originalFetch = window.fetch;
-      
-      window.fetch = async function (...args) {
-        activeFetchCount++;
-        document.body.classList.add("admin-body-loading");
-
-        const activeElement = document.activeElement as HTMLElement | null;
-        const isActionButton = activeElement && (
-          activeElement.tagName === 'BUTTON' || 
-          (activeElement.tagName === 'INPUT' && (activeElement as HTMLInputElement).type === 'submit')
-        );
-
-        if (isActionButton && activeElement && !activeElement.hasAttribute('data-no-disable')) {
-          activeElement.setAttribute('disabled', 'true');
-          activeElement.classList.add('btn-loading');
-          
-          if (!activeElement.hasAttribute('data-original-content')) {
-            activeElement.setAttribute('data-original-content', activeElement.innerHTML);
-          }
-          
-          // Prepend a spinner to the button content
-          activeElement.innerHTML = `<span class="spinner"></span> ` + activeElement.innerHTML;
-        }
-
-        try {
-          return await originalFetch(...args);
-        } finally {
-          activeFetchCount--;
-          if (activeFetchCount <= 0) {
-            document.body.classList.remove("admin-body-loading");
-          }
-          if (isActionButton && activeElement) {
-            activeElement.removeAttribute('disabled');
-            activeElement.classList.remove('btn-loading');
-            const originalContent = activeElement.getAttribute('data-original-content');
-            if (originalContent) {
-              activeElement.innerHTML = originalContent;
-            }
-          }
-        }
-      };
-    </script>
+    <script src="./admin-layout.client.ts"></script>
   </body>
 </html>
 
 <style is:global>
-  /* Global loading styles and cursor */
   .admin-body-loading,
   .admin-body-loading * {
     cursor: wait !important;
@@ -128,7 +84,9 @@ if (!admin) {
   }
 
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   :root {
@@ -206,7 +164,9 @@ if (!admin) {
     font-size: 0.85rem;
     font-weight: 700;
     cursor: pointer;
-    transition: border-color 180ms ease, color 180ms ease;
+    transition:
+      border-color 180ms ease,
+      color 180ms ease;
   }
 
   .logout-btn:hover {

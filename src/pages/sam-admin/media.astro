@@ -13,9 +13,7 @@ let error = "";
 
 if (db) {
   try {
-    const result = await db.prepare(
-      `select * from media_assets order by created_at desc`
-    ).all();
+    const result = await db.prepare(`select * from media_assets order by created_at desc`).all();
     mediaList = result.results || [];
   } catch (e: any) {
     error = e.message;
@@ -103,203 +101,9 @@ const videos = mediaList.filter((asset) => asset.content_type.startsWith("video/
       </div>
     </div>
   </div>
+
+  <script src="./media.client.ts"></script>
 </AdminLayout>
-
-<script>
-  import { formatBytes } from "@/lib/utils";
-
-  const fileInput = document.getElementById("media-file-input") as HTMLInputElement;
-  const tabBtns = document.querySelectorAll(".tab-btn");
-  const tabPanes = document.querySelectorAll(".tab-pane");
-
-  // Tab switching logic
-  tabBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const target = btn.getAttribute("data-tab");
-      if (!target) return;
-
-      tabBtns.forEach((b) => b.classList.remove("active"));
-      tabPanes.forEach((p) => p.classList.remove("active"));
-
-      btn.classList.add("active");
-      document.getElementById(`tab-${target}`)?.classList.add("active");
-
-      // Dynamically adjust accept attribute
-      if (target === "pictures") {
-        fileInput.setAttribute("accept", "image/png, image/jpeg, image/webp");
-      } else {
-        fileInput.setAttribute("accept", "video/mp4, video/webm, video/ogg, video/quicktime");
-      }
-    });
-  });
-
-
-  // Handle upload
-  async function uploadFile(file: File) {
-    if (!file) return;
-    
-    // Show loading indicator
-    const btn = document.querySelector(".upload-btn") as HTMLElement;
-    const originalText = btn.textContent;
-    btn.textContent = "Uploading...";
-    btn.style.opacity = "0.7";
-    btn.style.pointerEvents = "none";
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("alt", file.name.split(".")[0]);
-
-    try {
-      const response = await fetch("/sam-admin/api/media/upload", {
-        method: "POST",
-        body: formData
-      });
-
-      if (!response.ok) {
-        const err = await response.json() as any;
-        throw new Error(err.error || "Upload failed");
-      }
-
-      const data = await response.json() as any;
-      const isVideo = file.type.startsWith("video/");
-      
-      const targetGridId = isVideo ? "videos-grid" : "pictures-grid";
-      const targetEmptyMsgId = isVideo ? "empty-videos-msg" : "empty-pictures-msg";
-      
-      const grid = document.getElementById(targetGridId);
-      const emptyMsg = document.getElementById(targetEmptyMsgId);
-      if (emptyMsg) emptyMsg.remove();
-
-      // Prepend to grid
-      const card = document.createElement("div");
-      card.className = "media-card";
-      card.setAttribute("data-asset-id", data.id);
-      
-      const previewHtml = isVideo
-        ? `<video src="${data.url}" muted preload="metadata" controls style="max-width: 100%; max-height: 100%; object-fit: contain;"></video>`
-        : `<img src="${data.url}" alt="${file.name}" />`;
-
-      card.innerHTML = `
-        <div class="media-preview">
-          ${previewHtml}
-        </div>
-        <div class="media-details">
-          <strong class="media-name" title="${file.name}">${file.name}</strong>
-          <span class="media-meta">${formatBytes(file.size)} · ${file.type.split("/")[1].toUpperCase()}</span>
-          <input type="text" class="media-url-input" readonly value="${data.url}" title="Click to copy URL" />
-          <button class="delete-btn" data-id="${data.id}">Delete</button>
-        </div>
-      `;
-
-      // Copy url action for new card
-      const input = card.querySelector(".media-url-input") as HTMLInputElement;
-      input.addEventListener("click", () => {
-        input.select();
-        navigator.clipboard.writeText(input.value);
-        alert("URL copied to clipboard!");
-      });
-
-      // Delete action for new card
-      card.querySelector(".delete-btn")?.addEventListener("click", () => handleDelete(data.id, file.name, isVideo));
-
-      if (grid) {
-        grid.insertBefore(card, grid.firstChild);
-      }
-    } catch (e: any) {
-      alert("Error: " + e.message);
-    } finally {
-      btn.textContent = originalText;
-      btn.style.opacity = "";
-      btn.style.pointerEvents = "";
-      if (fileInput) fileInput.value = "";
-    }
-  }
-
-  // Handle delete
-  async function handleDelete(id: number, name: string, isVideo: boolean) {
-    if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
-
-    try {
-      const response = await fetch("/sam-admin/api/media/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id })
-      });
-
-      if (!response.ok) {
-        const err = await response.json() as any;
-        throw new Error(err.error || "Delete failed");
-      }
-
-      // Remove from UI
-      const card = document.querySelector(`[data-asset-id="${id}"]`);
-      card?.remove();
-      
-      const gridId = isVideo ? "videos-grid" : "pictures-grid";
-      const emptyMsgId = isVideo ? "empty-videos-msg" : "empty-pictures-msg";
-      const grid = document.getElementById(gridId);
-      
-      if (grid?.children.length === 0) {
-        const msg = document.createElement("div");
-        msg.className = "empty-media";
-        msg.id = emptyMsgId;
-        msg.textContent = isVideo ? "No videos uploaded yet." : "No pictures uploaded yet.";
-        grid.appendChild(msg);
-      }
-    } catch (e: any) {
-      alert("Error: " + e.message);
-    }
-  }
-
-  // Setup event listeners
-  fileInput?.addEventListener("change", () => {
-    const files = fileInput.files;
-    if (files && files.length > 0) {
-      uploadFile(files[0]);
-    }
-  });
-
-  document.querySelectorAll(".delete-btn").forEach((btn) => {
-    const id = Number(btn.getAttribute("data-id"));
-    const name = btn.closest(".media-card")?.querySelector(".media-name")?.textContent || "this asset";
-    const isVideo = btn.closest(".media-card")?.querySelector("video") !== null;
-    btn.addEventListener("click", () => handleDelete(id, name, isVideo));
-  });
-
-  // Setup Copy to Clipboard for server-rendered assets
-  document.querySelectorAll(".media-url-input").forEach((input: any) => {
-    input.addEventListener("click", () => {
-      input.select();
-      navigator.clipboard.writeText(input.value);
-      alert("URL copied to clipboard!");
-    });
-  });
-
-  // Drag and drop events for both zones
-  document.querySelectorAll(".drop-zone").forEach((dropZone) => {
-    ["dragenter", "dragover"].forEach((eventName) => {
-      dropZone.addEventListener(eventName, (e) => {
-        e.preventDefault();
-        dropZone.classList.add("highlight");
-      }, false);
-    });
-
-    ["dragleave", "drop"].forEach((eventName) => {
-      dropZone.addEventListener(eventName, (e) => {
-        e.preventDefault();
-        dropZone.classList.remove("highlight");
-      }, false);
-    });
-
-    dropZone.addEventListener("drop", ((e: DragEvent) => {
-      const dt = e.dataTransfer;
-      const files = dt?.files;
-      if (files && files.length > 0) {
-        uploadFile(files[0]);
-      }
-    }) as EventListener);
-  });
-</script>
 
 <style is:global>
   .media-header {
@@ -336,7 +140,6 @@ const videos = mediaList.filter((asset) => asset.content_type.startsWith("video/
     margin-bottom: 24px;
   }
 
-  /* Tabs Styling */
   .tab-buttons {
     display: flex;
     gap: 8px;
@@ -382,7 +185,9 @@ const videos = mediaList.filter((asset) => asset.content_type.startsWith("video/
     color: var(--admin-muted);
     font-weight: 500;
     margin-bottom: 32px;
-    transition: border-color 180ms ease, background-color 180ms ease;
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease;
   }
 
   .drop-zone.highlight {
@@ -473,7 +278,9 @@ const videos = mediaList.filter((asset) => asset.content_type.startsWith("video/
     font-weight: 700;
     cursor: pointer;
     margin-top: 4px;
-    transition: background 180ms ease, color 180ms ease;
+    transition:
+      background 180ms ease,
+      color 180ms ease;
   }
 
   .delete-btn:hover {

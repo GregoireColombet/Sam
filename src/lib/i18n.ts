@@ -72,7 +72,7 @@ export const labels: Record<Locale, Labels> = {
     ticketLinks: "Ticketing platforms",
     choosePlatform: "Choose a platform",
     backHome: "Back home",
-    video: " Moments",
+    video: "Moments",
     single: "Music single"
   },
   "zh-TW": {

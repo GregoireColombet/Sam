@@ -1,0 +1,125 @@
+---
+type Props = {
+  field: string;
+  name: string;
+  value?: number | string | null;
+  previewUrl?: string | null;
+  mediaType?: "image" | "video";
+  idPrefix?: string;
+  selectButtonText?: string;
+  small?: boolean;
+};
+
+const {
+  field,
+  name,
+  value = "",
+  previewUrl = "",
+  mediaType = "image",
+  idPrefix = field,
+  selectButtonText = "Select Image",
+  small = false
+} = Astro.props;
+---
+
+<div class="media-picker-control" data-field={field} data-media-type={mediaType} id={`${idPrefix}-control`}>
+  <input type="hidden" name={name} id={`${idPrefix}-id`} value={value || ""} />
+  <div class:list={["picker-preview", { "select-sm": small }]} id={`${idPrefix}-preview`}>
+    {previewUrl ? (
+      mediaType === "video" ? (
+        <span class="video-chosen">{String(previewUrl).split("/").pop()}</span>
+      ) : (
+        <img src={previewUrl} alt="Selected Media" />
+      )
+    ) : (
+      <span class="no-img">{mediaType === "video" ? "No Video Selected" : "No Image Selected"}</span>
+    )}
+  </div>
+  <div class="picker-actions">
+    <button type="button" class:list={["btn-select-media", { "btn-xs": small }]}>{selectButtonText}</button>
+    <button
+      type="button"
+      class:list={["btn-clear-media", { "btn-xs": small }]}
+      style={value || previewUrl ? "" : "display:none;"}
+    >
+      Clear
+    </button>
+  </div>
+</div>
+
+<style>
+  .media-picker-control {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid var(--admin-line);
+    background: var(--admin-bg);
+    padding: 10px;
+  }
+
+  .picker-preview {
+    width: 80px;
+    height: 60px;
+    background: #fff;
+    border: 1px solid var(--admin-line);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  .picker-preview.select-sm {
+    width: 60px;
+    height: 45px;
+  }
+
+  .picker-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .no-img {
+    font-size: 0.7rem;
+    color: var(--admin-muted);
+    text-align: center;
+    padding: 4px;
+  }
+
+  .video-chosen {
+    font-size: 0.75rem;
+    word-break: break-all;
+    padding: 4px;
+    text-align: center;
+  }
+
+  .picker-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .btn-select-media {
+    background: var(--admin-text);
+    color: #fff;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+
+  .btn-clear-media {
+    background: transparent;
+    color: #e55353;
+    border: 1px solid rgba(229, 83, 83, 0.3);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+
+  .btn-xs {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
+</style>
