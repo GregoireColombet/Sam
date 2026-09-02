@@ -239,7 +239,10 @@ const sections = [
   .album-card:focus .album-img-wrapper img {
     transform: scale(1.03) translateY(-2px);
     filter: saturate(1.2) contrast(1.1);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6), 0 0 8px rgba(130, 232, 231, 0.35);
+    box-shadow:
+      0 0 0 1px rgba(130, 232, 231, 0.45),
+      0 0 20px rgba(130, 232, 231, 0.65),
+      0 8px 18px rgba(0, 0, 0, 0.5);
     position: relative;
     z-index: 10;
   }
