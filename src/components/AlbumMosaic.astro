@@ -613,12 +613,11 @@ const t = labels[locale];
   }
 
   .album-title {
-    color: var(--ice-white);
+    color: var(--night-graphite);
     font-size: 1.05rem;
     font-weight: 700;
     line-height: 1.35;
     letter-spacing: 0.02em;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
     transition: color 220ms ease, text-shadow 220ms ease;
     word-break: break-word;
   }
@@ -630,12 +629,18 @@ const t = labels[locale];
   }
 
   .album-date {
-    color: var(--coral-red);
+    color: var(--night-graphite);
     font-size: 0.85rem;
     font-weight: 700;
     letter-spacing: 0.05em;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
     font-family: "Syncopate", sans-serif;
+    transition: color 220ms ease, text-shadow 220ms ease;
+  }
+
+  .album-card:hover .album-date,
+  .album-card:focus .album-date {
+    color: var(--coral-red);
+    text-shadow: 0 0 8px rgba(255, 116, 125, 0.4);
   }
 
   @media (max-width: 768px) {
