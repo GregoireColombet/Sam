@@ -77,7 +77,7 @@ export const labels: Record<Locale, Labels> = {
   },
   "zh-TW": {
     home: "首頁",
-    music: "音樂專輯",
+    music: "專輯",
     streaming: "線上串流",
     tour: "巡演",
     merch: "周邊商品",
@@ -102,11 +102,11 @@ export const labels: Record<Locale, Labels> = {
     choosePlatform: "選擇平台",
     backHome: "回首頁",
     video: "此刻",
-    single: "音樂單曲"
+    single: "單曲"
   },
   "zh-CN": {
     home: "首页",
-    music: "音乐专辑",
+    music: "专辑",
     streaming: "线上串流",
     tour: "巡演",
     merch: "周边商品",
@@ -131,7 +131,7 @@ export const labels: Record<Locale, Labels> = {
     choosePlatform: "选择平台",
     backHome: "回首页",
     video: "此刻",
-    single: "音乐单曲"
+    single: "单曲"
   }
 };
 
