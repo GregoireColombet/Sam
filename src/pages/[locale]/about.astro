@@ -192,6 +192,7 @@ const bonusImageUrl = bonusIsActive ? bonusSettings?.imageUrl || "" : "";
     </div>
   )}
   <main class="page-main">
+    <div class="about-bg-fixed" aria-hidden="true"></div>
     <div class="about-container">
       {chapters.map((chapter) => (
         <section class:list={["about-section", chapter.reverse ? "direction-row-reverse" : "direction-row"]}>
@@ -270,16 +271,31 @@ const bonusImageUrl = bonusIsActive ? bonusSettings?.imageUrl || "" : "";
   }
 
   .page-main {
+    position: relative;
     padding-top: 120px;
-    background-image: url("/assets/backgrounds/about-bg.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    background: transparent;
     color: var(--ice-white);
   }
 
+  .about-bg-fixed {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background-image: url("/assets/backgrounds/about-bg.jpg");
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    z-index: 0;
+    pointer-events: none;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+
   .about-container {
+    position: relative;
+    z-index: 1;
     max-width: 1000px;
     margin: 0 auto;
     padding: 40px 24px 80px;
