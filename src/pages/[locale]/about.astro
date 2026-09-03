@@ -385,6 +385,12 @@ const bonusImageUrl = bonusIsActive ? bonusSettings?.imageUrl || "" : "";
     margin: 0;
     opacity: 0.9;
     text-align: justify;
+    text-justify: inter-word;
+    text-align-last: left;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    overflow-wrap: break-word;
+    text-wrap: pretty;
     color: var(--ice-white);
     white-space: pre-line;
   }
@@ -473,7 +479,7 @@ const bonusImageUrl = bonusIsActive ? bonusSettings?.imageUrl || "" : "";
     }
 
     :global(html[lang="en"]) .paragraph {
-      line-height: 1.3;
+      line-height: 1.4;
     }
   }
 
@@ -545,6 +551,13 @@ const bonusImageUrl = bonusIsActive ? bonusSettings?.imageUrl || "" : "";
     color: var(--ice-white);
     opacity: 0.9;
     margin: 0;
+    text-align: justify;
+    text-justify: inter-word;
+    text-align-last: left;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    overflow-wrap: break-word;
+    text-wrap: pretty;
     white-space: pre-line;
   }
 

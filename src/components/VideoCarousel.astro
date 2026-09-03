@@ -67,7 +67,7 @@ const t = labels[locale];
     z-index: 1;
     width: 100%;
     margin: 0 auto;
-    padding: 108px 0 48px;
+    padding: 48px 0 72px;
     background: transparent;
   }
 
@@ -323,6 +323,14 @@ const t = labels[locale];
   }
 
   @media (max-width: 760px) {
+    .videos {
+      padding: 32px 0 48px;
+    }
+
+    .videos :global(.section-title) {
+      margin-bottom: 40px;
+    }
+
     .video-strip {
       grid-auto-columns: minmax(240px, 84%);
       gap: 16px;

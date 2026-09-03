@@ -55,7 +55,7 @@ const now = Date.now();
     color: var(--ice-white);
     width: 100%;
     margin: 0 auto;
-    padding: 108px 0 128px;
+    padding: 72px 0 48px;
   }
 
   .tour-section :global(.section-title) {
@@ -134,6 +134,14 @@ const now = Date.now();
   }
 
   @media (max-width: 760px) {
+    .tour-section {
+      padding: 48px 0 32px;
+    }
+
+    .tour-section :global(.section-title) {
+      margin-bottom: 40px;
+    }
+
     .tour-item {
       grid-template-columns: 1fr;
       gap: 16px;

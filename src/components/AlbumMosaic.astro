@@ -99,7 +99,7 @@ const sections = [
     background: transparent;
     width: 100%;
     margin: 0 auto;
-    padding: 108px 0 48px;
+    padding: 48px 0 48px;
   }
 
   .album-section {
@@ -108,7 +108,7 @@ const sections = [
 
   .single-section {
     background: transparent;
-    padding-bottom: 128px;
+    padding-bottom: 48px;
   }
 
   .albums :global(.section-title) {
@@ -276,7 +276,7 @@ const sections = [
   }
 
   .album-title {
-    color: var(--night-graphite);
+    color: var(--ice-white);
     font-size: 1.05rem;
     font-weight: 700;
     line-height: 1.35;
@@ -292,7 +292,7 @@ const sections = [
   }
 
   .album-date {
-    color: var(--night-graphite);
+    color: var(--ice-white);
     font-size: 0.85rem;
     font-weight: 700;
     letter-spacing: 0.05em;
@@ -314,6 +314,18 @@ const sections = [
   }
 
   @media (max-width: 768px) {
+    .albums {
+      padding: 32px 0 32px;
+    }
+
+    .single-section {
+      padding-bottom: 32px;
+    }
+
+    .albums :global(.section-title) {
+      margin-bottom: 40px;
+    }
+
     .album-carousel-wrapper {
       gap: 6px;
     }
