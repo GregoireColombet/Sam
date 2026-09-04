@@ -63,13 +63,13 @@ const t = labels[locale];
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     overflow: hidden;
-    width: calc(100% - 30px);
+    width: calc(100% - 60px);
     max-width: var(--max);
     margin: 0px auto;
     margin-top: 108px;
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    padding: 44px 0;
     border-radius: 16px;
-    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
   }
 
   .news-content {
@@ -88,7 +88,8 @@ const t = labels[locale];
   @media (max-width: 768px) {
     .news {
       margin-top: 24px;
-      padding-top: 20px;
+      padding: 28px 0;
+      width: calc(100% - 40px);
     }
   }
 
