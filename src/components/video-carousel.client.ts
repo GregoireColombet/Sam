@@ -24,36 +24,47 @@ function getEmbedUrl(url: string): string | null {
   if (!url) return null;
 
   // YouTube
-  if (url.includes("youtube.com/watch") || url.includes("youtu.be") || url.includes("youtube.com/embed")) {
+  if (url.includes("youtube.com") || url.includes("youtu.be")) {
     let videoId = "";
-    if (url.includes("youtube.com/watch")) {
-      const match = url.match(/[?&]v=([^&#]+)/);
+    if (url.includes("youtu.be/")) {
+      const match = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
       videoId = match ? match[1] : "";
-    } else if (url.includes("youtu.be")) {
-      const parts = url.split("/");
-      videoId = parts[parts.length - 1];
-    } else if (url.includes("youtube.com/embed")) {
-      const parts = url.split("/");
-      videoId = parts[parts.length - 1].split("?")[0];
+    } else if (url.includes("youtube.com/watch")) {
+      const match = url.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+      videoId = match ? match[1] : "";
+    } else if (url.includes("youtube.com/embed/")) {
+      const match = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
+      videoId = match ? match[1] : "";
+    } else if (url.includes("youtube.com/shorts/")) {
+      const match = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/);
+      videoId = match ? match[1] : "";
     }
-    return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0` : null;
+    return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0` : null;
   }
 
   // Vimeo
   if (url.includes("vimeo.com")) {
-    const match = url.match(/vimeo\.com\/(\d+)/);
+    const match = url.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/[^\/]*\/videos\/|video\/|)(\d+)/);
     const videoId = match ? match[1] : "";
-    return videoId ? `https://player.vimeo.com/video/${videoId}?autoplay=1` : null;
+    return videoId ? `https://player.vimeo.com/video/${videoId}?autoplay=1&playsinline=1` : null;
   }
 
   // Bilibili
   if (url.includes("bilibili.com")) {
     const match = url.match(/video\/(BV[a-zA-Z0-9]+)/);
     const bvId = match ? match[1] : "";
-    return bvId ? `https://player.bilibili.com/player.html?bvid=${bvId}&autoplay=1&high_quality=1` : null;
+    return bvId ? `https://player.bilibili.com/player.html?bvid=${bvId}&autoplay=1&high_quality=1&danmaku=0` : null;
   }
 
-  return url;
+  try {
+    const parsed = new URL(url, window.location.origin);
+    if (!parsed.searchParams.has("autoplay")) {
+      parsed.searchParams.set("autoplay", "1");
+    }
+    return parsed.toString();
+  } catch {
+    return url;
+  }
 }
 
 export function openLightbox(url: string, title: string) {
@@ -65,9 +76,14 @@ export function openLightbox(url: string, title: string) {
         src="${url}" 
         controls 
         autoplay 
+        playsinline
         style="width: 100%; height: 100%; display: block; background: #000;"
       ></video>
     `;
+    const videoEl = container.querySelector("video");
+    if (videoEl) {
+      videoEl.play().catch(() => {});
+    }
   } else {
     const embedUrl = getEmbedUrl(url);
     if (!embedUrl) return;
