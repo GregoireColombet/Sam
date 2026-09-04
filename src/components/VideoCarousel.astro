@@ -154,18 +154,16 @@ const t = labels[locale];
     background: rgba(15, 20, 24, 0.85);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--line);
     border-radius: 8px;
     display: grid;
     place-items: center;
     overflow: hidden;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
-    transition: border-color 220ms ease, box-shadow 220ms ease;
+    transition: box-shadow 220ms ease;
   }
 
   .video-card:hover .video-img-wrapper {
-    border-color: var(--aqua-glow);
-    box-shadow: 0 0 16px rgba(130, 232, 231, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
   }
 
   .video-card img {
@@ -191,7 +189,7 @@ const t = labels[locale];
     position: absolute;
     z-index: 2;
     background: rgba(0, 0, 0, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: none;
     color: #fff;
     width: 52px;
     height: 52px;
@@ -201,16 +199,16 @@ const t = labels[locale];
     font-size: 1.15rem;
     padding-left: 3px;
     opacity: 0.8;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
     transition: all 220ms ease;
   }
 
   .video-card:hover .play-icon {
     opacity: 1;
     transform: scale(1.1);
-    background: var(--dark);
+    background: rgba(0, 0, 0, 0.9);
     color: var(--aqua-glow);
-    border-color: var(--aqua-glow);
-    box-shadow: 0 0 15px rgba(130, 232, 231, 0.4);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
   }
 
   .video-card strong {
