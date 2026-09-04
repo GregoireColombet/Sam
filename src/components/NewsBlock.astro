@@ -15,26 +15,33 @@ const t = labels[locale];
 
 <section class="news section">
   <div class={`container news-content ${news.background ? 'has-image' : ''}`}>
-    <div class="news-text">
+    <div class="news-text news-header">
       <p class="eyebrow">News</p>
       <h2>{title}</h2>
-      <p>{body}</p>
     </div>
+
     {news.background && (
       <div class="news-image-container">
         <img src={news.background.url} alt={news.background.alt || title} class="news-image" />
       </div>
     )}
-  </div>
-  {news.countdownAtUtc && (
-    <div class="countdown-container">
-      <div class="countdown" data-countdown={news.countdownAtUtc}>
-        <span><strong data-days>0</strong>{t.days}</span>
-        <span><strong data-hours>0</strong>{t.hours}</span>
-        <span><strong data-minutes>0</strong>{t.minutes}</span>
+
+    {body && (
+      <div class="news-body">
+        <p>{body}</p>
       </div>
-    </div>
-  )}
+    )}
+
+    {news.countdownAtUtc && (
+      <div class="countdown-container">
+        <div class="countdown" data-countdown={news.countdownAtUtc}>
+          <span><strong data-days>0</strong>{t.days}</span>
+          <span><strong data-hours>0</strong>{t.hours}</span>
+          <span><strong data-minutes>0</strong>{t.minutes}</span>
+        </div>
+      </div>
+    )}
+  </div>
 </section>
 
 <script>
@@ -74,26 +81,32 @@ const t = labels[locale];
 
   .news-content {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 28px;
     align-items: center;
   }
 
-  @media (min-width: 768px) {
-    .news-content.has-image {
-      grid-template-columns: 3fr 2fr;
-    }
+  .news-content.has-image {
+    grid-template-columns: 1.1fr 0.9fr;
+    grid-template-areas:
+      "header image"
+      "body   body"
+      "timer  timer";
   }
 
-  @media (max-width: 768px) {
-    .news {
-      margin-top: 24px;
-      padding: 28px 0;
-      width: calc(100% - 40px);
-    }
+  .news-content:not(.has-image) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "body"
+      "timer";
+  }
+
+  .news-header {
+    grid-area: header;
   }
 
   .news-image-container {
+    grid-area: image;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -103,10 +116,73 @@ const t = labels[locale];
   .news-image {
     width: 100%;
     height: auto;
-    max-height: 400px;
+    max-height: 380px;
     object-fit: contain;
     border-radius: 8px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .news-body {
+    grid-area: body;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .news-body p {
+    max-width: 820px;
+    margin: 0 auto;
+    color: #ffffff;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    text-align: center;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+    white-space: pre-line;
+  }
+
+  .countdown-container {
+    grid-area: timer;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .news {
+      margin-top: 24px;
+      padding: 28px 0;
+      width: calc(100% - 40px);
+    }
+
+    .news-content {
+      gap: 20px;
+    }
+
+    .news-content.has-image {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "header"
+        "body"
+        "image"
+        "timer";
+    }
+
+    .news-content:not(.has-image) {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "header"
+        "body"
+        "timer";
+    }
+
+    .news-body p {
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .news-image {
+      max-height: 280px;
+    }
   }
 
   .eyebrow {
@@ -121,28 +197,13 @@ const t = labels[locale];
   h2 {
     max-width: 780px;
     margin: 0;
-    font-size: clamp(1.8rem, 5vw, 4.5rem);
+    font-size: clamp(1.8rem, 4vw, 3.8rem);
     line-height: 1.15;
     font-weight: normal;
     letter-spacing: -0.02em;
     text-transform: uppercase;
     color: var(--ice-white);
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(130, 232, 231, 0.25);
-  }
-
-  p {
-    max-width: 680px;
-    color: #ffffff;
-    font-size: 1.05rem;
-    line-height: 1.7;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
-  }
-
-  .countdown-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 40px;
-    width: 100%;
   }
 
   .countdown {
