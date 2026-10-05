@@ -5,7 +5,7 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
 ---
 
 <section class="hero" aria-label="Sam Lee">
-  <video class="hero-video" autoplay muted loop playsinline poster="/hero-poster.jpg">
+  <video class="hero-video" autoplay muted loop playsinline webkit-playsinline poster="/hero-poster.jpg">
     <source src={videoUrl} type="video/mp4" />
   </video>
   <div class="hero-shade"></div>
@@ -26,6 +26,8 @@ const videoUrl = `${mediaBase.replace(/\/$/, "")}/hero-video.mp4`;
     background: transparent;
     line-height: 0;
     font-size: 0;
+    isolation: isolate;
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
   }
 
   .hero-video {

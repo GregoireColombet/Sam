@@ -119,8 +119,22 @@ const t = labels[locale];
     overflow-x: auto;
     padding-bottom: 20px;
     scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
     scrollbar-color: var(--aqua-glow) transparent;
+  }
+
+  .video-strip::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .video-strip::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .video-strip::-webkit-scrollbar-thumb {
+    background: rgba(130, 232, 231, 0.4);
+    border-radius: 4px;
   }
 
   .video-strip.is-single {
@@ -249,6 +263,9 @@ const t = labels[locale];
     inset: 0;
     background: rgba(0, 0, 0, 0.96);
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    touch-action: none;
+    overscroll-behavior: contain;
   }
 
   .lightbox-content {

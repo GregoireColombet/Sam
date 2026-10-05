@@ -34,12 +34,14 @@ if (bonusBtn) {
     const windowHeight = window.innerHeight;
     const scrollY = window.scrollY;
     const documentHeight = document.documentElement.scrollHeight;
-    const maxScroll = documentHeight - windowHeight;
+    const maxScroll = Math.max(0, documentHeight - windowHeight);
 
-    const isAtBottom = maxScroll <= 0 || windowHeight + scrollY >= documentHeight - 15;
+    // On iOS Safari / macOS elastic scrolling, scrollY can be negative or exceed maxScroll.
+    const clampedScrollY = Math.max(0, Math.min(scrollY, maxScroll));
+    const isAtBottom = maxScroll <= 0 || windowHeight + scrollY >= documentHeight - 20;
 
-    if (scrollY !== lastScrollY) {
-      lastScrollY = scrollY;
+    if (!isAtBottom && clampedScrollY !== lastScrollY) {
+      lastScrollY = clampedScrollY;
       if (timer) {
         clearInterval(timer);
         timer = null;
@@ -47,11 +49,12 @@ if (bonusBtn) {
       if (bonusBtn) {
         bonusBtn.style.display = "none";
       }
-      const scrollPercent = maxScroll > 0 ? (scrollY / maxScroll) * 80 : 80;
+      const scrollPercent = maxScroll > 0 ? (clampedScrollY / maxScroll) * 80 : 80;
       updateGauge(Math.max(0, Math.min(80, scrollPercent)));
     }
 
     if (isAtBottom) {
+      lastScrollY = clampedScrollY;
       if (!timer && progress < 100 && bonusModal && !bonusModal.classList.contains("open")) {
         if (progress < 80) {
           updateGauge(80);

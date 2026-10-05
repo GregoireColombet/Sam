@@ -80,8 +80,7 @@ async function uploadFile(file: File) {
     const input = card.querySelector(".media-url-input") as HTMLInputElement;
     input.addEventListener("click", () => {
       input.select();
-      navigator.clipboard.writeText(input.value);
-      alert("URL copied to clipboard!");
+      copyToClipboard(input.value);
     });
 
     card.querySelector(".delete-btn")?.addEventListener("click", () => handleDelete(data.id, file.name, isVideo));
@@ -146,13 +145,30 @@ document.querySelectorAll(".delete-btn").forEach((btn) => {
   btn.addEventListener("click", () => handleDelete(id, name, isVideo));
 });
 
+async function copyToClipboard(text: string) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      throw new Error("Clipboard API unavailable");
+    }
+  } catch {
+    const tempInput = document.createElement("input");
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+  }
+  alert("URL copied to clipboard!");
+}
+
 // Copy to clipboard for existing cards
 document.querySelectorAll(".media-url-input").forEach((input) => {
   const textInput = input as HTMLInputElement;
   textInput.addEventListener("click", () => {
     textInput.select();
-    navigator.clipboard.writeText(textInput.value);
-    alert("URL copied to clipboard!");
+    copyToClipboard(textInput.value);
   });
 });
 

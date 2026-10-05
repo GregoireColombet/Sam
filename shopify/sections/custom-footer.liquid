@@ -1,0 +1,608 @@
+{% comment %}
+  =============================================================================
+  Sam Lee Marketing Footer for Shopify (Horizon & OS 2.0 Themes)
+  Matches exact layout, styling, colors, and behavior of https://www.samleemuzik.com
+  =============================================================================
+{% endcomment %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@200..900&family=Syncopate:wght@400&family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+{%- style -%}
+  .sl-footer-{{ section.id }} {
+    position: relative;
+    z-index: 10;
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+    border-top: 1px solid {{ section.settings.border_color }};
+    background-color: {{ section.settings.bg_color }};
+    color: {{ section.settings.text_color }};
+    font-family: "Chiron GoRound TC", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sl-footer-{{ section.id }} * {
+    box-sizing: border-box;
+  }
+
+  .sl-footer-container {
+    width: min(100% - 32px, 1160px);
+    margin-inline: auto;
+  }
+
+  .sl-footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  .sl-footer-left {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .sl-footer-brand {
+    display: flex;
+    align-items: center;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .sl-footer-logo-img {
+    height: {{ section.settings.logo_height }}px;
+    width: auto;
+    max-width: 220px;
+    display: block;
+    object-fit: contain;
+    {% if section.settings.invert_logo %}
+      filter: invert(1) brightness(1.2);
+    {% endif %}
+  }
+
+  .sl-footer-logo-svg {
+    height: {{ section.settings.logo_height }}px;
+    width: auto;
+    display: block;
+  }
+
+  .sl-zoommuzik-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-left: 1px solid {{ section.settings.border_color }};
+    padding-left: 24px;
+  }
+
+  .sl-zoommuzik-logo-img {
+    height: {{ section.settings.zoommuzik_logo_height }}px;
+    width: auto;
+    max-width: 180px;
+    align-self: flex-start;
+    object-fit: contain;
+    margin-bottom: 2px;
+    {% if section.settings.invert_zoommuzik_logo %}
+      filter: invert(1) brightness(1.2);
+    {% endif %}
+  }
+
+  .sl-mention {
+    font-size: 0.8rem;
+    color: {{ section.settings.muted_text_color }};
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+  }
+
+  .sl-contact-link {
+    font-size: 0.85rem;
+    color: {{ section.settings.accent_color }};
+    transition: color 150ms ease, text-shadow 150ms ease;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    line-height: 1.2;
+    display: inline-block;
+  }
+
+  .sl-contact-link:hover {
+    color: {{ section.settings.glow_color }};
+    text-shadow: 0 0 8px rgba(130, 232, 231, 0.6);
+    text-decoration: none;
+  }
+
+  .sl-socials {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .sl-social-link {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 180ms ease;
+    border-radius: 4px;
+  }
+
+  .sl-social-link img,
+  .sl-social-link svg {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    fill: currentColor;
+    color: #FAFAFA;
+    transition: filter 200ms ease, transform 200ms ease;
+  }
+
+  .sl-social-link:hover img,
+  .sl-social-link:hover svg {
+    filter: brightness(0) saturate(100%) invert(80%) sepia(35%) saturate(735%) hue-rotate(130deg) brightness(97%) contrast(98%) drop-shadow(0 0 8px rgba(130, 232, 231, 0.8));
+    transform: scale(1.08);
+  }
+
+  /* Optional e-commerce policies bar */
+  .sl-footer-bottom {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(130, 232, 231, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.75rem;
+    color: {{ section.settings.muted_text_color }};
+  }
+
+  .sl-footer-bottom-links {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sl-footer-bottom-links a {
+    color: {{ section.settings.muted_text_color }};
+    text-decoration: none;
+    transition: color 150ms ease;
+  }
+
+  .sl-footer-bottom-links a:hover {
+    color: {{ section.settings.glow_color }};
+  }
+
+  @media (max-width: 640px) {
+    .sl-footer-inner {
+      align-items: stretch;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .sl-footer-left {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 24px;
+    }
+
+    .sl-zoommuzik-info {
+      border-left: none;
+      padding-left: 0;
+      border-top: 1px solid {{ section.settings.border_color }};
+      padding-top: 16px;
+      width: 100%;
+    }
+
+    .sl-socials {
+      justify-content: flex-start;
+    }
+
+    .sl-footer-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  }
+{%- endstyle -%}
+
+<footer class="sl-footer sl-footer-{{ section.id }}" role="contentinfo">
+  <div class="sl-footer-container">
+    <div class="sl-footer-inner">
+      <div class="sl-footer-left">
+        
+        <!-- Brand Logo (Sam Lee) -->
+        <div class="sl-footer-brand">
+          <a href="{{ routes.root_url }}" aria-label="{{ shop.name | default: 'Sam Lee' }}">
+            {%- if section.settings.logo != blank -%}
+              {{ section.settings.logo | image_url: width: 400 | image_tag: 
+                class: 'sl-footer-logo-img', 
+                alt: section.settings.logo.alt | default: 'Sam Lee', 
+                loading: 'lazy' 
+              }}
+            {%- else -%}
+              <!-- Default vector SAM LEE Logo SVG -->
+              <svg class="sl-footer-logo-svg" viewBox="0 0 1600 520" fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linecap="square" stroke-linejoin="round" aria-hidden="true">
+                <path d="M325 155 H145 Q120 155 120 180 Q120 205 145 205 H275 Q300 205 300 230 Q300 255 275 255 H120"/>
+                <path d="M405 285 L485 155 L565 285"/>
+                <path d="M650 285 V155 L735 235 L820 155 V285"/>
+                <path d="M965 155 V285 H1105"/>
+                <path d="M1195 165 H1325"/>
+                <path d="M1195 220 H1325"/>
+                <path d="M1195 275 H1325"/>
+                <path d="M1400 165 H1530"/>
+                <path d="M1400 220 H1530"/>
+                <path d="M1400 275 H1530"/>
+              </svg>
+            {%- endif -%}
+          </a>
+        </div>
+
+        <!-- Zoommuzik Info & Business Inquiries -->
+        <div class="sl-zoommuzik-info">
+          {%- if section.settings.zoommuzik_logo != blank -%}
+            {{ section.settings.zoommuzik_logo | image_url: width: 300 | image_tag: 
+              class: 'sl-zoommuzik-logo-img', 
+              alt: 'Zoommuzik', 
+              loading: 'lazy' 
+            }}
+          {%- else -%}
+            <!-- Fallback text / logo if no image uploaded -->
+            <div style="font-weight: 800; font-size: 1.1rem; letter-spacing: 0.08em; color: #FFFFFF; text-transform: uppercase;">
+              ZOOMMUZIK
+            </div>
+          {%- endif -%}
+
+          {%- if section.settings.production_text != blank -%}
+            <span class="sl-mention">{{ section.settings.production_text }}</span>
+          {%- endif -%}
+
+          {%- if section.settings.contact_email != blank -%}
+            <a class="sl-contact-link" href="mailto:{{ section.settings.contact_email }}">
+              {{ section.settings.contact_label | default: 'Contact for business inquiries' }}
+            </a>
+          {%- endif -%}
+        </div>
+
+      </div>
+
+      <!-- Social Media Links -->
+      <div class="sl-socials" aria-label="Social links">
+        {%- if section.blocks.size > 0 -%}
+          {%- for block in section.blocks -%}
+            {%- case block.type -%}
+              {%- when 'social_link' -%}
+                {%- if block.settings.url != blank -%}
+                  <a class="sl-social-link" href="{{ block.settings.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ block.settings.title }}" {{ block.shopify_attributes }}>
+                    {%- if block.settings.custom_icon != blank -%}
+                      {{ block.settings.custom_icon | image_url: width: 60 | image_tag: alt: block.settings.title, loading: 'lazy' }}
+                    {%- else -%}
+                      {%- case block.settings.icon -%}
+                        {%- when 'instagram' -%}
+                          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        {%- when 'apple_music' -%}
+                          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.63-.76 1.05-1.83.93-2.89-.91.04-2 .6-2.64 1.36-.57.66-.99 1.74-.86 2.78.99.08 2.01-.5 2.57-1.25z"/></svg>
+                        {%- when 'youtube' -%}
+                          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        {%- when 'spotify' -%}
+                          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.48.66.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                        {%- when 'facebook' -%}
+                          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        {%- when 'tiktok' -%}
+                          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+                        {%- else -%}
+                          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+                      {%- endcase -%}
+                    {%- endif -%}
+                  </a>
+                {%- endif -%}
+            {%- endcase -%}
+          {%- endfor -%}
+        {%- else -%}
+          <!-- Default Fallback Social Links matching Sam Lee Marketing Website -->
+          <a class="sl-social-link" href="https://www.instagram.com/sam.station?igsh=MWZ4am9ydHZnM3h0cw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <a class="sl-social-link" href="https://music.apple.com/tw/artist/%E6%9D%8E%E8%81%96%E5%82%91/735931601" target="_blank" rel="noopener noreferrer" aria-label="Apple Music">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.63-.76 1.05-1.83.93-2.89-.91.04-2 .6-2.64 1.36-.57.66-.99 1.74-.86 2.78.99.08 2.01-.5 2.57-1.25z"/></svg>
+          </a>
+          <a class="sl-social-link" href="https://youtube.com/@zoommuzik221?si=pk5t13l7bx7gsq9u" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+          <a class="sl-social-link" href="https://open.spotify.com/artist/7ya3wFqG9X35S7L7XSrE2i" target="_blank" rel="noopener noreferrer" aria-label="Spotify">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.48.66.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          </a>
+          <a class="sl-social-link" href="https://www.facebook.com/FaceIISamLee/?locale=zh_TW" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a class="sl-social-link" href="https://www.douyin.com/user/MS4wLjABAAAAKrhh8D2DS_xqiiUNxvbzFqtf4SttafaHNxl-1r379DP5A32VBLxUiWuAiMzbwNkn" target="_blank" rel="noopener noreferrer" aria-label="Douyin / TikTok">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+          </a>
+        {%- endif -%}
+      </div>
+
+    </div>
+
+    {%- if section.settings.show_legal_bar -%}
+      <div class="sl-footer-bottom">
+        <div class="sl-copyright">
+          &copy; {{ 'now' | date: '%Y' }} {{ shop.name | default: 'Sam Lee' }}. {{ section.settings.copyright_text | default: 'All rights reserved.' }}
+        </div>
+        {%- if section.settings.footer_menu != blank -%}
+          <ul class="sl-footer-bottom-links">
+            {%- for link in linklists[section.settings.footer_menu].links -%}
+              <li>
+                <a href="{{ link.url }}">{{ link.title }}</a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Custom Marketing Footer",
+  "tag": "section",
+  "class": "shopify-section-custom-footer",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Brand Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Sam Lee Logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "min": 14,
+      "max": 60,
+      "step": 2,
+      "default": 22,
+      "unit": "px",
+      "label": "Logo Height"
+    },
+    {
+      "type": "checkbox",
+      "id": "invert_logo",
+      "default": false,
+      "label": "Invert logo to white (useful if uploading black logo)"
+    },
+    {
+      "type": "header",
+      "content": "Zoommuzik Info"
+    },
+    {
+      "type": "image_picker",
+      "id": "zoommuzik_logo",
+      "label": "Zoommuzik Logo Image"
+    },
+    {
+      "type": "range",
+      "id": "zoommuzik_logo_height",
+      "min": 12,
+      "max": 50,
+      "step": 2,
+      "default": 18,
+      "unit": "px",
+      "label": "Zoommuzik Logo Height"
+    },
+    {
+      "type": "checkbox",
+      "id": "invert_zoommuzik_logo",
+      "default": false,
+      "label": "Invert Zoommuzik logo to white"
+    },
+    {
+      "type": "text",
+      "id": "production_text",
+      "label": "Production Text",
+      "default": "Zoommuzik production"
+    },
+    {
+      "type": "text",
+      "id": "contact_label",
+      "label": "Contact Link Text",
+      "default": "Contact for business inquiries"
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Contact Email",
+      "default": "contact@zoommuzik.com"
+    },
+    {
+      "type": "header",
+      "content": "Colors & Styling"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#151B20"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border / Line Color",
+      "default": "rgba(130, 232, 231, 0.2)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#FAFAFA"
+    },
+    {
+      "type": "color",
+      "id": "muted_text_color",
+      "label": "Muted Text Color",
+      "default": "#9CA3AF"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Link Accent Color (Coral Red)",
+      "default": "#FF747D"
+    },
+    {
+      "type": "color",
+      "id": "glow_color",
+      "label": "Hover Glow Color (Aqua Glow)",
+      "default": "#82E8E7"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 10,
+      "max": 100,
+      "step": 2,
+      "default": 36,
+      "unit": "px",
+      "label": "Padding Top"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 10,
+      "max": 100,
+      "step": 2,
+      "default": 36,
+      "unit": "px",
+      "label": "Padding Bottom"
+    },
+    {
+      "type": "header",
+      "content": "E-Commerce Legal Bar (Optional)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_legal_bar",
+      "label": "Show copyright & policy links bar",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright notice",
+      "default": "All rights reserved."
+    },
+    {
+      "type": "link_list",
+      "id": "footer_menu",
+      "label": "Policy / Footer Menu"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "social_link",
+      "name": "Social Link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Platform Name / Aria Label",
+          "default": "Instagram"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Platform URL"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Preset Icon",
+          "options": [
+            { "value": "instagram", "label": "Instagram" },
+            { "value": "apple_music", "label": "Apple Music" },
+            { "value": "youtube", "label": "YouTube" },
+            { "value": "spotify", "label": "Spotify" },
+            { "value": "facebook", "label": "Facebook" },
+            { "value": "tiktok", "label": "TikTok / Douyin" },
+            { "value": "other", "label": "Other" }
+          ],
+          "default": "instagram"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_icon",
+          "label": "Custom Icon Image (Optional override)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Marketing Footer",
+      "blocks": [
+        {
+          "type": "social_link",
+          "settings": {
+            "title": "Instagram",
+            "icon": "instagram",
+            "url": "https://www.instagram.com/sam.station?igsh=MWZ4am9ydHZnM3h0cw=="
+          }
+        },
+        {
+          "type": "social_link",
+          "settings": {
+            "title": "Apple Music",
+            "icon": "apple_music",
+            "url": "https://music.apple.com/tw/artist/%E6%9D%8E%E8%81%96%E5%82%91/735931601"
+          }
+        },
+        {
+          "type": "social_link",
+          "settings": {
+            "title": "YouTube",
+            "icon": "youtube",
+            "url": "https://youtube.com/@zoommuzik221?si=pk5t13l7bx7gsq9u"
+          }
+        },
+        {
+          "type": "social_link",
+          "settings": {
+            "title": "Spotify",
+            "icon": "spotify",
+            "url": "https://open.spotify.com/artist/7ya3wFqG9X35S7L7XSrE2i"
+          }
+        },
+        {
+          "type": "social_link",
+          "settings": {
+            "title": "Facebook",
+            "icon": "facebook",
+            "url": "https://www.facebook.com/FaceIISamLee/?locale=zh_TW"
+          }
+        },
+        {
+          "type": "social_link",
+          "settings": {
+            "title": "Douyin / TikTok",
+            "icon": "tiktok",
+            "url": "https://www.douyin.com/user/MS4wLjABAAAAKrhh8D2DS_xqiiUNxvbzFqtf4SttafaHNxl-1r379DP5A32VBLxUiWuAiMzbwNkn"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

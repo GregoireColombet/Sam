@@ -121,6 +121,11 @@ const t = labels[locale];
     place-items: center;
     width: 42px;
     height: 42px;
+    transition: filter 200ms ease;
+  }
+
+  .socials a:hover {
+    filter: drop-shadow(0 0 8px rgba(130, 232, 231, 0.8));
   }
 
   .socials img {
@@ -131,7 +136,7 @@ const t = labels[locale];
   }
 
   .socials a:hover img {
-    filter: brightness(0) saturate(100%) invert(80%) sepia(35%) saturate(735%) hue-rotate(130deg) brightness(97%) contrast(98%) drop-shadow(0 0 8px rgba(130, 232, 231, 0.8));
+    filter: brightness(0) saturate(100%) invert(80%) sepia(35%) saturate(735%) hue-rotate(130deg) brightness(97%) contrast(98%);
   }
 
   @media (max-width: 640px) {

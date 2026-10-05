@@ -279,7 +279,7 @@ export class CarouselController {
     this.viewport.addEventListener(
       "touchstart",
       (e) => {
-        this.touchStartX = e.changedTouches[0].screenX;
+        this.touchStartX = e.changedTouches[0].clientX;
       },
       { passive: true }
     );
@@ -287,7 +287,7 @@ export class CarouselController {
     this.viewport.addEventListener(
       "touchend",
       (e) => {
-        this.touchEndX = e.changedTouches[0].screenX;
+        this.touchEndX = e.changedTouches[0].clientX;
         const diff = this.touchStartX - this.touchEndX;
         if (Math.abs(diff) > 40) {
           if (diff > 0) {
@@ -296,6 +296,15 @@ export class CarouselController {
             this.prev();
           }
         }
+      },
+      { passive: true }
+    );
+
+    this.viewport.addEventListener(
+      "touchcancel",
+      () => {
+        this.touchStartX = 0;
+        this.touchEndX = 0;
       },
       { passive: true }
     );

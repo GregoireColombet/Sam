@@ -77,6 +77,7 @@ export function openLightbox(url: string, title: string) {
         controls 
         autoplay 
         playsinline
+        webkit-playsinline
         style="width: 100%; height: 100%; display: block; background: #000;"
       ></video>
     `;
